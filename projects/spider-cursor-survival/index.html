@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no"/>
+<title>Spider Cursor Survival</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#040407;--red:#c0002a;--rg:rgba(192,0,42,.42);
+  --pur:#6a00c8;--pg:rgba(106,0,200,.36);
+  --txt:#e8e0f0;--mut:#7a6e8a;--sz:clamp(24px,2.6vw,38px);
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
+  color:var(--txt);font-family:'Segoe UI',system-ui,sans-serif;
+  user-select:none;cursor:none;touch-action:none}
+#bgc,#fxc{position:fixed;inset:0;pointer-events:none}
+#bgc{z-index:0}#fxc{z-index:3}
+#stage{position:fixed;inset:0;z-index:2}
+
+/* cursor */
+#cur{position:fixed;width:18px;height:18px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.92) 0%,transparent 70%);
+  box-shadow:0 0 10px 3px rgba(255,255,255,.5),0 0 20px rgba(200,150,255,.3);
+  pointer-events:none;transform:translate(-50%,-50%);z-index:100;transition:transform .1s}
+#cur.slayer{background:radial-gradient(circle,#ff4466 0%,transparent 70%);
+  box-shadow:0 0 14px 4px rgba(255,60,80,.6),0 0 28px rgba(255,0,40,.4);
+  transform:translate(-50%,-50%) scale(1.4)}
+#cur.shielded{background:radial-gradient(circle,#7df9ff 0%,transparent 70%);
+  box-shadow:0 0 14px 5px rgba(0,220,255,.7),0 0 30px rgba(0,180,255,.4);
+  transform:translate(-50%,-50%) scale(1.35)}
+#cur.slayer.shielded{
+  box-shadow:0 0 14px 4px rgba(255,60,80,.6),0 0 28px rgba(255,0,40,.4),0 0 38px rgba(0,220,255,.5);
+  transform:translate(-50%,-50%) scale(1.5)}
+
+/* HUD */
+#hud{position:fixed;top:0;left:0;right:0;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 20px 16px;
+  background:linear-gradient(180deg,rgba(4,4,7,.97) 55%,transparent);
+  pointer-events:none}
+.hb{display:flex;flex-direction:column;align-items:center;gap:1px}
+.hl{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+.hv{font-size:clamp(1rem,2.3vw,1.6rem);font-weight:800;font-variant-numeric:tabular-nums}
+#tv{color:#fff;text-shadow:0 0 12px var(--rg)}
+#tv.danger{color:#ff3355;animation:pt .45s infinite alternate}
+@keyframes pt{to{text-shadow:0 0 24px #ff0022,0 0 40px #ff0022}}
+#lv{color:#c084fc}#sv{color:#fb923c}#scv{color:#fbbf24}
+#dbadge{font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:2px 8px;border-radius:50px;font-weight:700;margin-top:2px}
+#dbadge.easy{background:rgba(74,222,128,.15);color:#4ade80}
+#dbadge.normal{background:rgba(250,204,21,.15);color:#facc15}
+#dbadge.nightmare{background:rgba(248,113,113,.15);color:#f87171}
+
+/* Slayer HUD */
+#slayer-hud{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  z-index:12;display:flex;align-items:center;gap:8px;
+  background:rgba(255,30,60,.18);border:1.5px solid rgba(255,60,80,.5);
+  border-radius:50px;padding:8px 20px;pointer-events:none;
+  box-shadow:0 0 20px rgba(255,30,60,.3)}
+#slayer-hud.hidden{display:none!important}
+.slayer-icon{font-size:1.2rem}
+.slayer-label{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:#ff8096;font-weight:700}
+.slayer-dots{display:flex;gap:5px;margin-left:4px}
+.sdot{width:10px;height:10px;border-radius:50%;background:#ff3355;
+  box-shadow:0 0 6px #ff0022;transition:all .2s}
+.sdot.used{background:rgba(255,255,255,.12);box-shadow:none}
+
+/* Shield HUD */
+#shield-hud{position:fixed;bottom:24px;right:20px;z-index:12;
+  display:flex;align-items:center;gap:6px;
+  background:rgba(0,150,255,.15);border:1.5px solid rgba(0,200,255,.4);
+  border-radius:50px;padding:8px 16px;pointer-events:none;
+  box-shadow:0 0 16px rgba(0,150,255,.3)}
+#shield-hud.hidden{display:none!important}
+.shield-icon{font-size:1.2rem}
+.shield-label{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:#7df9ff;font-weight:700}
+
+/* progress bars */
+#pbar{position:fixed;top:0;left:0;height:3px;
+  background:linear-gradient(90deg,var(--pur),var(--red));
+  box-shadow:0 0 8px var(--rg);z-index:15;pointer-events:none}
+#burst-bar{position:fixed;top:3px;left:0;height:2px;
+  background:#ff3355;box-shadow:0 0 6px #ff0022;
+  z-index:14;pointer-events:none;width:0%;transition:width .9s linear;opacity:0}
+
+/* spiders */
+.spider{position:fixed;pointer-events:none;z-index:5;
+  font-size:var(--sz);line-height:1;transform:translate(-50%,-50%);
+  will-change:transform;filter:drop-shadow(0 0 5px rgba(192,0,42,.6))}
+.spider.angry{filter:drop-shadow(0 0 8px rgba(255,30,0,.9))}
+.spider.boss{font-size:calc(var(--sz)*1.9)!important;
+  filter:drop-shadow(0 0 12px rgba(255,0,0,.95)) drop-shadow(0 0 5px rgba(255,100,0,.7))!important}
+.spider.boss.angry{filter:drop-shadow(0 0 18px rgba(255,0,0,1)) drop-shadow(0 0 9px rgba(255,60,0,.9))!important}
+.spider.close{filter:drop-shadow(0 0 10px rgba(255,220,0,.85))!important}
+
+/* Red slayer bottle */
+#pu-bottle{position:fixed;z-index:9;transform:translate(-50%,-50%);
+  cursor:pointer;display:flex;flex-direction:column;align-items:center;
+  gap:3px;pointer-events:auto;animation:pu-float 1.4s ease-in-out infinite}
+#pu-bottle.hidden{display:none!important}
+@keyframes pu-float{0%,100%{transform:translate(-50%,-55%)}50%{transform:translate(-50%,-45%)}}
+.pu-inner{width:50px;height:50px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#ff6680,#c0002a 55%,#7a0018);
+  box-shadow:0 0 14px 4px rgba(255,30,60,.6),0 0 28px rgba(200,0,40,.5),inset 0 1px 0 rgba(255,255,255,.3);
+  display:flex;align-items:center;justify-content:center;font-size:1.6rem;
+  animation:pu-pulse 1s ease-in-out infinite alternate}
+@keyframes pu-pulse{from{box-shadow:0 0 14px 4px rgba(255,30,60,.5),0 0 28px rgba(200,0,40,.4)}
+  to{box-shadow:0 0 22px 8px rgba(255,30,60,.8),0 0 44px rgba(200,0,40,.6)}}
+.pu-label{font-size:.55rem;font-weight:800;letter-spacing:.1em;color:#ff8096;
+  text-shadow:0 0 8px rgba(255,0,40,.6);text-transform:uppercase}
+
+/* Blue shield bottle */
+#pu-shield{position:fixed;z-index:9;transform:translate(-50%,-50%);
+  cursor:pointer;display:flex;flex-direction:column;align-items:center;
+  gap:3px;pointer-events:auto;animation:pu-float 1.6s ease-in-out infinite}
+#pu-shield.hidden{display:none!important}
+.ps-inner{width:50px;height:50px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#7df9ff,#0099ff 55%,#0040cc);
+  box-shadow:0 0 14px 4px rgba(0,180,255,.6),0 0 28px rgba(0,100,255,.5),inset 0 1px 0 rgba(255,255,255,.3);
+  display:flex;align-items:center;justify-content:center;font-size:1.6rem;
+  animation:ps-pulse 1s ease-in-out infinite alternate}
+@keyframes ps-pulse{
+  from{box-shadow:0 0 14px 4px rgba(0,180,255,.5),0 0 28px rgba(0,100,255,.4)}
+  to{box-shadow:0 0 22px 8px rgba(0,180,255,.8),0 0 44px rgba(0,100,255,.6)}}
+.ps-label{font-size:.55rem;font-weight:800;letter-spacing:.1em;color:#7df9ff;
+  text-shadow:0 0 8px rgba(0,180,255,.6);text-transform:uppercase}
+
+/* web corners */
+.wc{position:fixed;width:150px;height:150px;pointer-events:none;z-index:1;opacity:.12}
+.wc.tl{top:0;left:0}.wc.tr{top:0;right:0;transform:scaleX(-1)}
+.wc.bl{bottom:0;left:0;transform:scaleY(-1)}.wc.br{bottom:0;right:0;transform:scale(-1)}
+
+/* SCREENS */
+.screen{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:13px;padding:22px;
+  background:radial-gradient(ellipse at 50% 40%,rgba(106,0,200,.15) 0%,rgba(4,4,7,.97) 65%)}
+.screen.hidden{display:none}
+.gtitle{font-size:clamp(1.5rem,4vw,2.8rem);font-weight:900;letter-spacing:.03em;text-align:center;
+  background:linear-gradient(135deg,#e040fb 0%,#ff3355 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.gsub{color:var(--mut);font-size:.8rem;letter-spacing:.07em;text-align:center;margin-top:2px}
+.sfloat{font-size:clamp(2.2rem,5.5vw,4rem);animation:fl 3s ease-in-out infinite}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+#hsd{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}
+.hsc{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  border-radius:50px;padding:4px 14px;font-size:.71rem;color:var(--mut)}
+.hsc .hv2{font-weight:700}
+.hsc.easy .hv2{color:#4ade80}.hsc.normal .hv2{color:#facc15}.hsc.nightmare .hv2{color:#f87171}
+.mnav{display:flex;flex-direction:column;gap:9px;width:100%;max-width:250px}
+.bp,.bs,.bg{width:100%;padding:12px 22px;border:none;border-radius:50px;
+  font-size:clamp(.86rem,1.7vw,1rem);font-weight:700;letter-spacing:.06em;
+  cursor:pointer;transition:transform .15s,box-shadow .15s,background .15s;font-family:inherit}
+.bp{background:linear-gradient(135deg,var(--pur),var(--red));color:#fff;
+  box-shadow:0 0 18px var(--pg),0 0 32px var(--rg)}
+.bp:hover{transform:scale(1.05);box-shadow:0 0 28px var(--pg),0 0 48px var(--rg)}
+.bs{background:rgba(255,255,255,.06);color:var(--txt);border:1px solid rgba(255,255,255,.12)}
+.bs:hover{background:rgba(255,255,255,.10);transform:scale(1.03)}
+.bg{background:transparent;color:var(--mut);border:1px solid rgba(255,255,255,.07);font-size:.83rem}
+.bg:hover{color:var(--txt);border-color:rgba(255,255,255,.2);transform:scale(1.02)}
+.bp:active,.bs:active,.bg:active{transform:scale(.97)}
+.bbk{position:absolute;top:16px;left:16px;background:none;border:none;
+  color:var(--mut);font-size:.8rem;cursor:pointer;letter-spacing:.06em;
+  transition:color .2s;font-family:inherit}
+.bbk:hover{color:var(--txt)}
+.sh{font-size:clamp(1rem,2.6vw,1.6rem);font-weight:800;
+  background:linear-gradient(135deg,#e040fb,#ff3355);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:5px}
+.slbl{font-size:.63rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin-bottom:9px}
+.dgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:420px}
+.db{padding:13px 8px;border-radius:12px;border:2px solid transparent;
+  background:rgba(255,255,255,.04);color:var(--txt);cursor:pointer;text-align:center;
+  transition:all .2s;font-family:inherit}
+.db:hover{background:rgba(255,255,255,.08)}
+.db.active.easy{border-color:#4ade80;background:rgba(74,222,128,.1)}
+.db.active.normal{border-color:#facc15;background:rgba(250,204,21,.1)}
+.db.active.nightmare{border-color:#f87171;background:rgba(248,113,113,.1)}
+.db .di{font-size:1.4rem;display:block;margin-bottom:3px}
+.db .dn{font-size:.73rem;font-weight:700;letter-spacing:.06em}
+.db.easy .dn{color:#4ade80}.db.normal .dn{color:#facc15}.db.nightmare .dn{color:#f87171}
+.db .dd{font-size:.59rem;color:var(--mut);margin-top:3px;line-height:1.4}
+.acard{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
+  border-radius:14px;padding:14px 18px;max-width:450px;width:100%}
+.acard h3{font-size:.63rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin-bottom:7px}
+.acard p,.acard li{font-size:.84rem;line-height:1.7}
+.acard ul{padding-left:15px}.acard li{margin-bottom:3px}
+
+/* level intro */
+#li-wrap{position:fixed;inset:0;z-index:18;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:6px;pointer-events:none;
+  background:rgba(4,4,7,.8);animation:liin .3s ease}
+#li-wrap.hidden{display:none}
+@keyframes liin{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:scale(1)}}
+#li-num{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mut)}
+#li-name{font-size:clamp(1.4rem,4vw,2.6rem);font-weight:900;
+  background:linear-gradient(135deg,#e040fb,#ff3355);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+#li-sub{font-size:.72rem;color:var(--mut)}
+#li-boss{font-size:.9rem;color:#ff4444;font-weight:800;letter-spacing:.06em;
+  text-shadow:0 0 10px rgba(255,0,0,.6);display:none}
+#li-cd{font-size:clamp(2.2rem,6.5vw,4.5rem);font-weight:900;color:#fff;
+  text-shadow:0 0 30px var(--pg);min-height:1.1em}
+
+/* result screens */
+.ricon{font-size:clamp(2.6rem,6.5vw,5rem);animation:fl 3s ease-in-out infinite}
+.rtitle{font-size:clamp(1.2rem,3.2vw,2rem);font-weight:900;text-align:center}
+.rtitle.lose{color:#ff3355;text-shadow:0 0 20px rgba(255,51,85,.5)}
+.rtitle.win{color:#4ade80;text-shadow:0 0 20px rgba(74,222,128,.4)}
+.rtitle.lvl{color:#c084fc;text-shadow:0 0 20px rgba(192,132,252,.4)}
+.rsub{color:var(--mut);text-align:center;font-size:.84rem}
+.srow{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}
+.sbox{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+  border-radius:11px;padding:8px 16px;text-align:center;min-width:74px}
+.sbox .sv{font-size:1.25rem;font-weight:800;color:#c084fc}
+.sbox .sl{font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.hsbadge{background:linear-gradient(135deg,#4ade80,#22d3ee);color:#000;
+  font-weight:800;font-size:.7rem;letter-spacing:.1em;padding:3px 13px;
+  border-radius:50px;animation:pop .5s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.rbtnrow{display:flex;flex-direction:column;gap:9px;width:100%;max-width:215px}
+
+/* mobile */
+#mhint{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  z-index:25;font-size:.7rem;color:var(--mut);letter-spacing:.06em;pointer-events:none}
+@media(hover:none)and(pointer:coarse){#mhint{display:block}}
+
+/* flash overlays */
+#kill-flash,#shield-flash{position:fixed;inset:0;z-index:6;pointer-events:none;transition:background .05s}
+#kill-flash{background:rgba(255,30,60,0)}
+#kill-flash.flash{background:rgba(255,30,60,.18)}
+#shield-flash{background:rgba(0,180,255,0)}
+#shield-flash.flash{background:rgba(0,180,255,.22)}
+
+/* screen shake */
+@keyframes shake{
+  0%,100%{transform:translate(0)}
+  12%{transform:translate(-10px,5px) rotate(-.5deg)}
+  25%{transform:translate(9px,-5px) rotate(.4deg)}
+  37%{transform:translate(-7px,6px) rotate(-.3deg)}
+  50%{transform:translate(5px,-3px) rotate(.2deg)}
+  62%{transform:translate(-4px,4px) rotate(-.15deg)}
+  75%{transform:translate(3px,-2px)}
+  87%{transform:translate(-1px,1px)}
+}
+body.shake{animation:shake .55s cubic-bezier(.36,.07,.19,.97) both}
+
+/* boss HP bar */
+#boss-hp{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);
+  z-index:12;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:5px}
+#boss-hp.hidden{display:none!important}
+.bhp-label{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:#ff6666;font-weight:700}
+.bhp-track{width:180px;height:9px;background:rgba(255,255,255,.1);border-radius:50px;overflow:hidden}
+.bhp-fill{height:100%;background:linear-gradient(90deg,#ff2200,#ff8800);
+  border-radius:50px;transition:width .25s ease;box-shadow:0 0 7px #ff2200}
+
+/* achievement toasts */
+#toasts{position:fixed;top:74px;right:14px;z-index:50;
+  display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{background:rgba(14,14,22,.95);border:1px solid rgba(255,255,255,.09);
+  border-left:3px solid #c084fc;border-radius:10px;
+  padding:9px 14px;min-width:190px;
+  animation:tin .4s cubic-bezier(.175,.885,.32,1.275) forwards}
+.toast.tout{animation:tout .3s ease forwards}
+@keyframes tin{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes tout{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(40px)}}
+.t-title{font-size:.72rem;font-weight:800;color:#c084fc;letter-spacing:.06em}
+.t-desc{font-size:.62rem;color:var(--mut);margin-top:2px}
+</style>
+</head>
+<body>
+
+<canvas id="bgc"></canvas>
+<canvas id="fxc"></canvas>
+<div id="pbar" style="width:0%"></div>
+<div id="burst-bar"></div>
+<div id="kill-flash"></div>
+<div id="shield-flash"></div>
+
+<svg class="wc tl" viewBox="0 0 150 150" fill="none"><path d="M0 0L150 0M0 0L0 150M0 0L75 150M0 0L150 75M0 0L150 48M0 0L48 150" stroke="white" stroke-width="1"/><path d="M28 0A28 28 0 0 1 0 28" stroke="white" stroke-width=".7" fill="none"/><path d="M65 0A65 65 0 0 1 0 65" stroke="white" stroke-width=".7" fill="none"/><path d="M110 0A110 110 0 0 1 0 110" stroke="white" stroke-width=".7" fill="none"/><path d="M145 0A145 145 0 0 1 0 145" stroke="white" stroke-width=".7" fill="none"/></svg>
+<svg class="wc tr" viewBox="0 0 150 150" fill="none"><path d="M0 0L150 0M0 0L0 150M0 0L75 150M0 0L150 75M0 0L150 48M0 0L48 150" stroke="white" stroke-width="1"/><path d="M28 0A28 28 0 0 1 0 28" stroke="white" stroke-width=".7" fill="none"/><path d="M65 0A65 65 0 0 1 0 65" stroke="white" stroke-width=".7" fill="none"/><path d="M110 0A110 110 0 0 1 0 110" stroke="white" stroke-width=".7" fill="none"/><path d="M145 0A145 145 0 0 1 0 145" stroke="white" stroke-width=".7" fill="none"/></svg>
+<svg class="wc bl" viewBox="0 0 150 150" fill="none"><path d="M0 0L150 0M0 0L0 150M0 0L75 150M0 0L150 75M0 0L150 48M0 0L48 150" stroke="white" stroke-width="1"/><path d="M28 0A28 28 0 0 1 0 28" stroke="white" stroke-width=".7" fill="none"/><path d="M65 0A65 65 0 0 1 0 65" stroke="white" stroke-width=".7" fill="none"/><path d="M110 0A110 110 0 0 1 0 110" stroke="white" stroke-width=".7" fill="none"/><path d="M145 0A145 145 0 0 1 0 145" stroke="white" stroke-width=".7" fill="none"/></svg>
+<svg class="wc br" viewBox="0 0 150 150" fill="none"><path d="M0 0L150 0M0 0L0 150M0 0L75 150M0 0L150 75M0 0L150 48M0 0L48 150" stroke="white" stroke-width="1"/><path d="M28 0A28 28 0 0 1 0 28" stroke="white" stroke-width=".7" fill="none"/><path d="M65 0A65 65 0 0 1 0 65" stroke="white" stroke-width=".7" fill="none"/><path d="M110 0A110 110 0 0 1 0 110" stroke="white" stroke-width=".7" fill="none"/><path d="M145 0A145 145 0 0 1 0 145" stroke="white" stroke-width=".7" fill="none"/></svg>
+
+<!-- HUD -->
+<div id="hud" style="display:none">
+  <div class="hb"><span class="hl">TIME</span><span class="hv" id="tv">20</span></div>
+  <div class="hb"><span class="hl">LEVEL</span><span class="hv" id="lv">1</span><span id="dbadge" class="normal">Normal</span></div>
+  <div class="hb"><span class="hl">SPIDERS</span><span class="hv" id="sv">0</span></div>
+  <div class="hb"><span class="hl">SCORE</span><span class="hv" id="scv">0</span></div>
+</div>
+
+<!-- Slayer HUD -->
+<div id="slayer-hud" class="hidden">
+  <span class="slayer-icon">🎯</span>
+  <span class="slayer-label">Spider Slayer</span>
+  <div class="slayer-dots">
+    <div class="sdot" id="dot1"></div>
+    <div class="sdot" id="dot2"></div>
+    <div class="sdot" id="dot3"></div>
+  </div>
+</div>
+
+<!-- Shield HUD -->
+<div id="shield-hud" class="hidden">
+  <span class="shield-icon">🛡️</span>
+  <span class="shield-label">SHIELD ACTIVE</span>
+</div>
+
+<!-- Boss HP -->
+<div id="boss-hp" class="hidden">
+  <div class="bhp-label">💀 BOSS SPIDER</div>
+  <div class="bhp-track"><div class="bhp-fill" id="bhp-fill" style="width:100%"></div></div>
+</div>
+
+<!-- Achievement toasts -->
+<div id="toasts"></div>
+
+<div id="stage"></div>
+<div id="cur"></div>
+
+<!-- Red slayer bottle -->
+<div id="pu-bottle" class="hidden">
+  <div class="pu-inner">💊</div>
+  <div class="pu-label">SLAYER ×3</div>
+</div>
+
+<!-- Blue shield bottle -->
+<div id="pu-shield" class="hidden">
+  <div class="ps-inner">🛡️</div>
+  <div class="ps-label">SHIELD ×1</div>
+</div>
+
+<!-- Level intro -->
+<div id="li-wrap" class="hidden">
+  <span id="li-num">LEVEL 1 OF 20</span>
+  <span id="li-name">First Steps</span>
+  <span id="li-sub"></span>
+  <span id="li-boss">💀 BOSS LEVEL</span>
+  <span id="li-cd">3</span>
+</div>
+
+<!-- MAIN MENU -->
+<div id="scr-menu" class="screen">
+  <div class="sfloat">🕷️</div>
+  <div><div class="gtitle">Spider Cursor Survival</div><div class="gsub">20 LEVELS · BOSS SPIDERS · POWER-UPS</div></div>
+  <div id="hsd">
+    <div class="hsc easy">Easy <span class="hv2" id="hs-easy">—</span></div>
+    <div class="hsc normal">Normal <span class="hv2" id="hs-normal">—</span></div>
+    <div class="hsc nightmare">Nightmare <span class="hv2" id="hs-nightmare">—</span></div>
+  </div>
+  <div class="mnav">
+    <button class="bp" id="btn-newgame">🕷️&nbsp; NEW GAME</button>
+    <button class="bs" id="btn-settings">⚙️&nbsp; SETTINGS</button>
+    <button class="bg" id="btn-about">ℹ️&nbsp; ABOUT</button>
+  </div>
+  <p style="font-size:.66rem;color:var(--mut)">Desktop mouse · Mobile touch</p>
+</div>
+
+<!-- SETTINGS -->
+<div id="scr-settings" class="screen hidden">
+  <button class="bbk" id="btn-sback">← BACK</button>
+  <div class="sfloat" style="font-size:2rem">⚙️</div>
+  <div class="sh">Settings</div>
+  <div style="width:100%;max-width:420px">
+    <div class="slbl">Difficulty</div>
+    <div class="dgrid">
+      <button class="db easy" data-d="easy"><span class="di">🕷️</span><span class="dn">EASY</span><span class="dd">Slow spiders. Great for beginners.</span></button>
+      <button class="db normal active" data-d="normal"><span class="di">🕷️🕷️</span><span class="dn">NORMAL</span><span class="dd">Fair challenge. 20 levels to beat.</span></button>
+      <button class="db nightmare" data-d="nightmare"><span class="di">🕷️🕷️🕷️</span><span class="dn">NIGHTMARE</span><span class="dd">Blazing speed. Legends only.</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div id="scr-about" class="screen hidden">
+  <button class="bbk" id="btn-aback">← BACK</button>
+  <div class="sh">About</div>
+  <div class="acard"><h3>How to Play</h3><ul>
+    <li>Move your cursor away from all spiders.</li>
+    <li>Spiders spawn from every edge &amp; corner, chasing you.</li>
+    <li>Survive the timer each level to advance. 20 levels total.</li>
+    <li>In the last 12 seconds of each level, spiders go berserk.</li>
+  </ul></div>
+  <div class="acard"><h3>💊 Red Bottle — Spider Slayer</h3><ul>
+    <li>Click to activate <strong>Slayer mode</strong> — then click to kill the nearest spider.</li>
+    <li>You get <strong>3 kills</strong> per bottle. Each kill earns bonus score.</li>
+  </ul></div>
+  <div class="acard"><h3>🛡️ Blue Bottle — Shield</h3><ul>
+    <li>Click to activate a <strong>protective shield</strong>.</li>
+    <li>The shield absorbs <strong>one spider collision</strong> — saving your life!</li>
+  </ul></div>
+  <div class="acard"><h3>💀 Boss Spiders (Levels 5, 10, 15, 20)</h3><ul>
+    <li>A giant Boss Spider appears on every 5th level.</li>
+    <li>Bosses take <strong>3 Slayer hits</strong> to kill and earn massive score.</li>
+  </ul></div>
+  <div class="acard"><h3>Controls</h3><ul>
+    <li>Desktop: Mouse movement + click</li><li>Mobile: Touch &amp; drag + tap</li>
+    <li>Enter / Space: Quick start</li>
+  </ul></div>
+</div>
+
+<!-- GAME OVER -->
+<div id="scr-gameover" class="screen hidden">
+  <div class="ricon">🕷️</div>
+  <div class="rtitle lose">Caught by a Spider!</div>
+  <p class="rsub">You fell on Level <span id="go-lv">1</span>.</p>
+  <div class="srow" id="go-stats"></div>
+  <div class="rbtnrow">
+    <button class="bp" id="btn-retry">↺ TRY AGAIN</button>
+    <button class="bg" id="btn-go-menu">⬅ MAIN MENU</button>
+  </div>
+</div>
+
+<!-- LEVEL COMPLETE -->
+<div id="scr-lvl" class="screen hidden">
+  <div class="ricon">✨</div>
+  <div class="rtitle lvl" id="lc-title">Level 1 Complete!</div>
+  <p class="rsub" id="lc-sub"></p>
+  <div class="srow" id="lc-stats"></div>
+  <div class="rbtnrow">
+    <button class="bp" id="btn-next">NEXT LEVEL →</button>
+    <button class="bg" id="btn-lc-menu">⬅ MAIN MENU</button>
+  </div>
+</div>
+
+<!-- VICTORY -->
+<div id="scr-win" class="screen hidden">
+  <div class="ricon">🏆</div>
+  <div class="rtitle win">ALL 20 LEVELS BEATEN!</div>
+  <p class="rsub">You are the ultimate spider survivor. Legendary.</p>
+  <div class="srow" id="vc-stats"></div>
+  <div id="vc-hsbadge" style="display:none" class="hsbadge">🏅 NEW HIGH SCORE!</div>
+  <div class="rbtnrow">
+    <button class="bp" id="btn-vc-play">↺ PLAY AGAIN</button>
+    <button class="bg" id="btn-vc-menu">⬅ MAIN MENU</button>
+  </div>
+</div>
+
+<div id="mhint">Touch and drag · Tap bottle to power up</div>
+
+<script>
+/* Spider Cursor Survival — v4 Enhanced
+   Score · Screen Shake · Boss Spiders · Shield · Achievements */
+
+const $=id=>document.getElementById(id);
+const bgC=$('bgc'),fxC=$('fxc');
+const bgX=bgC.getContext('2d'),fxX=fxC.getContext('2d');
+const stage=$('stage'),curEl=$('cur'),hud=$('hud');
+const timerEl=$('tv'),levelEl=$('lv'),spiderEl=$('sv'),scoreEl=$('scv');
+const pbar=$('pbar'),burstBar=$('burst-bar'),dbadge=$('dbadge');
+const liWrap=$('li-wrap'),liNum=$('li-num'),liName=$('li-name'),liSub=$('li-sub'),liCd=$('li-cd'),liBoss=$('li-boss');
+const slayerHUD=$('slayer-hud'),shieldHUD=$('shield-hud');
+const killFlash=$('kill-flash'),shieldFlash=$('shield-flash');
+const puBottle=$('pu-bottle'),puShield=$('pu-shield');
+const bossHPEl=$('boss-hp'),bhpFill=$('bhp-fill');
+const toastsEl=$('toasts');
+const dots=[1,2,3].map(i=>$('dot'+i));
+
+const LEVELS=[
+  {name:'First Steps',    tier:'Intro',    dur:18,spd:0.9, max:3, si:3.8,wb:0.00},
+  {name:'Awakening',      tier:'Intro',    dur:20,spd:1.1, max:5, si:3.4,wb:0.00},
+  {name:'Stirring',       tier:'Intro',    dur:20,spd:1.3, max:6, si:3.1,wb:0.02},
+  {name:'Crawlers',       tier:'Novice',   dur:22,spd:1.5, max:8, si:2.8,wb:0.05},
+  {name:'The Hunt Begins',tier:'Novice',   dur:22,spd:1.75,max:10,si:2.5,wb:0.08},
+  {name:'Skittering',     tier:'Novice',   dur:24,spd:2.0, max:12,si:2.2,wb:0.11},
+  {name:'Many Legs',      tier:'Skilled',  dur:24,spd:2.3, max:14,si:2.0,wb:0.15},
+  {name:'Web of Fear',    tier:'Skilled',  dur:26,spd:2.6, max:16,si:1.8,wb:0.20},
+  {name:'The Hunt',       tier:'Skilled',  dur:26,spd:2.9, max:18,si:1.6,wb:0.26},
+  {name:'Darkness Falls', tier:'Skilled',  dur:28,spd:3.2, max:20,si:1.4,wb:0.32},
+  {name:'Frenzy',         tier:'Veteran',  dur:28,spd:3.55,max:22,si:1.25,wb:0.38},
+  {name:'Swarm Rising',   tier:'Veteran',  dur:30,spd:3.9, max:24,si:1.1,wb:0.44},
+  {name:'Infestation',    tier:'Veteran',  dur:30,spd:4.25,max:26,si:0.95,wb:0.50},
+  {name:'Feeding Ground', tier:'Expert',   dur:32,spd:4.65,max:28,si:0.82,wb:0.57},
+  {name:'Overrun',        tier:'Expert',   dur:32,spd:5.1, max:30,si:0.70,wb:0.64},
+  {name:'Nightmare',      tier:'Expert',   dur:34,spd:5.6, max:32,si:0.59,wb:0.71},
+  {name:'Arachnid Hell',  tier:'Master',   dur:35,spd:6.1, max:35,si:0.50,wb:0.79},
+  {name:'The Swarm',      tier:'Master',   dur:36,spd:6.8, max:38,si:0.42,wb:0.87},
+  {name:'Final Stand',    tier:'Master',   dur:38,spd:7.6, max:42,si:0.36,wb:0.93},
+  {name:'Apocalypse',     tier:'LEGEND',   dur:40,spd:8.8, max:48,si:0.30,wb:1.00},
+];
+const BOSS_LEVELS=new Set([4,9,14,19]);
+
+const DIFF={
+  easy:     {label:'Easy',     m:.52},
+  normal:   {label:'Normal',   m:1.0},
+  nightmare:{label:'Nightmare',m:1.78},
+};
+
+let G={
+  diff:'normal',lvl:0,active:false,
+  timeLeft:0,spiders:[],parts:[],spawnT:0,
+  lastTs:0,frameId:null,timerIntv:null,
+  totalSpiders:0,maxSim:0,bottlesCollected:0,
+  score:0,totalKills:0,
+  puOnScreen:false,puX:0,puY:0,puLife:0,puSpawnCountdown:0,slayerCharges:0,
+  shieldOnScreen:false,shieldX:0,shieldY:0,shieldLife:0,shieldSpawnCountdown:0,shielded:false,
+  boss:null,bossSpawned:false,
+};
+let mX=window.innerWidth/2,mY=window.innerHeight/2;
+
+// ── High scores ──────────────────────────────────────────
+const hsKey=d=>`scs4_${d}`;
+const getHS=d=>parseInt(localStorage.getItem(hsKey(d))||localStorage.getItem(`scs3_${d}`)||'0');
+function setHS(d,lvl){if(lvl>getHS(d)){localStorage.setItem(hsKey(d),lvl);return true;}return false;}
+function refreshHS(){
+  ['easy','normal','nightmare'].forEach(d=>{
+    const v=getHS(d);$(`hs-${d}`).textContent=v?`Lv ${v}/20`:'—';
+  });
+}
+
+// ── Achievements ─────────────────────────────────────────
+const ACHV={
+  firstKill: {title:'🎯 First Blood',    desc:'Killed your first spider',    color:'#ff8096'},
+  kill10:    {title:'💀 Serial Slayer',  desc:'Killed 10 spiders total',     color:'#f87171'},
+  bossKill:  {title:'👑 Boss Slayer',    desc:'Defeated a Boss Spider',      color:'#ff8800'},
+  shieldSave:{title:'🛡️ Iron Skin',      desc:'Blocked a hit with your shield',color:'#7df9ff'},
+  lvl5:      {title:'🌟 Survivor',       desc:'Reached Level 5',             color:'#4ade80'},
+  lvl10:     {title:'⚡ Halfway There',  desc:'Reached Level 10',            color:'#facc15'},
+  lvl20:     {title:'🏆 Legend',         desc:'Defeated all 20 levels',      color:'#c084fc'},
+};
+let unlockedAchv=JSON.parse(localStorage.getItem('scs4_achv')||'{}');
+
+function unlockAchievement(key){
+  if(unlockedAchv[key])return;
+  unlockedAchv[key]=true;
+  localStorage.setItem('scs4_achv',JSON.stringify(unlockedAchv));
+  const a=ACHV[key];if(!a)return;
+  showToast(a.title,a.desc,a.color);
+}
+
+function showToast(title,desc,color='#c084fc'){
+  const el=document.createElement('div');
+  el.className='toast';
+  el.innerHTML=`<div class="t-title" style="color:${color}">${title}</div><div class="t-desc">${desc}</div>`;
+  toastsEl.appendChild(el);
+  setTimeout(()=>{
+    el.classList.add('tout');
+    el.addEventListener('animationend',()=>el.remove(),{once:true});
+  },3000);
+}
+
+// ── Screen manager ───────────────────────────────────────
+const SIDS=['menu','settings','about','gameover','lvl','win'];
+function show(name){
+  SIDS.forEach(s=>$(`scr-${s}`).classList.add('hidden'));
+  liWrap.classList.add('hidden');hud.style.display='none';
+  if(name)$(`scr-${name}`).classList.remove('hidden');
+}
+
+// ── Audio ────────────────────────────────────────────────
+let actx=null,hbIntv=null;
+function audio(){if(!actx)try{actx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}return actx;}
+function tone(f,type,dur,vol,delay=0){
+  const c=audio();if(!c)return;
+  const o=c.createOscillator(),g=c.createGain();
+  o.connect(g);g.connect(c.destination);
+  o.type=type;o.frequency.value=f;
+  const t=c.currentTime+delay;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.01);g.gain.linearRampToValueAtTime(0,t+dur);
+  o.start(t);o.stop(t+dur+.05);
+}
+function noise(dur,vol,delay=0,freq=800){
+  const c=audio();if(!c)return;
+  const buf=c.createBuffer(1,c.sampleRate*dur,c.sampleRate);
+  const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  const src=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();
+  src.buffer=buf;f.type='bandpass';f.frequency.value=freq;f.Q.value=2;
+  src.connect(f);f.connect(g);g.connect(c.destination);
+  const t=c.currentTime+delay;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.01);g.gain.linearRampToValueAtTime(0,t+dur);
+  src.start(t);src.stop(t+dur+.05);
+}
+function sfxSpawn(){noise(.065,.03);tone(155,'sawtooth',.055,.022);}
+function sfxBossSpawn(){tone(80,'sawtooth',.4,.2);tone(60,'sawtooth',.35,.18,.12);noise(.3,.12,.1,200);}
+function sfxHB(){tone(55,'sine',.12,.17);tone(50,'sine',.10,.13,.13);}
+function sfxDanger(){tone(40,'sine',.14,.20);tone(38,'sine',.11,.15,.13);}
+function sfxGameOver(){stopHB();[0,.11,.25].forEach((d,i)=>tone([200,155,100][i],'sawtooth',.55,.13-i*.04,d));noise(.38,.1,.1);}
+function sfxLvlComplete(){[[440,'sine',0],[554,'sine',.14],[659,'sine',.28],[880,'sine',.42]].forEach(([f,t,d])=>tone(f,t,.32,.1,d));}
+function sfxVictory(){[[523,'sine',0],[659,'sine',.09],[784,'sine',.18],[1047,'sine',.28],[880,'sine',.46],[1047,'sine',.60],[1319,'sine',.75]].forEach(([f,t,d])=>tone(f,t,.38,.11,d));}
+function sfxPuCollect(){tone(880,'sine',.12,.15);tone(1100,'sine',.12,.12,.1);tone(1320,'sine',.15,.1,.22);}
+function sfxShieldCollect(){tone(660,'sine',.12,.12);tone(880,'sine',.12,.12,.1);tone(1100,'sine',.18,.1,.22);}
+function sfxShieldBreak(){tone(300,'sawtooth',.12,.15);tone(200,'sawtooth',.1,.12,.08);noise(.15,.08,.05,500);}
+function sfxSpiderKill(){noise(.1,.08,0,400);tone(220,'sawtooth',.08,.14);}
+function sfxBossKill(){noise(.15,.12,0,300);[0,.1,.22,.36].forEach((d,i)=>tone([300,250,200,150][i],'sawtooth',.2,.1-i*.02,d));}
+
+function startHB(iv=1600){stopHB();sfxHB();hbIntv=setInterval(()=>{if(G.active)sfxHB();},iv);}
+function stopHB(){clearInterval(hbIntv);hbIntv=null;}
+function updateHB(){
+  const urgency=Math.max(0,1-G.timeLeft/LEVELS[G.lvl].dur);
+  startHB(Math.max(320,1600-urgency*1280));
+  if(G.timeLeft<=7)sfxDanger();
+}
+
+// ── Screen shake ─────────────────────────────────────────
+function shakeScreen(){
+  document.body.classList.remove('shake');
+  void document.body.offsetWidth;
+  document.body.classList.add('shake');
+  setTimeout(()=>document.body.classList.remove('shake'),600);
+}
+
+// ── Score ────────────────────────────────────────────────
+function addScore(pts){
+  G.score+=pts;
+  scoreEl.textContent=G.score.toLocaleString();
+}
+
+// ── Frame difficulty ─────────────────────────────────────
+function frameDiff(){
+  const lv=LEVELS[G.lvl];
+  const t=Math.min((lv.dur-G.timeLeft)/lv.dur,1);
+  const m=DIFF[G.diff].m;
+  const endBurst=G.timeLeft<=12?1+(12-G.timeLeft)/12*.9:1.0;
+  return{spd:(lv.spd+t*1.1)*m*endBurst,max:Math.floor(lv.max*(.52+t*.48)),si:lv.si*(1-t*.22),wb:lv.wb+t*.18};
+}
+
+// ── Background ───────────────────────────────────────────
+function drawBg(){
+  const W=bgC.width,H=bgC.height;bgX.clearRect(0,0,W,H);
+  const bg=bgX.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*.8);
+  bg.addColorStop(0,'#0d0010');bg.addColorStop(.5,'#060008');bg.addColorStop(1,'#020002');
+  bgX.fillStyle=bg;bgX.fillRect(0,0,W,H);
+  [[W*.2,H*.3,W*.4,'rgba(106,0,200,.12)'],[W*.8,H*.7,W*.35,'rgba(192,0,42,.10)']].forEach(([cx,cy,r,c])=>{
+    const g=bgX.createRadialGradient(cx,cy,0,cx,cy,r);
+    g.addColorStop(0,c);g.addColorStop(1,'transparent');
+    bgX.fillStyle=g;bgX.fillRect(0,0,W,H);
+  });
+  const vig=bgX.createRadialGradient(W/2,H/2,H*.27,W/2,H/2,Math.max(W,H)*.76);
+  vig.addColorStop(0,'transparent');vig.addColorStop(1,'rgba(0,0,0,.74)');
+  bgX.fillStyle=vig;bgX.fillRect(0,0,W,H);
+}
+function resize(){bgC.width=fxC.width=window.innerWidth;bgC.height=fxC.height=window.innerHeight;drawBg();}
+window.addEventListener('resize',resize);
+
+// ── Particles ────────────────────────────────────────────
+function burst(x,y,color,n=22){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2,s=1.5+Math.random()*4.5;
+    G.parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,decay:.017+Math.random()*.027,r:2+Math.random()*4,color});
+  }
+}
+function drawParts(){
+  fxX.clearRect(0,0,fxC.width,fxC.height);
+  G.parts=G.parts.filter(p=>p.life>0);
+  for(const p of G.parts){
+    p.x+=p.vx;p.y+=p.vy;p.vy+=.1;p.life-=p.decay;
+    fxX.globalAlpha=Math.max(0,p.life);fxX.fillStyle=p.color;
+    fxX.beginPath();fxX.arc(p.x,p.y,p.r,0,Math.PI*2);fxX.fill();
+  }
+  fxX.globalAlpha=1;
+}
+
+// ── Spawn regular spider ─────────────────────────────────
+function spawn(){
+  const W=window.innerWidth,H=window.innerHeight,pad=-32;
+  let x,y;
+  if(Math.random()<.12){x=Math.random()<.5?pad:W-pad;y=Math.random()<.5?pad:H-pad;}
+  else{
+    const e=Math.floor(Math.random()*4);
+    if(e===0){x=Math.random()*W;y=pad;}
+    else if(e===1){x=W-pad;y=Math.random()*H;}
+    else if(e===2){x=Math.random()*W;y=H-pad;}
+    else{x=pad;y=Math.random()*H;}
+  }
+  const el=document.createElement('div');
+  el.className='spider';el.textContent='🕷️';
+  el.style.left=x+'px';el.style.top=y+'px';
+  stage.appendChild(el);
+  G.spiders.push({el,x,y,wo:Math.random()*Math.PI*2});
+  G.totalSpiders++;sfxSpawn();
+}
+
+// ── Boss spider ───────────────────────────────────────────
+function spawnBoss(){
+  if(G.bossSpawned||!G.active)return;
+  G.bossSpawned=true;
+  const W=window.innerWidth,H=window.innerHeight;
+  const edge=Math.floor(Math.random()*4);
+  let x,y;
+  if(edge===0){x=W/2+(Math.random()-.5)*300;y=-70;}
+  else if(edge===1){x=W+70;y=H/2+(Math.random()-.5)*200;}
+  else if(edge===2){x=W/2+(Math.random()-.5)*300;y=H+70;}
+  else{x=-70;y=H/2+(Math.random()-.5)*200;}
+  const el=document.createElement('div');
+  el.className='spider boss';el.textContent='🕷️';
+  el.style.left=x+'px';el.style.top=y+'px';
+  stage.appendChild(el);
+  G.boss={el,x,y,wo:Math.random()*Math.PI*2,hp:3,maxHp:3};
+  sfxBossSpawn();
+  updateBossHPBar();
+  bossHPEl.classList.remove('hidden');
+  showToast('💀 BOSS INCOMING!','Defeat the giant spider with Slayer charges!','#ff4444');
+}
+
+function updateBossHPBar(){
+  if(!G.boss)return;
+  const pct=G.boss.hp/G.boss.maxHp*100;
+  bhpFill.style.width=pct+'%';
+  bhpFill.style.background=pct<=34?'#ff0000':pct<=67?'linear-gradient(90deg,#ff2200,#ff6600)':'linear-gradient(90deg,#ff2200,#ff8800)';
+}
+
+// ── Collision detection ───────────────────────────────────
+function hitCheck(sp,isBoss){
+  const sz=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sz'))||32;
+  const r=sz*(isBoss?.78:.42),dx=sp.x-mX,dy=sp.y-mY;
+  return dx*dx+dy*dy<r*r;
+}
+function nearCheck(sp){
+  const sz=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sz'))||32;
+  const r=sz*.95,dx=sp.x-mX,dy=sp.y-mY;
+  return dx*dx+dy*dy<r*r;
+}
+
+// ── Slayer power-up ───────────────────────────────────────
+function spawnPU(){
+  if(G.puOnScreen||!G.active)return;
+  const pad=80;
+  G.puX=pad+Math.random()*(window.innerWidth-pad*2);
+  G.puY=80+Math.random()*(window.innerHeight-160);
+  G.puLife=9;G.puOnScreen=true;
+  puBottle.style.left=G.puX+'px';puBottle.style.top=G.puY+'px';
+  puBottle.classList.remove('hidden');
+}
+function collectPU(){
+  if(!G.puOnScreen)return;
+  G.puOnScreen=false;puBottle.classList.add('hidden');
+  G.puSpawnCountdown=28+Math.random()*16;
+  G.slayerCharges=3;G.bottlesCollected++;
+  sfxPuCollect();burst(G.puX,G.puY,'#ff4466',20);burst(G.puX,G.puY,'#ffffff',12);
+  updateSlayerHUD();slayerHUD.classList.remove('hidden');updateCursor();
+  showToast('💊 Slayer Active!','Click to kill the nearest spider (×3)','#ff8096');
+}
+function updatePU(dt){
+  if(!G.active)return;
+  if(G.puOnScreen){
+    G.puLife-=dt;puBottle.style.opacity=Math.max(.3,G.puLife/9).toFixed(2);
+    if(G.puLife<=0){G.puOnScreen=false;puBottle.classList.add('hidden');G.puSpawnCountdown=20+Math.random()*12;}
+  }else if(G.slayerCharges===0){
+    G.puSpawnCountdown-=dt;if(G.puSpawnCountdown<=0)spawnPU();
+  }
+}
+function updateSlayerHUD(){dots.forEach((d,i)=>d.classList.toggle('used',i>=G.slayerCharges));}
+
+// ── Shield power-up ───────────────────────────────────────
+function spawnShield(){
+  if(G.shieldOnScreen||!G.active||G.shielded)return;
+  const pad=80;let sx,sy,tries=0;
+  do{sx=pad+Math.random()*(window.innerWidth-pad*2);sy=80+Math.random()*(window.innerHeight-160);
+    const dx=sx-G.puX,dy=sy-G.puY;if(!G.puOnScreen||dx*dx+dy*dy>80*80)break;
+  }while(++tries<8);
+  G.shieldX=sx;G.shieldY=sy;G.shieldLife=8;G.shieldOnScreen=true;
+  puShield.style.left=sx+'px';puShield.style.top=sy+'px';
+  puShield.classList.remove('hidden');
+}
+function collectShield(){
+  if(!G.shieldOnScreen)return;
+  G.shieldOnScreen=false;puShield.classList.add('hidden');
+  G.shieldSpawnCountdown=40+Math.random()*20;
+  G.shielded=true;sfxShieldCollect();
+  burst(G.shieldX,G.shieldY,'#7df9ff',18);burst(G.shieldX,G.shieldY,'#ffffff',10);
+  shieldHUD.classList.remove('hidden');updateCursor();
+  showToast('🛡️ Shield Active!','One spider collision will be absorbed!','#7df9ff');
+}
+function useShield(){
+  G.shielded=false;sfxShieldBreak();
+  shieldFlash.classList.add('flash');setTimeout(()=>shieldFlash.classList.remove('flash'),100);
+  shakeScreen();shieldHUD.classList.add('hidden');updateCursor();
+  burst(mX,mY,'#7df9ff',30);burst(mX,mY,'#ffffff',15);
+  unlockAchievement('shieldSave');
+  G.shieldSpawnCountdown=30+Math.random()*15;
+}
+function updateShield(dt){
+  if(!G.active)return;
+  if(G.shieldOnScreen){
+    G.shieldLife-=dt;puShield.style.opacity=Math.max(.3,G.shieldLife/8).toFixed(2);
+    if(G.shieldLife<=0){G.shieldOnScreen=false;puShield.classList.add('hidden');G.shieldSpawnCountdown=30+Math.random()*15;}
+  }else if(!G.shielded){
+    G.shieldSpawnCountdown-=dt;if(G.shieldSpawnCountdown<=0)spawnShield();
+  }
+}
+
+function updateCursor(){
+  curEl.classList.toggle('slayer',G.slayerCharges>0);
+  curEl.classList.toggle('shielded',G.shielded);
+}
+
+// ── Slayer kill ───────────────────────────────────────────
+function useSlayerCharge(){
+  if(G.slayerCharges<=0)return;
+  // Boss takes priority
+  if(G.boss){
+    G.boss.hp--;updateBossHPBar();
+    burst(G.boss.x,G.boss.y,'#ff3355',14);sfxSpiderKill();
+    killFlash.classList.add('flash');setTimeout(()=>killFlash.classList.remove('flash'),80);
+    if(G.boss.hp<=0){
+      burst(G.boss.x,G.boss.y,'#ff0000',35);burst(G.boss.x,G.boss.y,'#ff8800',20);burst(G.boss.x,G.boss.y,'#ffffff',15);
+      sfxBossKill();shakeScreen();
+      G.boss.el.remove();G.boss=null;bossHPEl.classList.add('hidden');
+      const bonus=(G.lvl+1)*200;addScore(bonus);
+      showToast('💀 Boss Defeated!',`+${bonus} bonus score!`,'#ff8800');
+      unlockAchievement('bossKill');
+    }
+    G.slayerCharges--;updateSlayerHUD();
+    if(G.slayerCharges===0){slayerHUD.classList.add('hidden');G.puSpawnCountdown=20+Math.random()*12;}
+    updateCursor();return;
+  }
+  // Nearest regular spider
+  if(!G.spiders.length)return;
+  let nearest=null,minD=Infinity;
+  for(const sp of G.spiders){const dx=sp.x-mX,dy=sp.y-mY,d=dx*dx+dy*dy;if(d<minD){minD=d;nearest=sp;}}
+  if(!nearest)return;
+  burst(nearest.x,nearest.y,'#ff3355',18);burst(nearest.x,nearest.y,'#ff8096',10);
+  sfxSpiderKill();nearest.el.remove();G.spiders=G.spiders.filter(s=>s!==nearest);
+  G.slayerCharges--;G.totalKills++;updateSlayerHUD();
+  addScore((G.lvl+1)*25);
+  killFlash.classList.add('flash');setTimeout(()=>killFlash.classList.remove('flash'),80);
+  if(G.totalKills===1)unlockAchievement('firstKill');
+  if(G.totalKills>=10)unlockAchievement('kill10');
+  if(G.slayerCharges===0){slayerHUD.classList.add('hidden');G.puSpawnCountdown=20+Math.random()*12;}
+  updateCursor();
+}
+
+// ── Main game loop ────────────────────────────────────────
+function loop(ts){
+  if(!G.active)return;
+  const dt=Math.min((ts-G.lastTs)/1000,.05);G.lastTs=ts;
+  const d=frameDiff();
+
+  G.spawnT+=dt;
+  if(G.spawnT>=d.si&&G.spiders.length<d.max){G.spawnT=0;spawn();}
+
+  // Boss spawns 5s into boss levels
+  if(BOSS_LEVELS.has(G.lvl)&&!G.bossSpawned&&(LEVELS[G.lvl].dur-G.timeLeft)>=5)spawnBoss();
+
+  // End-burst bar
+  if(G.timeLeft<=12&&G.timeLeft>0){
+    burstBar.style.width=((12-G.timeLeft)/12*100)+'%';burstBar.style.opacity='1';
+  }else{burstBar.style.width='0%';burstBar.style.opacity='0';}
+
+  const isAngry=G.timeLeft<=12;
+  G.spiders.forEach(sp=>sp.el.classList.toggle('angry',isAngry));
+  if(G.boss)G.boss.el.classList.toggle('angry',isAngry);
+
+  let caught=false;
+
+  // Move boss
+  if(G.boss&&!caught){
+    const b=G.boss;
+    const dx=mX-b.x,dy=mY-b.y,dist=Math.sqrt(dx*dx+dy*dy)||1;
+    const wx=d.wb*Math.sin(ts*.002+b.wo)*20,wy=d.wb*Math.cos(ts*.003+b.wo)*20;
+    const spd=d.spd*1.3*60*dt;
+    b.x+=(dx+wx)/dist*spd;b.y+=(dy+wy)/dist*spd;
+    b.el.style.left=b.x+'px';b.el.style.top=b.y+'px';
+    if(hitCheck(b,true)){if(G.shielded)useShield();else caught=true;}
+  }
+
+  // Move regular spiders
+  for(const sp of G.spiders){
+    const dx=mX-sp.x,dy=mY-sp.y,dist=Math.sqrt(dx*dx+dy*dy)||1;
+    const wx=d.wb*Math.sin(ts*.003+sp.wo)*26,wy=d.wb*Math.cos(ts*.004+sp.wo)*26;
+    sp.x+=(dx+wx)/dist*(d.spd*60*dt);sp.y+=(dy+wy)/dist*(d.spd*60*dt);
+    sp.el.style.left=sp.x+'px';sp.el.style.top=sp.y+'px';
+    sp.el.classList.toggle('close',!caught&&nearCheck(sp)&&!hitCheck(sp,false));
+    if(!caught&&hitCheck(sp,false)){if(G.shielded)useShield();else caught=true;}
+  }
+
+  G.maxSim=Math.max(G.maxSim,G.spiders.length+(G.boss?1:0));
+  spiderEl.textContent=G.spiders.length+(G.boss?1:0);
+  updatePU(dt);updateShield(dt);drawParts();
+  if(caught){doGameOver();return;}
+  G.frameId=requestAnimationFrame(loop);
+}
+
+// ── Timer ─────────────────────────────────────────────────
+function startTimer(){
+  const lv=LEVELS[G.lvl];
+  G.timeLeft=lv.dur;timerEl.textContent=G.timeLeft;timerEl.classList.remove('danger');
+  pbar.style.transition='none';pbar.style.width='0%';
+  burstBar.style.width='0%';burstBar.style.opacity='0';
+  setTimeout(()=>{pbar.style.transition='width 1s linear';},50);
+  G.timerIntv=setInterval(()=>{
+    if(!G.active)return;
+    G.timeLeft--;timerEl.textContent=G.timeLeft;
+    pbar.style.width=((lv.dur-G.timeLeft)/lv.dur*100)+'%';
+    if(G.timeLeft<=7)timerEl.classList.add('danger');
+    if(G.timeLeft%6===0||G.timeLeft<=7)updateHB();
+    addScore((G.lvl+1)*10);
+    if(G.timeLeft<=0)doLvlComplete();
+  },1000);
+}
+
+function clearSpiders(){G.spiders.forEach(s=>s.el.remove());G.spiders=[];}
+function clearBoss(){if(G.boss){G.boss.el.remove();G.boss=null;}bossHPEl.classList.add('hidden');}
+function hideAllPowerups(){
+  G.puOnScreen=false;puBottle.classList.add('hidden');
+  G.shieldOnScreen=false;puShield.classList.add('hidden');
+  G.slayerCharges=0;slayerHUD.classList.add('hidden');
+  G.shielded=false;shieldHUD.classList.add('hidden');
+  updateCursor();
+}
+
+// ── Level intro ───────────────────────────────────────────
+function levelIntro(idx,onDone){
+  const lv=LEVELS[idx];
+  const isBossLevel=BOSS_LEVELS.has(idx);
+  liNum.textContent=`LEVEL ${idx+1} OF ${LEVELS.length}`;
+  liName.textContent=lv.name;
+  liSub.textContent=lv.tier;
+  liBoss.style.display=isBossLevel?'block':'none';
+  liWrap.classList.remove('hidden');
+  let c=3;liCd.textContent=c;
+  const t=setInterval(()=>{
+    c--;if(c<=0){clearInterval(t);liCd.textContent='GO!';setTimeout(()=>{liWrap.classList.add('hidden');onDone();},550);}
+    else liCd.textContent=c;
+  },1000);
+}
+
+// ── Start level ───────────────────────────────────────────
+function startLevel(idx){
+  G.lvl=idx;G.active=false;G.spawnT=0;G.bossSpawned=false;
+  clearSpiders();clearBoss();clearInterval(G.timerIntv);cancelAnimationFrame(G.frameId);
+  hideAllPowerups();
+  G.puSpawnCountdown=15+Math.random()*10;
+  G.shieldSpawnCountdown=22+Math.random()*12;
+  show(null);hud.style.display='flex';
+  levelEl.textContent=idx+1;spiderEl.textContent=0;
+  timerEl.textContent=LEVELS[idx].dur;timerEl.classList.remove('danger');
+  dbadge.className=G.diff;dbadge.textContent=DIFF[G.diff].label;
+  if(idx>=4)unlockAchievement('lvl5');
+  if(idx>=9)unlockAchievement('lvl10');
+  levelIntro(idx,()=>{
+    G.active=true;G.lastTs=performance.now();
+    startTimer();startHB(1600);G.frameId=requestAnimationFrame(loop);
+  });
+}
+
+function newGame(){
+  audio();G.totalSpiders=0;G.maxSim=0;G.bottlesCollected=0;
+  G.score=0;G.totalKills=0;scoreEl.textContent='0';
+  startLevel(0);
+}
+
+// ── Game over ─────────────────────────────────────────────
+function doGameOver(){
+  G.active=false;clearInterval(G.timerIntv);cancelAnimationFrame(G.frameId);
+  sfxGameOver();hideAllPowerups();clearBoss();shakeScreen();
+  G.spiders.forEach(sp=>burst(sp.x,sp.y,'#c0002a',14));
+  burst(mX,mY,'#ff3355',26);
+  const surv=LEVELS[G.lvl].dur-G.timeLeft;
+  setTimeout(()=>{
+    hud.style.display='none';burstBar.style.opacity='0';clearSpiders();
+    $('go-lv').textContent=G.lvl+1;
+    $('go-stats').innerHTML=sboxes([
+      ['Level',`${G.lvl+1}/20`],['Score',G.score.toLocaleString()],
+      ['Survived',`${Math.round(surv)}s`],['Kills',G.totalKills],
+    ]);
+    show('gameover');
+  },320);
+}
+
+// ── Level complete ────────────────────────────────────────
+function doLvlComplete(){
+  G.active=false;clearInterval(G.timerIntv);cancelAnimationFrame(G.frameId);
+  stopHB();hideAllPowerups();clearBoss();
+  addScore((G.lvl+1)*100);
+  const isLast=G.lvl>=LEVELS.length-1;
+  if(isLast){
+    sfxVictory();
+    burst(mX,mY,'#4ade80',40);burst(mX-80,mY+50,'#c084fc',22);burst(mX+80,mY+50,'#4ade80',22);
+    unlockAchievement('lvl20');
+    const newHS=setHS(G.diff,LEVELS.length);
+    setTimeout(()=>{
+      hud.style.display='none';burstBar.style.opacity='0';clearSpiders();
+      $('vc-stats').innerHTML=sboxes([
+        ['Levels','20/20'],['Score',G.score.toLocaleString()],
+        ['Spiders',G.totalSpiders],['Kills',G.totalKills],['Mode',DIFF[G.diff].label],
+      ]);
+      $('vc-hsbadge').style.display=newHS?'block':'none';
+      show('win');refreshHS();
+    },320);
+  }else{
+    sfxLvlComplete();burst(mX,mY,'#c084fc',26);
+    setHS(G.diff,G.lvl+1);
+    setTimeout(()=>{
+      hud.style.display='none';burstBar.style.opacity='0';clearSpiders();
+      $('lc-title').textContent=`Level ${G.lvl+1} Complete!`;
+      const nx=LEVELS[G.lvl+1];const nb=BOSS_LEVELS.has(G.lvl+1);
+      $('lc-sub').textContent=`Next: Level ${G.lvl+2} — ${nx.name} [${nx.tier}]${nb?' 💀 BOSS':''}`;
+      $('lc-stats').innerHTML=sboxes([
+        ['Time',LEVELS[G.lvl].dur+'s'],['Score',G.score.toLocaleString()],
+        ['Peak',G.maxSim+'🕷️'],['Kills',G.totalKills],
+      ]);
+      show('lvl');
+    },320);
+  }
+}
+
+function sboxes(pairs){return pairs.map(([l,v])=>`<div class="sbox"><div class="sv">${v}</div><div class="sl">${l}</div></div>`).join('');}
+
+// ── Pointer ───────────────────────────────────────────────
+function setPtr(x,y){mX=x;mY=y;curEl.style.left=x+'px';curEl.style.top=y+'px';}
+document.addEventListener('mousemove',e=>setPtr(e.clientX,e.clientY));
+document.addEventListener('touchstart',e=>{audio();const t=e.touches[0];setPtr(t.clientX,t.clientY);},{passive:true});
+document.addEventListener('touchmove',e=>{e.preventDefault();const t=e.touches[0];setPtr(t.clientX,t.clientY);},{passive:false});
+
+// ── Bottle clicks ─────────────────────────────────────────
+puBottle.addEventListener('click',e=>{e.stopPropagation();if(G.active)collectPU();});
+puBottle.addEventListener('touchstart',e=>{e.stopPropagation();e.preventDefault();if(G.active)collectPU();},{passive:false});
+puShield.addEventListener('click',e=>{e.stopPropagation();if(G.active)collectShield();});
+puShield.addEventListener('touchstart',e=>{e.stopPropagation();e.preventDefault();if(G.active)collectShield();},{passive:false});
+
+stage.addEventListener('click',()=>{if(G.active&&G.slayerCharges>0)useSlayerCharge();});
+stage.addEventListener('touchend',e=>{if(G.active&&G.slayerCharges>0){e.preventDefault();useSlayerCharge();}},{passive:false});
+
+// ── Buttons ───────────────────────────────────────────────
+$('btn-newgame').onclick=newGame;
+$('btn-settings').onclick=()=>show('settings');
+$('btn-sback').onclick=()=>{show('menu');refreshHS();};
+$('btn-about').onclick=()=>show('about');
+$('btn-aback').onclick=()=>show('menu');
+$('btn-retry').onclick=()=>{audio();startLevel(G.lvl);};
+$('btn-go-menu').onclick=()=>{clearSpiders();show('menu');refreshHS();};
+$('btn-next').onclick=()=>{audio();startLevel(G.lvl+1);};
+$('btn-lc-menu').onclick=()=>{clearSpiders();show('menu');refreshHS();};
+$('btn-vc-play').onclick=()=>{audio();newGame();};
+$('btn-vc-menu').onclick=()=>{clearSpiders();show('menu');refreshHS();};
+
+document.querySelectorAll('.db').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.db').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');G.diff=btn.dataset.d;
+  };
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'||e.key===' '){
+    if(!$('scr-menu').classList.contains('hidden'))newGame();
+    else if(!$('scr-gameover').classList.contains('hidden')){audio();startLevel(G.lvl);}
+    else if(!$('scr-lvl').classList.contains('hidden')){audio();startLevel(G.lvl+1);}
+    else if(!$('scr-win').classList.contains('hidden')){audio();newGame();}
+  }
+});
+
+(function amb(){if(!G.active)drawParts();requestAnimationFrame(amb);})();
+resize();refreshHS();show('menu');
+</script>
+</body>
+</html>
