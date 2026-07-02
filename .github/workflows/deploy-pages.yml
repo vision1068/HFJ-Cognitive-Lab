@@ -1,0 +1,71 @@
+name: Deploy Sites to GitHub Pages
+
+on:
+  push:
+    branches: [ main, claude/jolly-newton-5uctey ]
+    paths:
+      - 'projects/doh-flight-checker/**'
+      - 'projects/market-compass/**'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: projects/market-compass/package-lock.json
+
+      - name: Install Market Compass dependencies
+        working-directory: projects/market-compass
+        run: npm ci
+
+      - name: Build Market Compass
+        working-directory: projects/market-compass
+        env:
+          VITE_FMP_API_KEY: ${{ secrets.VITE_FMP_API_KEY }}
+        run: npm run build
+
+      # SPA fallback so deep links / refreshes (e.g. /market-compass/live-analysis)
+      # resolve to index.html instead of a GitHub Pages 404.
+      - name: Add SPA fallback for client-side routing
+        run: cp projects/market-compass/dist/index.html projects/market-compass/dist/404.html
+
+      - name: Assemble combined Pages site
+        run: |
+          mkdir -p _site
+          cp -r projects/doh-flight-checker/. _site/
+          mkdir -p _site/market-compass
+          cp -r projects/market-compass/dist/. _site/market-compass/
+          touch _site/.nojekyll
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

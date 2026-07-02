@@ -18,10 +18,14 @@ import { SettingsPage } from "@/pages/SettingsPage";
 
 const queryClient = new QueryClient();
 
+// GitHub Pages serves this app from a subpath in production (see vite.config.ts `base`).
+// import.meta.env.BASE_URL already reflects that, so the router and the app agree.
+const routerBasename = import.meta.env.BASE_URL.replace(/\/$/, "");
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <BrowserRouter basename={routerBasename}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<AuthPage mode="login" />} />
