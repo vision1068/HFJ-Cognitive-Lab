@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import { clsx } from "clsx";
 import {
   LayoutDashboard,
+  Activity,
   Globe2,
   Search,
   SlidersHorizontal,
@@ -18,6 +19,7 @@ import { useAppStore } from "@/store/useAppStore";
 
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/live-analysis", label: "Live Analysis", icon: Activity },
   { to: "/markets", label: "Markets", icon: Globe2 },
   { to: "/search", label: "Company Search", icon: Search },
   { to: "/screener", label: "Screener", icon: SlidersHorizontal },

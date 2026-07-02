@@ -4,6 +4,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { LandingPage } from "@/pages/LandingPage";
 import { AuthPage } from "@/pages/AuthPage";
 import { DashboardPage } from "@/pages/DashboardPage";
+import { LiveAnalysisPage } from "@/pages/LiveAnalysisPage";
 import { SearchPage } from "@/pages/SearchPage";
 import { CompanyDetailPage } from "@/pages/CompanyDetailPage";
 import { MarketsPage } from "@/pages/MarketsPage";
@@ -28,6 +29,7 @@ function App() {
 
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/live-analysis" element={<LiveAnalysisPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/company/:ticker" element={<CompanyDetailPage />} />
             <Route path="/markets" element={<MarketsPage />} />
