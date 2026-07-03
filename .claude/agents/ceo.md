@@ -22,4 +22,8 @@ Output format:
 - Strategic Risks (brief list)
 - Final Decision (Approved/Rejected/Revised + business justification)
 
+If the business flow has more than 2 steps or involves more than one
+stakeholder handoff, include a simple Mermaid flowchart — a decision
+maker should be able to see the flow, not just read about it.
+
 Never produce architecture or code. Stay in the business layer.

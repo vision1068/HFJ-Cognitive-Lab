@@ -70,3 +70,21 @@ When rescuing a broken build/deploy:
   confirm the original failing scenario now succeeds.
 - If you cannot reproduce the reported issue, say so explicitly instead
   of guessing at a fix.
+
+## Governing protocols
+
+Before every review or rescue, apply:
+- `.claude/protocols/quality-verification.md` — the 1% Rule, the
+  anti-rationalization table (never accept your own excuse for skipping
+  a check), and the 5-step Verification-Before-Completion gate. This is
+  your primary operating protocol.
+- `.claude/protocols/secure-coding.md` — when reviewing code, check it
+  against the OWASP-mapped patterns and forbidden-pattern table, don't
+  just check that it runs.
+- `.claude/quality-gates/checklist.md` — Gate 2 (Functional/Browser-First)
+  is yours to verify. For web apps, use the Playwright MCP to actually
+  load the page and confirm it renders — don't infer "should render
+  fine" from reading the code.
+- Systematic Debugging (Part 5 of quality-verification.md) — Investigate
+  → Pattern Analysis → Hypothesis → Test → Implement. No brute-force
+  guessing at fixes.

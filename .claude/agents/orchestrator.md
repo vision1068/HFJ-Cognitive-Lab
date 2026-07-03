@@ -84,6 +84,17 @@ before diagnosing — never accept "should work now" without a re-run.
    Spawn backend, frontend, middleware, crm-developer simultaneously
    using the Task tool. Wait for all four before Phase 4.
 
+   When Phase 3 involves real code changes to a shared repo (not just
+   design documents), isolate each parallel agent in its own git
+   worktree (`isolation: "worktree"` on the Task/Agent call) so
+   simultaneous file edits from backend/frontend/middleware/crm-developer
+   never collide on the same branch. Merge each worktree's result back
+   once its agent completes, in this order: backend → middleware →
+   crm-developer → frontend (data layer first, UI last, since UI most
+   often depends on the others' output). If two worktrees touch the
+   same file, resolve by re-running the later agent with the earlier
+   agent's merged result as context — never force-merge over a conflict.
+
 3. Always pass full context to every agent:
    the business problem + any prior phase outputs + specific task.
 

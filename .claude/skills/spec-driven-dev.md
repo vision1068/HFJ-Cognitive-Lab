@@ -62,6 +62,30 @@ Agreed and frozen before implementation begins.
 3. No requirement added after spec is frozen without a change request
 4. Every FR has a corresponding test in QA phase
 
+## Traceability — carry IDs all the way through
+
+IDs are assigned at spec creation time, not retrofitted later (see
+Anti-Rationalization P4 in `.claude/protocols/quality-verification.md`).
+Every requirement ID must be traceable end-to-end:
+
+```
+FR-# / NFR-# / AC-#  (spec)
+        ↓
+commit message: "feat(scope): description [FR-3][AC-2]"
+        ↓
+test name: test('[FR-3][AC-2] should reject invalid input', ...)
+        ↓
+PR description: "Implements: FR-3, FR-4 — Acceptance: AC-2, AC-3"
+        ↓
+QA phase output references the same IDs when reporting pass/fail
+        ↓
+Auditor's Phase 5 review can trace any control back to its requirement
+```
+
+If a requirement ID can't be found in the commit history, the test
+suite, and the QA report, treat that requirement as **not verified**,
+regardless of whether the feature "looks done."
+
 ## Output format
 Full spec document written to projects/<name>/brief.md.
 Flag any ambiguous requirements as [OPEN QUESTION] for stakeholder resolution.

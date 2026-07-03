@@ -39,3 +39,39 @@ codex-rescuer
 All outputs written to: projects/<name>/
   brief.md, phase-1-ceo.md, phase-2-arch.md, phase-3-tech.md,
   phase-4-qa.md, phase-5-audit.md, phase-6-ceo.md, full-engagement.md
+
+## Constitution — 6 non-negotiable standards
+
+Scaled down from ConnectSW's 14-article constitution
+(github.com/Tamoura/Claude-Code-creates-the-SW-company) to what
+actually matters at our size. Every agent that writes or reviews code
+follows these; the orchestrator verifies compliance at each checkpoint.
+
+1. **Spec-first.** No implementation output before a spec exists with
+   IDed requirements (FR-#/NFR-#/AC-#). Ambiguity gets a
+   `[NEEDS CLARIFICATION]` marker, never a guess.
+   See `.claude/skills/spec-driven-dev.md`.
+
+2. **Test before claim.** No task is marked complete without the
+   5-step Verification-Before-Completion gate — actual command output,
+   not "should work now." See `.claude/protocols/quality-verification.md`.
+
+3. **Traceability.** Requirement IDs carry through commits, tests, PRs,
+   and the QA/Audit phase outputs. If an ID can't be found in the test
+   suite, treat that requirement as unverified.
+
+4. **Secure by construction.** OWASP Top 10 patterns are followed at
+   write-time, not caught later in review. See
+   `.claude/protocols/secure-coding.md`.
+
+5. **Quality gates are blocking.** The 6 gates in
+   `.claude/quality-gates/checklist.md` (Spec Consistency → Functional
+   → Security → Performance → Testing → Production Readiness) are
+   sequential and blocking — a project does not skip ahead.
+
+6. **Diagram-first.** Anything that can be drawn (architecture,
+   integration flow, multi-step business process) must be drawn in
+   Mermaid, not just described in prose.
+
+Amendments to this Constitution require explicit user approval — no
+agent may loosen these standards on its own judgment.
