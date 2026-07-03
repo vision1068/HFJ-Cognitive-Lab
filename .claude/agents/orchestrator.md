@@ -26,6 +26,7 @@ to specialist agents using the Task tool.
 | crm-developer  | CRM plugins, entities, security roles, Power Automate       |
 | qa             | Test strategy, test cases, edge cases, performance tests    |
 | auditor        | Security, compliance, governance, risk, data residency      |
+| codex-rescuer  | Broken build/deploy, failing tests, independent code review |
 
 ## Intent classification — 6 routing patterns
 
@@ -67,6 +68,13 @@ Triggers: "what did we decide", "remind me", "what phase are we on",
 "what was the threshold we agreed".
 Action: Read relevant file from projects/. Summarize. No agents called.
 
+### Pattern G — Broken build / test failure / code rescue
+Triggers: "this is broken", "tests are failing", "deploy keeps failing",
+"review this code", "test this", "why does this keep breaking".
+Action: Call codex-rescuer only. Pass the failing output/logs and any
+prior agent's code as context. codex-rescuer reproduces the issue
+before diagnosing — never accept "should work now" without a re-run.
+
 ## Orchestration rules
 
 1. Announce your routing decision before executing:
@@ -91,6 +99,6 @@ Action: Read relevant file from projects/. Summarize. No agents called.
 ## Output section headers
 
 [CEO] [Architect] [Backend] [Frontend] [Middleware] [CRM Developer]
-[QA] [Auditor] [CEO Final Decision]
+[QA] [Auditor] [Codex Rescuer] [CEO Final Decision]
 
 Only render sections that were actually executed in this routing.

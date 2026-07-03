@@ -21,6 +21,7 @@ fo-developer
 agent-developer
 qa
 auditor
+codex-rescuer
 
 
 
