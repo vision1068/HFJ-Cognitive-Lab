@@ -1,24 +1,19 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Bell, BellOff, Plus, Trash2, X } from "lucide-react";
 import { useAppStore } from "@/store/useAppStore";
-import { getCompany, companies } from "@/data/companies";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { CompanyLogo } from "@/components/ui/CompanyLogo";
 import { Badge } from "@/components/ui/Badge";
+import { useCompanies } from "@/hooks/useMarketData";
 import { formatCurrency } from "@/lib/format";
 
 const NOTIFICATION_TYPES = [
   "Price reaches target",
   "Price drops below target",
   "Price rises above target",
-  "Earnings announcement",
-  "Dividend announcement",
-  "Major news event",
-  "Score changes significantly",
-  "Risk score increases",
-  "Strong positive signal appears",
-  "Negative signal appears",
+  "Significant intraday move (> 5%)",
+  "New 52-week high or low",
 ];
 
 export function AlertsPage() {
@@ -30,16 +25,18 @@ export function AlertsPage() {
   const [ticker, setTicker] = useState("");
   const [type, setType] = useState<"above" | "below">("above");
   const [price, setPrice] = useState("");
-  const [dailyBriefing, setDailyBriefing] = useState(true);
   const [notificationToggles, setNotificationToggles] = useState<Record<string, boolean>>(
-    Object.fromEntries(NOTIFICATION_TYPES.map((t, i) => [t, i < 5]))
+    Object.fromEntries(NOTIFICATION_TYPES.map((t, i) => [t, i < 3]))
   );
+
+  const { data: companies } = useCompanies();
+  const byTicker = useMemo(() => new Map((companies ?? []).map((c) => [c.ticker, c])), [companies]);
 
   function handleAdd(e: React.FormEvent) {
     e.preventDefault();
-    const company = getCompany(ticker.toUpperCase());
-    if (!company || !price) return;
-    addAlert({ ticker: company.ticker, type, targetPrice: Number(price), active: true });
+    const match = byTicker.get(ticker.toUpperCase());
+    if (!match || !price) return;
+    addAlert({ ticker: match.ticker, type, targetPrice: Number(price), active: true });
     setShowAdd(false);
     setTicker("");
     setPrice("");
@@ -49,7 +46,7 @@ export function AlertsPage() {
     <div className="p-4 md:p-6 max-w-3xl mx-auto space-y-6">
       <PageHeader
         title="Alerts"
-        subtitle="Manage price alerts and notification preferences."
+        subtitle="Price alerts on live PSX prices and notification preferences."
         actions={
           <button onClick={() => setShowAdd(true)} className="inline-flex items-center gap-1.5 bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium px-3.5 py-2 rounded-lg transition-colors">
             <Plus className="h-4 w-4" /> New Price Alert
@@ -61,7 +58,8 @@ export function AlertsPage() {
         <form onSubmit={handleAdd} className="card p-4 grid sm:grid-cols-4 gap-3 items-end">
           <div>
             <label className="text-xs text-text-secondary mb-1.5 block">Ticker</label>
-            <input value={ticker} onChange={(e) => setTicker(e.target.value)} placeholder="e.g. HBL" required className="w-full bg-bg-elevated border border-border-subtle rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-500" />
+            <input value={ticker} onChange={(e) => setTicker(e.target.value)} placeholder="e.g. HBL" required list="alert-tickers" className="w-full bg-bg-elevated border border-border-subtle rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-500" />
+            <datalist id="alert-tickers">{[...byTicker.keys()].map((t) => <option key={t} value={t} />)}</datalist>
           </div>
           <div>
             <label className="text-xs text-text-secondary mb-1.5 block">Condition</label>
@@ -71,7 +69,7 @@ export function AlertsPage() {
             </select>
           </div>
           <div>
-            <label className="text-xs text-text-secondary mb-1.5 block">Target Price</label>
+            <label className="text-xs text-text-secondary mb-1.5 block">Target Price (PKR)</label>
             <input value={price} onChange={(e) => setPrice(e.target.value)} type="number" min="0" step="any" required className="w-full bg-bg-elevated border border-border-subtle rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-500" />
           </div>
           <div className="flex items-center gap-2">
@@ -85,15 +83,15 @@ export function AlertsPage() {
         <h2 className="text-sm font-semibold text-text-primary mb-3">Active Price Alerts</h2>
         <div className="space-y-2.5">
           {alerts.map((a) => {
-            const c = getCompany(a.ticker);
-            if (!c) return null;
+            const c = byTicker.get(a.ticker);
             return (
               <div key={a.id} className="card p-4 flex items-center gap-3">
-                <CompanyLogo initials={c.logoInitials} color={c.logoColor} size={34} />
+                {c && <CompanyLogo initials={c.logoInitials} color={c.logoColor} size={34} />}
                 <div className="flex-1 min-w-0">
-                  <Link to={`/company/${c.ticker}`} className="text-sm font-medium text-text-primary hover:text-brand-400">{c.name}</Link>
+                  <Link to={`/company/${a.ticker}`} className="text-sm font-medium text-text-primary hover:text-brand-400">{c?.name ?? a.ticker}</Link>
                   <p className="text-xs text-text-secondary">
-                    Alert when price {a.type === "above" ? "rises above" : "drops below"} {formatCurrency(a.targetPrice, c.currency)} (current: {formatCurrency(c.price, c.currency)})
+                    Alert when price {a.type === "above" ? "rises above" : "drops below"} {formatCurrency(a.targetPrice, "PKR")}
+                    {c ? ` (current: ${formatCurrency(c.price, "PKR")})` : ""}
                   </p>
                 </div>
                 <Badge tone={a.active ? "positive" : "neutral"}>{a.active ? "Active" : "Paused"}</Badge>
@@ -124,16 +122,11 @@ export function AlertsPage() {
               />
             </label>
           ))}
-          <label className="flex items-center justify-between text-sm cursor-pointer pt-2 border-t border-border-subtle">
-            <span className="text-text-primary font-medium">Daily briefing notification</span>
-            <input type="checkbox" checked={dailyBriefing} onChange={() => setDailyBriefing((s) => !s)} className="accent-brand-500 h-4 w-4" />
-          </label>
         </div>
+        <p className="text-xs text-text-secondary mt-3">
+          Alerts are evaluated against live PSX prices while the app is open. Background/push delivery requires a server component not included in this build.
+        </p>
       </section>
-
-      <p className="text-xs text-text-secondary">
-        Showing alert examples for: {companies.slice(0, 3).map((c) => c.ticker).join(", ")}. Connect real-time data sources to enable live alert delivery.
-      </p>
     </div>
   );
 }

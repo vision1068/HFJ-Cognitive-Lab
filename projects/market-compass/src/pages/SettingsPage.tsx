@@ -2,15 +2,10 @@ import { Moon, Sun } from "lucide-react";
 import { useAppStore } from "@/store/useAppStore";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Disclaimer } from "@/components/ui/Disclaimer";
-import type { Currency } from "@/types";
-
-const CURRENCIES: Currency[] = ["USD", "PKR", "GBP", "EUR", "JPY"];
 
 export function SettingsPage() {
   const theme = useAppStore((s) => s.theme);
   const toggleTheme = useAppStore((s) => s.toggleTheme);
-  const baseCurrency = useAppStore((s) => s.baseCurrency);
-  const setBaseCurrency = useAppStore((s) => s.setBaseCurrency);
 
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-6">
@@ -34,24 +29,6 @@ export function SettingsPage() {
       </section>
 
       <section className="card p-5">
-        <h2 className="text-sm font-semibold text-text-primary mb-4">Portfolio Base Currency</h2>
-        <p className="text-xs text-text-secondary mb-3">Convert your portfolio valuation into a single base currency.</p>
-        <div className="flex flex-wrap gap-1.5">
-          {CURRENCIES.map((c) => (
-            <button
-              key={c}
-              onClick={() => setBaseCurrency(c)}
-              className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
-                baseCurrency === c ? "bg-brand-500 text-white" : "bg-bg-elevated text-text-secondary hover:bg-bg-hover"
-              }`}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="card p-5">
         <h2 className="text-sm font-semibold text-text-primary mb-4">Account</h2>
         <div className="space-y-3">
           <div>
@@ -68,9 +45,11 @@ export function SettingsPage() {
       <section className="card p-5">
         <h2 className="text-sm font-semibold text-text-primary mb-4">Data Sources</h2>
         <p className="text-xs text-text-secondary leading-relaxed">
-          Market Compass currently displays illustrative mock data. The application is structured to connect to live providers
-          (Alpha Vantage, Finnhub, Financial Modeling Prep, Polygon.io, Twelve Data, PSX data feeds, and news/economic calendar APIs)
-          through a modular adapter layer once API credentials are configured.
+          Market Compass shows only real, live data for the Pakistan Stock Exchange (PSX). Prices, price history, indices
+          (KSE-100, KMI-30), and fundamentals (P/E, EPS, market cap) come from the PSX Data Portal (dps.psx.com.pk); the USD/PKR
+          rate comes from Yahoo Finance. Data auto-refreshes every 60 seconds. Features that no free data source can support
+          (financial statements, AI scores, news, economic calendar) are clearly marked "data not available" rather than filled
+          with estimated numbers.
         </p>
       </section>
 

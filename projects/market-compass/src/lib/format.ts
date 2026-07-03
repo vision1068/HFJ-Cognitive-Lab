@@ -2,10 +2,6 @@ import type { Currency } from "@/types";
 
 const CURRENCY_SYMBOLS: Record<Currency, string> = {
   PKR: "Rs",
-  USD: "$",
-  GBP: "£",
-  EUR: "€",
-  JPY: "¥",
 };
 
 export function formatCurrency(value: number, currency: Currency, opts?: { compact?: boolean }): string {
