@@ -43,6 +43,7 @@ jobs:
         working-directory: projects/market-compass
         env:
           VITE_FMP_API_KEY: ${{ secrets.VITE_FMP_API_KEY }}
+          VITE_DEPLOY_TARGET: static
         run: npm run build
 
       # SPA fallback so deep links / refreshes (e.g. /market-compass/live-analysis)
