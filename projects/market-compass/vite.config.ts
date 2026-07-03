@@ -9,7 +9,8 @@ import path from 'path'
 const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  base: command === 'build' ? '/HFJ-Cognitive-Lab/market-compass/' : '/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
@@ -34,4 +35,4 @@ export default defineConfig({
       },
     },
   },
-})
+}))
