@@ -40,6 +40,12 @@ All outputs written to: projects/<name>/
   brief.md, phase-1-ceo.md, phase-2-arch.md, phase-3-tech.md,
   phase-4-qa.md, phase-5-audit.md, phase-6-ceo.md, full-engagement.md
 
+## Requirements intake & company memory
+New projects start with the requirements-intake skill (3-round
+interview → IDed brief.md), never from a one-liner. Before any
+engagement, read .claude/memory/lessons-learned.md; after Phase 6,
+append a retrospective entry to it (orchestrator rules 7-9).
+
 ## Constitution — 6 non-negotiable standards
 
 Scaled down from ConnectSW's 14-article constitution

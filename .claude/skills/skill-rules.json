@@ -1,0 +1,36 @@
+{
+  "skills": {
+    "requirements-intake": {
+      "keywords": ["new project", "new app", "build me", "i want to build", "new requirement", "new idea", "requirements"],
+      "hint": "Run the structured intake interview to produce an IDed brief.md BEFORE any engagement phase starts"
+    },
+    "spec-driven-dev": {
+      "keywords": ["spec", "specification", "requirement", "feature", "implement", "brief"],
+      "hint": "Spec with FR-#/NFR-#/AC-# IDs before implementation; traceability through commits/tests/PRs"
+    },
+    "qdb-design-system": {
+      "keywords": ["design system", "brand", "colors", "typography", "theme", "styling"],
+      "hint": "QDB Navy/Gold tokens, component states, layout templates"
+    },
+    "ux-guidelines": {
+      "keywords": ["ux", "usability", "accessibility", "form design", "screen", "review the ui"],
+      "hint": "99-rule UX review with severity ratings, mapped to Power Apps"
+    },
+    "bi-dashboard-styles": {
+      "keywords": ["dashboard", "power bi", "report", "kpi", "analytics", "chart"],
+      "hint": "10 dashboard styles with layouts, chart choices, QDB colour assignments"
+    },
+    "power-platform-dev": {
+      "keywords": ["power apps", "power automate", "canvas app", "model-driven", "dataverse", "flow"],
+      "hint": "Build patterns + ALM checklist for Power Platform"
+    },
+    "dataverse-schema": {
+      "keywords": ["table", "entity", "schema", "column", "relationship"],
+      "hint": "Dataverse table/column/relationship standards with required audit columns"
+    },
+    "token-efficient": {
+      "keywords": ["summarize", "compress", "too long", "shorten"],
+      "hint": "Compression rules for long engagement outputs"
+    }
+  }
+}

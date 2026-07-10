@@ -190,6 +190,41 @@ Invocable shortcuts for common cross-project operations:
 | `/security-scan <project>` | Runs the `secure-coding.md` checklist and dependency audit, item by item, with evidence |
 | `/pre-deploy <project>` | Walks Gate 6 (Production Readiness) plus confirms Gates 1–5 already passed |
 | `/compliance-check <project>` | Focused QCB/governance pass — the standard Auditor Phase 5 mode |
+| `/new-project <idea>` | Structured 3-round requirements intake interview → IDed `brief.md` → full 6-phase engagement |
+
+---
+
+## Hooks (`.claude/hooks/`)
+
+Automation that fires on session events — the company reacts without being asked. Pattern from [diet103/claude-code-infrastructure-showcase](https://github.com/diet103/claude-code-infrastructure-showcase):
+
+| Hook | Fires on | What it does |
+|---|---|---|
+| `session-start.sh` | SessionStart | Briefs every new session: active projects, phase progress, company memory count, constitution reminder |
+| `skill-activation.sh` | UserPromptSubmit | Matches your prompt against `skill-rules.json` keyword rules and injects the relevant skill suggestions — so the right skill is applied even when nobody remembers to invoke it |
+
+`skill-rules.json` maps keywords → skills (e.g. "dashboard" → `bi-dashboard-styles`, "new app" → `requirements-intake`). Add a keyword rule whenever a new skill is created.
+
+---
+
+## Requirements Intake
+
+New projects no longer start from a one-liner. The `requirements-intake` skill (adapted from [metaswarm](https://github.com/dsifry/metaswarm)'s brainstorming flow) runs a **3-round interview** — problem → shape & constraints → confirmation playback — and produces a proper `brief.md` with FR-#/NFR-#/AC-# IDs before Phase 1 begins. Unknowns become `[NEEDS CLARIFICATION]` markers, never guesses. Invoke with `/new-project`.
+
+---
+
+## Plan Review Gate & Independent Validation
+
+Two orchestrator rules adapted from metaswarm:
+
+- **Plan Review Gate (Phase 2.5):** before any implementation agent is spawned, QA and the Auditor adversarially review the architecture in parallel — their job is to find what's wrong, not to approve. Max 3 revise-and-re-review iterations; unresolved disagreement goes to the user, not forced through.
+- **Independent Validation:** the orchestrator never trusts a subagent's own "done" claim. Every completion needs Verification Evidence (actual command output), and the orchestrator spot-checks by re-running at least one claimed command before accepting the phase.
+
+---
+
+## Company Memory (`.claude/memory/`)
+
+`lessons-learned.md` is an append-only log: after every engagement, a Phase 7 retrospective records what happened, the lesson, and the rule going forward. The orchestrator reads it at the start of every new engagement — the company never pays for the same mistake twice. Seeded with three real lessons already learned in production (the `.gitignore`/`.env` miss, the GitHub Pages first-deploy settings trap, and shared-branch push discipline).
 
 ---
 
@@ -256,4 +291,9 @@ Just type your request. Don't address a specific agent — the Orchestrator deci
 
 ## Prior Art
 
-Several structural ideas in this company — the anti-rationalization protocol, the 6-gate quality system, the 11-dimension `/audit` structure, and the constitution format — are adapted from [Tamoura/Claude-Code-creates-the-SW-company (ConnectSW)](https://github.com/Tamoura/Claude-Code-creates-the-SW-company), a larger multi-product AI software company built on Claude Code. We scaled down what fit our size (a single small team serving QDB) and skipped what didn't (component/port registries built for 14 simultaneous products, proprietary codebase-indexing tooling).
+Structural ideas in this company are adapted from the best open-source AI-company frameworks, scaled to our size:
+
+- [Tamoura/Claude-Code-creates-the-SW-company (ConnectSW)](https://github.com/Tamoura/Claude-Code-creates-the-SW-company) — the anti-rationalization protocol, 6-gate quality system, 11-dimension `/audit` structure, and constitution format. We skipped its component/port registries (built for 14 simultaneous products) and proprietary indexing tooling.
+- [dsifry/metaswarm](https://github.com/dsifry/metaswarm) — the requirements-intake flow, the adversarial Plan Review Gate with a 3-iteration cap, the "never trust subagent self-reports" independent-validation rule, and the post-engagement retrospective feeding company memory.
+- [diet103/claude-code-infrastructure-showcase](https://github.com/diet103/claude-code-infrastructure-showcase) — the hooks architecture: SessionStart context priming and `skill-rules.json`-driven skill auto-activation.
+- [rohitg00/pro-workflow](https://github.com/rohitg00/pro-workflow) — the compounding, append-only lessons-learned memory pattern.
