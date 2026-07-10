@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catch the Falling Stars</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="game-wrap">
+  <h1 class="title">⭐ Catch the Falling Stars</h1>
+
+  <div class="hud" aria-live="polite">
+    <span id="hud-score" class="hud-item">⭐ Score: 0</span>
+    <span id="hud-lives" class="hud-item">♥ Lives: 3</span>
+    <span id="hud-timer" class="hud-item">⏱ Time: 60s</span>
+    <span id="hud-high" class="hud-item">🏆 Best: 0</span>
+  </div>
+
+  <div class="stage">
+    <canvas id="game-canvas" width="560" height="520" aria-label="Game play area. Use left and right arrow keys or the mouse to move the basket."></canvas>
+
+    <div id="overlay-start" class="overlay" role="dialog" aria-labelledby="start-heading">
+      <h2 id="start-heading">Ready to play?</h2>
+      <p>Catch ⭐ stars (+1) and ✨ golden stars (+5).<br>
+         Avoid 💣 bombs (−1 life). Missing a star also costs a life.<br>
+         3 lives. 60 seconds. Good luck!</p>
+      <p class="controls-hint">Controls: ← → arrow keys or mouse. P pauses.</p>
+      <button id="btn-start" class="btn btn-primary" type="button">▶ Start</button>
+    </div>
+
+    <div id="overlay-pause" class="overlay hidden" role="dialog" aria-labelledby="pause-heading">
+      <h2 id="pause-heading">⏸ Paused</h2>
+      <button id="btn-resume" class="btn btn-primary" type="button">▶ Resume</button>
+    </div>
+
+    <div id="overlay-gameover" class="overlay hidden" role="dialog" aria-labelledby="gameover-heading">
+      <h2 id="gameover-heading">Game Over</h2>
+      <p id="gameover-reason"></p>
+      <p id="gameover-score"></p>
+      <p id="gameover-record" class="record hidden">🏆 New high score!</p>
+      <button id="btn-playagain" class="btn btn-primary" type="button">↻ Play again</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button id="btn-pause" class="btn" type="button" disabled>⏸ Pause</button>
+    <button id="btn-restart" class="btn" type="button" disabled>↻ Restart</button>
+  </div>
+
+  <p id="storage-note" class="storage-note hidden">High score is saved for this session only (storage unavailable).</p>
+</main>
+<script src="js/game.js"></script>
+</body>
+</html>

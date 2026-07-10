@@ -1,0 +1,119 @@
+/* Catch the Falling Stars — night-sky theme */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sky-top: #0b1026;
+  --sky-bottom: #1b2a52;
+  --panel: rgba(13, 18, 43, 0.92);
+  --ink: #eaf0ff;
+  --accent: #ffd75e;
+  --focus: #7fd3ff;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at 20% 10%, #1d2b5e 0%, var(--sky-top) 55%) fixed;
+  color: var(--ink);
+  font-family: "Segoe UI", system-ui, sans-serif;
+  padding: 16px;
+}
+
+.game-wrap { width: 592px; max-width: 100%; }
+
+.title {
+  text-align: center;
+  font-size: 1.5rem;
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 12px rgba(255, 215, 94, 0.35);
+}
+
+.hud {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: var(--panel);
+  border: 1px solid #2c3a6e;
+  border-radius: 10px 10px 0 0;
+  padding: 10px 14px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.hud-item { white-space: nowrap; }
+
+.stage { position: relative; line-height: 0; }
+
+#game-canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: linear-gradient(var(--sky-top), var(--sky-bottom));
+  border: 1px solid #2c3a6e;
+  border-top: 0;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  line-height: 1.5;
+  background: rgba(7, 10, 26, 0.82);
+  backdrop-filter: blur(2px);
+  padding: 20px;
+}
+.overlay h2 { font-size: 1.6rem; color: var(--accent); }
+.overlay.hidden, .hidden { display: none; }
+.controls-hint { opacity: 0.8; font-size: 0.9rem; }
+.record { color: var(--accent); font-weight: 700; }
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  background: var(--panel);
+  border: 1px solid #2c3a6e;
+  border-top: 0;
+  border-radius: 0 0 10px 10px;
+  padding: 12px;
+}
+
+/* Buttons: >= 44px touch target, visible focus */
+.btn {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 10px 22px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: #223163;
+  border: 2px solid #3d4f8f;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.btn:hover:not(:disabled) { background: #2c3f7e; }
+.btn:active:not(:disabled) { transform: scale(0.97); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-primary { background: #b8860b; border-color: var(--accent); color: #fff8e1; }
+.btn-primary:hover:not(:disabled) { background: #d29e17; }
+
+.btn:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.storage-note {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}

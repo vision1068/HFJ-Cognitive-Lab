@@ -2,10 +2,11 @@ name: Deploy Sites to GitHub Pages
 
 on:
   push:
-    branches: [ main, claude/jolly-newton-5uctey ]
+    branches: [ Main, main, claude/jolly-newton-5uctey ]
     paths:
       - 'projects/doh-flight-checker/**'
       - 'projects/market-compass/**'
+      - 'projects/catch-the-falling-stars/**'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
@@ -57,6 +58,10 @@ jobs:
           cp -r projects/doh-flight-checker/. _site/
           mkdir -p _site/market-compass
           cp -r projects/market-compass/dist/. _site/market-compass/
+          mkdir -p _site/catch-the-falling-stars
+          cp projects/catch-the-falling-stars/index.html _site/catch-the-falling-stars/
+          cp -r projects/catch-the-falling-stars/css _site/catch-the-falling-stars/
+          cp -r projects/catch-the-falling-stars/js _site/catch-the-falling-stars/
           touch _site/.nojekyll
 
       - name: Setup Pages
