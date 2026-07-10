@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, X } from "lucide-react";
-import { companies } from "@/data/companies";
 import { CompanyLogo } from "@/components/ui/CompanyLogo";
 import { PriceChange } from "@/components/ui/PriceChange";
+import { useCompanies } from "@/hooks/useMarketData";
 import { formatCurrency } from "@/lib/format";
 
 export function GlobalSearch() {
@@ -11,6 +11,7 @@ export function GlobalSearch() {
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const { data: companies = [] } = useCompanies();
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -32,9 +33,7 @@ export function GlobalSearch() {
   const results = query.trim()
     ? companies
         .filter((c) =>
-          [c.name, c.ticker, c.country, c.sector, c.industry, c.region].some((f) =>
-            f.toLowerCase().includes(query.toLowerCase())
-          )
+          [c.name, c.ticker, c.sector, c.industry].some((f) => f.toLowerCase().includes(query.toLowerCase()))
         )
         .slice(0, 8)
     : [];
@@ -56,7 +55,7 @@ export function GlobalSearch() {
         className="flex items-center gap-2 w-full max-w-md rounded-lg border border-border-subtle bg-bg-elevated px-3 py-2 text-sm text-text-secondary hover:border-border-default transition-colors"
       >
         <Search className="h-4 w-4 shrink-0" />
-        <span className="flex-1 text-left">Search companies, tickers, sectors...</span>
+        <span className="flex-1 text-left">Search PSX companies, tickers, sectors...</span>
         <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded border border-border-default px-1.5 py-0.5 text-[10px] font-mono text-text-secondary">
           ⌘K
         </kbd>
@@ -64,10 +63,7 @@ export function GlobalSearch() {
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 px-4 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setOpen(false)}>
-          <div
-            className="w-full max-w-xl card border-border-default shadow-2xl overflow-hidden animate-slide-up"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="w-full max-w-xl card border-border-default shadow-2xl overflow-hidden animate-slide-up" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-2 px-4 py-3 border-b border-border-subtle">
               <Search className="h-4 w-4 text-text-secondary shrink-0" />
               <input
@@ -75,7 +71,7 @@ export function GlobalSearch() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && query.trim() && goToSearch()}
-                placeholder="Search by name, ticker, country, sector..."
+                placeholder="Search by name, ticker, or sector..."
                 className="flex-1 bg-transparent outline-none text-sm placeholder:text-text-secondary"
               />
               <button onClick={() => setOpen(false)} className="text-text-secondary hover:text-text-primary">
@@ -87,7 +83,7 @@ export function GlobalSearch() {
                 <p className="px-4 py-6 text-sm text-text-secondary text-center">No companies found for "{query}"</p>
               )}
               {results.length === 0 && !query.trim() && (
-                <p className="px-4 py-6 text-sm text-text-secondary text-center">Try "Apple", "ENGRO", "Banking", or "Pakistan"</p>
+                <p className="px-4 py-6 text-sm text-text-secondary text-center">Try "OGDC", "Meezan", "Banking", or "Cement"</p>
               )}
               {results.map((c) => (
                 <button
@@ -99,7 +95,7 @@ export function GlobalSearch() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-text-primary truncate">{c.name}</p>
                     <p className="text-xs text-text-secondary">
-                      {c.ticker} · {c.exchange} · {c.country}
+                      {c.ticker} · {c.exchange} · {c.sector}
                     </p>
                   </div>
                   <div className="text-right shrink-0">

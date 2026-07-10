@@ -1,8 +1,11 @@
-export type Currency = "PKR" | "USD" | "GBP" | "EUR" | "JPY";
+// Market Compass — PSX-only real-data model.
+// All market data is sourced live from the Pakistan Stock Exchange Data Portal
+// (dps.psx.com.pk) and Yahoo Finance (USD/PKR only). Fields that no free data
+// source can provide are typed as nullable and rendered as "Data not available".
 
-export type MarketRegion = "Pakistan" | "United States" | "United Kingdom" | "Japan" | "Europe" | "Global";
+export type Currency = "PKR";
 
-export type Exchange = "PSX" | "NYSE" | "NASDAQ" | "LSE" | "TSE" | "XETRA" | "EURONEXT" | "SIX";
+export type Exchange = "PSX";
 
 export type Sector =
   | "Banking"
@@ -10,36 +13,10 @@ export type Sector =
   | "Cement"
   | "Oil & Gas"
   | "Power"
-  | "Technology"
-  | "Textile"
-  | "Pharmaceuticals"
-  | "Insurance"
-  | "Consumer Goods"
-  | "Automotive"
-  | "E-Commerce"
-  | "Semiconductors"
-  | "Telecommunications"
-  | "Industrials";
-
-export type SignalLevel = "Strong Positive" | "Positive" | "Neutral" | "Caution" | "High Risk";
-
-export type InvestorProfile =
-  | "Long-term investor"
-  | "Dividend investor"
-  | "Growth investor"
-  | "Value investor"
-  | "Short-term trader"
-  | "High-risk investor";
-
-export type SuggestedAction =
-  | "Research Further"
-  | "Add to Watchlist"
-  | "Consider Gradual Investment"
-  | "Wait for Better Entry Price"
-  | "Avoid Until Fundamentals Improve";
+  | "Technology";
 
 export interface PricePoint {
-  date: string;
+  date: string; // ISO yyyy-mm-dd
   open: number;
   high: number;
   low: number;
@@ -47,85 +24,14 @@ export interface PricePoint {
   volume: number;
 }
 
-export interface FinancialPeriod {
-  period: string; // e.g. "FY2023", "Q3 2024"
-  revenue: number;
-  netProfit: number;
-  operatingProfit: number;
-  eps: number;
-  freeCashFlow: number;
-  debt: number;
-  cash: number;
-  netMargin: number;
-  roe: number;
-  roa: number;
-}
-
-export interface DividendRecord {
-  date: string;
-  amountPerShare: number;
-  yieldAtDate: number;
-}
-
-export interface NewsItem {
-  id: string;
-  ticker: string;
-  headline: string;
-  source: string;
-  publishedAt: string;
-  summary: string;
-  sentiment: "Positive" | "Neutral" | "Negative";
-  impact: "Low" | "Medium" | "High";
-}
-
-export interface ScoreBreakdown {
-  fundamentals: { score: number; weight: number; reason: string };
-  growth: { score: number; weight: number; reason: string };
-  valuation: { score: number; weight: number; reason: string };
-  technical: { score: number; weight: number; reason: string };
-  sentiment: { score: number; weight: number; reason: string };
-  risk: { score: number; weight: number; reason: string };
-  overall: number;
-  signal: SignalLevel;
-}
-
-export interface HealthScore {
-  overall: number;
-  revenueGrowth: number;
-  profitGrowth: number;
-  earningsQuality: number;
-  cashFlow: number;
-  debtLiquidity: number;
-  valuation: number;
-  dividendSustainability: number;
-  technicalMomentum: number;
-  marketSentiment: number;
-  riskScore: number;
-}
-
-export interface RiskFactor {
-  label: string;
-  level: "Low" | "Medium" | "High";
-  description: string;
-}
-
-export interface AIResearchSummary {
-  overallSignal: SignalLevel;
-  thesis: string;
-  positiveSignals: string[];
-  warningSigns: string[];
-  investorProfiles: InvestorProfile[];
-  suggestedAction: SuggestedAction;
-}
-
 export interface Company {
   ticker: string;
+  psxSymbol: string; // symbol used on PSX endpoints
   name: string;
   logoInitials: string;
   logoColor: string;
   exchange: Exchange;
-  country: string;
-  region: MarketRegion;
+  country: "Pakistan";
   sector: Sector;
   industry: string;
   currency: Currency;
@@ -133,43 +39,47 @@ export interface Company {
   website: string;
   ceo: string;
 
+  // --- Live market data (real, from PSX) ---
   price: number;
-  changePercent: number;
+  previousClose: number;
   changeAbs: number;
-  marketCap: number; // in currency units
-  week52High: number;
-  week52Low: number;
-  dividendYield: number;
-  peRatio: number;
-  pbRatio: number;
-  pegRatio: number;
-  evEbitda: number;
-  eps: number;
-  beta: number;
-  analystTarget: number | null;
-  esgScore: number | null;
+  changePercent: number;
+  dayOpen: number | null;
+  dayHigh: number | null;
+  dayLow: number | null;
+  volume: number | null;
+  week52High: number | null;
+  week52Low: number | null;
+
+  // --- Fundamentals (real, from PSX company page; null when unavailable) ---
+  marketCap: number | null; // in PKR
+  peRatio: number | null;
+  eps: number | null;
+  sharesOutstanding: number | null;
+  psxSector: string | null; // official PSX sector label
 
   sparkline: number[];
   priceHistory: PricePoint[];
-  financialsAnnual: FinancialPeriod[];
-  financialsQuarterly: FinancialPeriod[];
-  dividends: DividendRecord[];
-  news: NewsItem[];
 
-  health: HealthScore;
-  scoreBreakdown: ScoreBreakdown;
-  riskFactors: RiskFactor[];
-  aiSummary: AIResearchSummary;
+  priceSource: string;
+  fundamentalsSource: string | null;
+  lastUpdated: string; // ISO timestamp
+}
 
-  fairValueLow: number;
-  fairValueHigh: number;
-  valuationVerdict: "Undervalued" | "Fairly Valued" | "Overvalued";
-  sectorAvgPE: number;
-  growthRating: "Very High Growth Potential" | "High Growth Potential" | "Moderate Growth Potential" | "Low Growth Potential" | "Weak Growth Outlook";
-  growthDrivers: string[];
+export interface MarketIndex {
+  name: string;
+  symbol: string;
+  value: number;
+  changePercent: number;
+  changeAbs: number;
+  source: string;
+}
 
-  nextEarningsDate: string;
-  lastUpdated: string;
+export interface FxRate {
+  pair: string; // "USD/PKR"
+  rate: number;
+  changePercent: number;
+  source: string;
 }
 
 export interface WatchlistEntry {
@@ -191,22 +101,6 @@ export interface PortfolioHolding {
   purchasePrice: number;
   purchaseDate: string;
   currency: Currency;
-}
-
-export interface MarketIndex {
-  name: string;
-  region: MarketRegion;
-  value: number;
-  changePercent: number;
-  changeAbs: number;
-}
-
-export interface EconomicEvent {
-  date: string;
-  title: string;
-  region: MarketRegion;
-  impact: "Low" | "Medium" | "High";
-  description: string;
 }
 
 export interface PriceAlert {

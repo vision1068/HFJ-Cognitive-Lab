@@ -26,6 +26,7 @@ Every instruction — a business problem, a design request, a bug, a question �
 | **D — Parallel Consultation** | "what do backend and QA think" | Calls named agents in parallel, synthesizes the results |
 | **E — Audit/Governance Check** | "audit this", "is this secure", "QCB requirements" | Calls the Auditor only |
 | **F — Memory/Status Query** | "what did we decide", "what phase are we on" | Reads from `projects/`, summarizes — no agents called |
+| **G — Broken Build / Code Rescue** | "this is broken", "tests are failing", "review this code" | Calls Codex Rescuer only — reproduces before diagnosing |
 
 If your request is ambiguous between two patterns, the orchestrator asks **one** clarifying question rather than guessing.
 
@@ -109,6 +110,9 @@ Azure DevOps pipelines, Power Platform Build Tools, environment promotion, rollb
 ### Agent Developer
 Meta-role: designs and maintains the other agents themselves — writes agent definition files, configures skills and MCP integrations, engineers prompts for reliability.
 
+### Codex Rescuer
+Called in when something is broken — a failing build, a red test suite, a deploy stuck in a loop — or when another agent's code needs an independent second pass before it ships. Operating rule: **reproduce before diagnosing**. Never explains a failure from reading code alone if it can run the thing and read the actual output; never marks a fix "done" without re-running the original failing scenario. Root-causes rather than brute-force retrying the same change hoping for a different result.
+
 ---
 
 ## Skills Library
@@ -125,8 +129,113 @@ Beyond the specialist agents, the company maintains a shared **skills library** 
 | `dataverse-schema` | Table/column/relationship design standards, required audit columns, business rule checklist |
 | `dynamics365-mcp` | MCP server configuration for querying live Dynamics 365 / Dataverse data from Claude Code |
 | `ui-ux-design` | Screen specs, user flow templates, accessibility checklist, QDB brand colors |
-| `spec-driven-dev` | Spec-before-code discipline — functional/non-functional requirements, ADRs, frozen scope before Phase 3 begins |
+| `spec-driven-dev` | Spec-before-code discipline — functional/non-functional requirements, ADRs, frozen scope before Phase 3 begins, plus end-to-end requirement traceability (spec ID → commit → test → PR → QA/Audit) |
 | `token-efficient` | Output compression rules for long engagements — trims agent prose, merges redundant points |
+
+---
+
+## Constitution
+
+Six non-negotiable standards every agent follows, scaled down from [ConnectSW's 14-article constitution](https://github.com/Tamoura/Claude-Code-creates-the-SW-company) to what actually matters at our size. Full text in [`CLAUDE.md`](./CLAUDE.md):
+
+1. **Spec-first** — no implementation before an IDed spec exists (FR-#/NFR-#/AC-#); ambiguity gets `[NEEDS CLARIFICATION]`, never a guess
+2. **Test before claim** — no task marked complete without actual command output proving it, not "should work now"
+3. **Traceability** — requirement IDs carry through commits → tests → PRs → QA/Audit output
+4. **Secure by construction** — OWASP patterns followed at write-time, not caught later
+5. **Quality gates are blocking** — sequential, not advisory; a project doesn't skip ahead
+6. **Diagram-first** — anything drawable (architecture, flow, process) gets a Mermaid diagram, not just prose
+
+Amendments require explicit user approval — no agent loosens these on its own judgment.
+
+---
+
+## Protocols (`.claude/protocols/`)
+
+Shared discipline any agent applies mid-task, adapted from ConnectSW:
+
+| Protocol | Purpose |
+|---|---|
+| `quality-verification.md` | The 1% Rule, the anti-rationalization table (16 exact excuses agents use to skip quality steps, each with a counter), and the 5-step Verification-Before-Completion gate |
+| `secure-coding.md` | OWASP Top 10 mapped to concrete patterns for our two stacks (Power Platform/CRM on-premise, and Node/React/TypeScript) — forbidden-pattern table and a security self-review checklist |
+
+The anti-rationalization table is the single highest-value idea borrowed from ConnectSW: it documents the exact excuses ("it's just a prototype," "existing tests probably cover it," "time pressure") an agent reaches for to skip a test or check, with a scripted counter for each — turning a vague rule ("write tests") into something enforceable in the moment.
+
+---
+
+## Quality Gates (`.claude/quality-gates/checklist.md`)
+
+Six sequential, blocking gates — a project does not advance past one it fails:
+
+| Gate | Runs when | Owner |
+|---|---|---|
+| 1. Spec Consistency | Before Phase 3 implementation | orchestrator + `spec-driven-dev` |
+| 2. Functional / Browser-First | After Phase 3, before Phase 4 | engineer agent, verified by Codex Rescuer |
+| 3. Security | Before any PR/deploy | Auditor, via `secure-coding.md` |
+| 4. Performance | Before staging/production | engineer agent, spot-checked by Codex Rescuer |
+| 5. Testing | Before CEO checkpoint | QA, verified by Codex Rescuer |
+| 6. Production Readiness | Immediately before go-live | DevOps + named human approver |
+
+Each gate maps onto the existing 6-phase engagement — it's the enforcement layer underneath the phases, not a separate process.
+
+---
+
+## Commands (`.claude/commands/`)
+
+Invocable shortcuts for common cross-project operations:
+
+| Command | What it does |
+|---|---|
+| `/audit <project>` | Full 11-dimension score (Security, Architecture, Test Coverage, Code Quality, Performance, DevOps, Runability + Accessibility/Privacy/Observability/API Design) against 9 frameworks (OWASP, WCAG, GDPR, ISO 25010, DORA...). Two-part output: Executive Memo + Engineering Appendix |
+| `/status [project]` | Quick status across all projects, or deep-dive one — phases completed, last CEO decision, open items |
+| `/security-scan <project>` | Runs the `secure-coding.md` checklist and dependency audit, item by item, with evidence |
+| `/pre-deploy <project>` | Walks Gate 6 (Production Readiness) plus confirms Gates 1–5 already passed |
+| `/compliance-check <project>` | Focused QCB/governance pass — the standard Auditor Phase 5 mode |
+| `/new-project <idea>` | Structured 3-round requirements intake interview → IDed `brief.md` → full 6-phase engagement |
+
+---
+
+## Hooks (`.claude/hooks/`)
+
+Automation that fires on session events — the company reacts without being asked. Pattern from [diet103/claude-code-infrastructure-showcase](https://github.com/diet103/claude-code-infrastructure-showcase):
+
+| Hook | Fires on | What it does |
+|---|---|---|
+| `session-start.sh` | SessionStart | Briefs every new session: active projects, phase progress, company memory count, constitution reminder |
+| `skill-activation.sh` | UserPromptSubmit | Matches your prompt against `skill-rules.json` keyword rules and injects the relevant skill suggestions — so the right skill is applied even when nobody remembers to invoke it |
+
+`skill-rules.json` maps keywords → skills (e.g. "dashboard" → `bi-dashboard-styles`, "new app" → `requirements-intake`). Add a keyword rule whenever a new skill is created.
+
+---
+
+## Requirements Intake
+
+New projects no longer start from a one-liner. The `requirements-intake` skill (adapted from [metaswarm](https://github.com/dsifry/metaswarm)'s brainstorming flow) runs a **3-round interview** — problem → shape & constraints → confirmation playback — and produces a proper `brief.md` with FR-#/NFR-#/AC-# IDs before Phase 1 begins. Unknowns become `[NEEDS CLARIFICATION]` markers, never guesses. Invoke with `/new-project`.
+
+---
+
+## Plan Review Gate & Independent Validation
+
+Two orchestrator rules adapted from metaswarm:
+
+- **Plan Review Gate (Phase 2.5):** before any implementation agent is spawned, QA and the Auditor adversarially review the architecture in parallel — their job is to find what's wrong, not to approve. Max 3 revise-and-re-review iterations; unresolved disagreement goes to the user, not forced through.
+- **Independent Validation:** the orchestrator never trusts a subagent's own "done" claim. Every completion needs Verification Evidence (actual command output), and the orchestrator spot-checks by re-running at least one claimed command before accepting the phase.
+
+---
+
+## Company Memory (`.claude/memory/`)
+
+`lessons-learned.md` is an append-only log: after every engagement, a Phase 7 retrospective records what happened, the lesson, and the rule going forward. The orchestrator reads it at the start of every new engagement — the company never pays for the same mistake twice. Seeded with three real lessons already learned in production (the `.gitignore`/`.env` miss, the GitHub Pages first-deploy settings trap, and shared-branch push discipline).
+
+---
+
+## MCP Servers (`.mcp.json`)
+
+| Server | Purpose |
+|---|---|
+| `playwright` | Real browser verification for Gate 2 (Functional/Browser-First) — Codex Rescuer loads the actual page rather than inferring "should render" |
+| `context7` | Live, current library/framework documentation during implementation |
+
+GitHub access is provided natively by this environment's built-in GitHub MCP integration.
 
 ---
 
@@ -173,4 +282,18 @@ Just type your request. Don't address a specific agent — the Orchestrator deci
 
 "Audit this integration for QCB compliance"
 → Pattern E: auditor only
+
+"The deploy keeps failing, can you fix it"
+→ Pattern G: codex-rescuer reproduces the failure, root-causes, fixes, re-verifies
 ```
+
+---
+
+## Prior Art
+
+Structural ideas in this company are adapted from the best open-source AI-company frameworks, scaled to our size:
+
+- [Tamoura/Claude-Code-creates-the-SW-company (ConnectSW)](https://github.com/Tamoura/Claude-Code-creates-the-SW-company) — the anti-rationalization protocol, 6-gate quality system, 11-dimension `/audit` structure, and constitution format. We skipped its component/port registries (built for 14 simultaneous products) and proprietary indexing tooling.
+- [dsifry/metaswarm](https://github.com/dsifry/metaswarm) — the requirements-intake flow, the adversarial Plan Review Gate with a 3-iteration cap, the "never trust subagent self-reports" independent-validation rule, and the post-engagement retrospective feeding company memory.
+- [diet103/claude-code-infrastructure-showcase](https://github.com/diet103/claude-code-infrastructure-showcase) — the hooks architecture: SessionStart context priming and `skill-rules.json`-driven skill auto-activation.
+- [rohitg00/pro-workflow](https://github.com/rohitg00/pro-workflow) — the compounding, append-only lessons-learned memory pattern.

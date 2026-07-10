@@ -1,13 +1,10 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Currency, PortfolioHolding, PriceAlert, Watchlist } from "@/types";
+import type { PortfolioHolding, PriceAlert, Watchlist } from "@/types";
 
 interface AppState {
   theme: "dark" | "light";
   toggleTheme: () => void;
-
-  baseCurrency: Currency;
-  setBaseCurrency: (c: Currency) => void;
 
   watchlists: Watchlist[];
   addWatchlist: (name: string, group: string) => void;
@@ -34,47 +31,35 @@ const defaultWatchlists: Watchlist[] = [
     name: "My Watchlist",
     group: "Personal",
     entries: [
-      { ticker: "ENGRO", addedAt: new Date().toISOString() },
+      { ticker: "ENGROH", addedAt: new Date().toISOString() },
       { ticker: "MEBL", addedAt: new Date().toISOString() },
-      { ticker: "AAPL", addedAt: new Date().toISOString() },
-      { ticker: "NVDA", addedAt: new Date().toISOString() },
       { ticker: "SYS", addedAt: new Date().toISOString() },
+      { ticker: "OGDC", addedAt: new Date().toISOString() },
     ],
   },
   {
     id: "wl-dividend",
-    name: "Dividend Stocks",
+    name: "Dividend Payers",
     group: "Dividend stocks",
     entries: [
       { ticker: "FFC", addedAt: new Date().toISOString() },
       { ticker: "MCB", addedAt: new Date().toISOString() },
-      { ticker: "JPM", addedAt: new Date().toISOString() },
-    ],
-  },
-  {
-    id: "wl-growth",
-    name: "Growth Stocks",
-    group: "Growth stocks",
-    entries: [
-      { ticker: "TSLA", addedAt: new Date().toISOString() },
-      { ticker: "SYS", addedAt: new Date().toISOString() },
-      { ticker: "GOOGL", addedAt: new Date().toISOString() },
+      { ticker: "HUBC", addedAt: new Date().toISOString() },
     ],
   },
 ];
 
 const defaultPortfolio: PortfolioHolding[] = [
-  { id: "p1", ticker: "ENGRO", shares: 500, purchasePrice: 268.4, purchaseDate: "2024-02-10", currency: "PKR" },
-  { id: "p2", ticker: "MEBL", shares: 300, purchasePrice: 165.2, purchaseDate: "2024-05-22", currency: "PKR" },
-  { id: "p3", ticker: "AAPL", shares: 15, purchasePrice: 192.3, purchaseDate: "2024-01-15", currency: "USD" },
-  { id: "p4", ticker: "NVDA", shares: 40, purchasePrice: 98.6, purchaseDate: "2024-06-03", currency: "USD" },
-  { id: "p5", ticker: "FFC", shares: 800, purchasePrice: 118.9, purchaseDate: "2023-11-08", currency: "PKR" },
+  { id: "p1", ticker: "ENGROH", shares: 500, purchasePrice: 268.4, purchaseDate: "2025-02-10", currency: "PKR" },
+  { id: "p2", ticker: "MEBL", shares: 300, purchasePrice: 165.2, purchaseDate: "2025-05-22", currency: "PKR" },
+  { id: "p3", ticker: "FFC", shares: 800, purchasePrice: 118.9, purchaseDate: "2024-11-08", currency: "PKR" },
+  { id: "p4", ticker: "OGDC", shares: 400, purchasePrice: 210.5, purchaseDate: "2025-01-15", currency: "PKR" },
 ];
 
 const defaultAlerts: PriceAlert[] = [
-  { id: "a1", ticker: "ENGRO", type: "above", targetPrice: 330, active: true, createdAt: new Date().toISOString() },
-  { id: "a2", ticker: "AAPL", type: "below", targetPrice: 210, active: true, createdAt: new Date().toISOString() },
-  { id: "a3", ticker: "TSLA", type: "above", targetPrice: 270, active: false, createdAt: new Date().toISOString() },
+  { id: "a1", ticker: "ENGROH", type: "above", targetPrice: 330, active: true, createdAt: new Date().toISOString() },
+  { id: "a2", ticker: "OGDC", type: "below", targetPrice: 300, active: true, createdAt: new Date().toISOString() },
+  { id: "a3", ticker: "SYS", type: "above", targetPrice: 600, active: false, createdAt: new Date().toISOString() },
 ];
 
 export const useAppStore = create<AppState>()(
@@ -82,9 +67,6 @@ export const useAppStore = create<AppState>()(
     (set, get) => ({
       theme: "dark",
       toggleTheme: () => set((s) => ({ theme: s.theme === "dark" ? "light" : "dark" })),
-
-      baseCurrency: "USD",
-      setBaseCurrency: (c) => set({ baseCurrency: c }),
 
       watchlists: defaultWatchlists,
       addWatchlist: (name, group) =>
@@ -122,6 +104,6 @@ export const useAppStore = create<AppState>()(
       sidebarCollapsed: false,
       toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
     }),
-    { name: "market-compass-store" }
+    { name: "market-compass-psx-store" }
   )
 );

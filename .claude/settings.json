@@ -2,5 +2,35 @@
   "defaultAgent": "orchestrator",
   "env": {
     "CLAUDE_CODE_SUBAGENT_MODEL": "claude-opus-4-8"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(curl -s *)",
+      "Bash(npm run dev)",
+      "mcp__Claude_Preview__preview_screenshot",
+      "mcp__claude-in-chrome__tabs_context_mcp"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session-start.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/skill-activation.sh"
+          }
+        ]
+      }
+    ]
   }
 }

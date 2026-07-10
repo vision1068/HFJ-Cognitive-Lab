@@ -26,19 +26,27 @@ to specialist agents using the Task tool.
 | crm-developer  | CRM plugins, entities, security roles, Power Automate       |
 | qa             | Test strategy, test cases, edge cases, performance tests    |
 | auditor        | Security, compliance, governance, risk, data residency      |
+| codex-rescuer  | Broken build/deploy, failing tests, independent code review |
 
 ## Intent classification — 6 routing patterns
 
 ### Pattern A — Full engagement
 Triggers: "build", "design", "create a system", "we need a solution",
 "new project", any business problem described from scratch.
-Action: Run all 6 phases in strict order:
+Action:
+  0. If no brief.md exists yet (or the request is a one-liner), run the
+     requirements-intake skill FIRST — 3-round interview producing
+     projects/<name>/brief.md. Read .claude/memory/lessons-learned.md
+     before starting.
+  Then run all 6 phases in strict order:
   1. ceo → Phase 1: business understanding + success criteria
   2. architect → Phase 2: architecture + technology stack
+  2.5. PLAN REVIEW GATE (see rule 7) — before any implementation
   3. backend + frontend + middleware + crm-developer IN PARALLEL → Phase 3
   4. qa → Phase 4: test strategy
   5. auditor → Phase 5: risk and governance review
   6. ceo → Phase 6: final approve/reject/revise decision
+  7. RETROSPECTIVE (see rule 9) — append lesson to company memory
 Write each phase output to projects/<name>/phase-N-<role>.md
 
 ### Pattern B — Single specialist
@@ -67,6 +75,13 @@ Triggers: "what did we decide", "remind me", "what phase are we on",
 "what was the threshold we agreed".
 Action: Read relevant file from projects/. Summarize. No agents called.
 
+### Pattern G — Broken build / test failure / code rescue
+Triggers: "this is broken", "tests are failing", "deploy keeps failing",
+"review this code", "test this", "why does this keep breaking".
+Action: Call codex-rescuer only. Pass the failing output/logs and any
+prior agent's code as context. codex-rescuer reproduces the issue
+before diagnosing — never accept "should work now" without a re-run.
+
 ## Orchestration rules
 
 1. Announce your routing decision before executing:
@@ -75,6 +90,17 @@ Action: Read relevant file from projects/. Summarize. No agents called.
 2. Phase 3 always runs in parallel — never sequentially.
    Spawn backend, frontend, middleware, crm-developer simultaneously
    using the Task tool. Wait for all four before Phase 4.
+
+   When Phase 3 involves real code changes to a shared repo (not just
+   design documents), isolate each parallel agent in its own git
+   worktree (`isolation: "worktree"` on the Task/Agent call) so
+   simultaneous file edits from backend/frontend/middleware/crm-developer
+   never collide on the same branch. Merge each worktree's result back
+   once its agent completes, in this order: backend → middleware →
+   crm-developer → frontend (data layer first, UI last, since UI most
+   often depends on the others' output). If two worktrees touch the
+   same file, resolve by re-running the later agent with the earlier
+   agent's merged result as context — never force-merge over a conflict.
 
 3. Always pass full context to every agent:
    the business problem + any prior phase outputs + specific task.
@@ -88,9 +114,29 @@ Action: Read relevant file from projects/. Summarize. No agents called.
 6. After full engagement, write consolidated output to:
    projects/<name>/full-engagement.md
 
+7. PLAN REVIEW GATE (between Phase 2 and Phase 3): before spawning any
+   implementation agent, send the architecture + plan to qa AND auditor
+   in parallel for adversarial review — their job is to find what's
+   wrong with the plan, not to approve it. Each returns findings with
+   evidence. Revise the plan and re-review, maximum 3 iterations; if
+   still contested after 3, present the disagreement to the user rather
+   than forcing it through. (Adapted from metaswarm's design-review-gate.)
+
+8. INDEPENDENT VALIDATION: never trust a subagent's own "done" claim.
+   Every completion must include Verification Evidence per
+   .claude/protocols/quality-verification.md Part 4; spot-check it —
+   re-run at least one claimed command yourself (or via codex-rescuer)
+   before accepting the phase. Reject completions whose evidence is
+   missing, stale, or doesn't match the claim.
+
+9. RETROSPECTIVE (Phase 7, after the CEO decision): append one entry to
+   .claude/memory/lessons-learned.md — what happened, the lesson, and
+   the rule going forward. Read that file at the start of every new
+   engagement so the same mistake is never paid for twice.
+
 ## Output section headers
 
 [CEO] [Architect] [Backend] [Frontend] [Middleware] [CRM Developer]
-[QA] [Auditor] [CEO Final Decision]
+[QA] [Auditor] [Codex Rescuer] [CEO Final Decision]
 
 Only render sections that were actually executed in this routing.
