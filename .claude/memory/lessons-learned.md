@@ -29,3 +29,7 @@ Entry format:
 - **What happened:** Multiple sessions pushed to `claude/jolly-newton-5uctey` simultaneously; pushes were rejected and required fetch+merge before every push, and one rerun failed on a stale duplicate artifact.
 - **Lesson:** Shared-branch parallel work needs fetch-merge-push discipline every time, and reruns of partially-failed workflows can collide with stale artifacts — a fresh run is safer.
 - **Rule going forward:** Always `git fetch` + merge before push; prefer a new triggering commit over rerunning a failed workflow when artifacts may be stale.
+
+### 2026-07-10 — auto-captured — PSX API rejects requests without a browser User-Agent header
+- **Lesson:** PSX API rejects requests without a browser User-Agent header — always set one on server-side fetches.
+- **Source:** [LEARN] block auto-captured by learn-capture hook

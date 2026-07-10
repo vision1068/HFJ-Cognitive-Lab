@@ -202,8 +202,11 @@ Automation that fires on session events — the company reacts without being ask
 |---|---|---|
 | `session-start.sh` | SessionStart | Briefs every new session: active projects, phase progress, company memory count, constitution reminder |
 | `skill-activation.sh` | UserPromptSubmit | Matches your prompt against `skill-rules.json` keyword rules and injects the relevant skill suggestions — so the right skill is applied even when nobody remembers to invoke it |
+| `safety-guard.sh` | PreToolUse (Bash) | **Blocks** destructive commands (recursive delete of root/home, force-push to main/master, `terraform destroy`); **warns** on risky ones (bulk `git add`, `rm -rf`, hard reset) — from dralgorhythm's safety hooks |
+| `file-guard.sh` | PreToolUse (Write/Edit) | Blocks agent edits to secret-bearing files (`.env`, private keys, certificates) — `.env.example` stays editable |
+| `learn-capture.sh` | Stop | Auto-captures any `[LEARN] ...` line from agent output into company memory, deduplicated — corrections compound without anyone remembering to file them (from pro-workflow) |
 
-`skill-rules.json` maps keywords → skills (e.g. "dashboard" → `bi-dashboard-styles`, "new app" → `requirements-intake`). Add a keyword rule whenever a new skill is created.
+`skill-rules.json` maps keywords → skills (e.g. "dashboard" → `bi-dashboard-styles`, "new app" → `requirements-intake`). Add a keyword rule whenever a new skill is created. All hooks are fail-soft: a hook error never blocks legitimate work.
 
 ---
 
@@ -219,6 +222,12 @@ Two orchestrator rules adapted from metaswarm:
 
 - **Plan Review Gate (Phase 2.5):** before any implementation agent is spawned, QA and the Auditor adversarially review the architecture in parallel — their job is to find what's wrong, not to approve. Max 3 revise-and-re-review iterations; unresolved disagreement goes to the user, not forced through.
 - **Independent Validation:** the orchestrator never trusts a subagent's own "done" claim. Every completion needs Verification Evidence (actual command output), and the orchestrator spot-checks by re-running at least one claimed command before accepting the phase.
+
+Plus three delegation rules adapted from the AWS agent team and ciscoittech framework:
+
+- **Machine-checkable task format:** every delegated task reads `"[role] <verb> <what> | <file paths> | <acceptance>. Run: <command>"` — a task with no file scope, acceptance criterion, or Run: command isn't delegable. The Run: command is exactly what Independent Validation re-executes.
+- **Single-verdict synthesis:** parallel reviewers merge into one report with one verdict (PASS / PASS-WITH-CONDITIONS / FAIL) — never three overlapping reports for the user to reconcile.
+- **Model/cost routing:** status queries and summaries never spawn heavyweight agents; full-strength agents are reserved for design, implementation, and review.
 
 ---
 
@@ -296,4 +305,8 @@ Structural ideas in this company are adapted from the best open-source AI-compan
 - [Tamoura/Claude-Code-creates-the-SW-company (ConnectSW)](https://github.com/Tamoura/Claude-Code-creates-the-SW-company) — the anti-rationalization protocol, 6-gate quality system, 11-dimension `/audit` structure, and constitution format. We skipped its component/port registries (built for 14 simultaneous products) and proprietary indexing tooling.
 - [dsifry/metaswarm](https://github.com/dsifry/metaswarm) — the requirements-intake flow, the adversarial Plan Review Gate with a 3-iteration cap, the "never trust subagent self-reports" independent-validation rule, and the post-engagement retrospective feeding company memory.
 - [diet103/claude-code-infrastructure-showcase](https://github.com/diet103/claude-code-infrastructure-showcase) — the hooks architecture: SessionStart context priming and `skill-rules.json`-driven skill auto-activation.
-- [rohitg00/pro-workflow](https://github.com/rohitg00/pro-workflow) — the compounding, append-only lessons-learned memory pattern.
+- [rohitg00/pro-workflow](https://github.com/rohitg00/pro-workflow) — the compounding, append-only lessons-learned memory pattern and the `[LEARN]`-block auto-capture Stop hook.
+- [dralgorhythm/claude-agentic-framework](https://github.com/dralgorhythm/claude-agentic-framework) — the safety hooks (destructive-command blocking, protected secret files) and the "keep the skill catalog lean" design principle.
+- [aws-samples/sample-claude-code-agent-team](https://github.com/aws-samples/sample-claude-code-agent-team) — the machine-checkable task format (`[role] verb what | files | acceptance. Run: command`) and single-verdict review synthesis.
+- [ciscoittech/claude-agent-framework](https://github.com/ciscoittech/claude-agent-framework) — effort-based model/cost routing.
+- [ChrisWiles/claude-code-showcase](https://github.com/ChrisWiles/claude-code-showcase) — hook lifecycle reference (PreToolUse/PostToolUse/Stop patterns) informing our hook design.

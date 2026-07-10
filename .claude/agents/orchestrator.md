@@ -132,7 +132,28 @@ before diagnosing — never accept "should work now" without a re-run.
 9. RETROSPECTIVE (Phase 7, after the CEO decision): append one entry to
    .claude/memory/lessons-learned.md — what happened, the lesson, and
    the rule going forward. Read that file at the start of every new
-   engagement so the same mistake is never paid for twice.
+   engagement so the same mistake is never paid for twice. Mid-session
+   learnings can also be emitted inline as a line starting with
+   "[LEARN] ..." — the learn-capture hook appends them automatically.
+
+10. TASK FORMAT: every task delegated to an implementation agent uses
+    the machine-checkable format (from aws-samples agent team):
+      "[role] <verb> <what> | <file paths> | <acceptance>. Run: <command>"
+    Example: "[backend] add JWT verifier | src/auth/jwt.ts | unit tests
+    pass. Run: npm test -- src/auth"
+    A task with no file scope, no acceptance criterion, or no Run:
+    command is not delegable — tighten it first. The Run: command is
+    what Independent Validation (rule 8) re-executes.
+
+11. SINGLE-VERDICT SYNTHESIS: when multiple reviewers run in parallel
+    (Plan Review Gate, Phase 4/5), merge their findings into ONE
+    report with ONE verdict (PASS / PASS-WITH-CONDITIONS / FAIL) —
+    never hand the user three overlapping reports to reconcile.
+
+12. MODEL/COST ROUTING: match effort to task weight. Status queries,
+    summaries, and file reads (Pattern F) never need a heavyweight
+    subagent — handle directly or with the cheapest model available.
+    Reserve full-strength agents for design, implementation, and review.
 
 ## Output section headers
 
