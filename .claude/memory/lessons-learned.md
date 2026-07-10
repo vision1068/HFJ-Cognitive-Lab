@@ -33,3 +33,8 @@ Entry format:
 ### 2026-07-10 — auto-captured — PSX API rejects requests without a browser User-Agent header
 - **Lesson:** PSX API rejects requests without a browser User-Agent header — always set one on server-side fetches.
 - **Source:** [LEARN] block auto-captured by learn-capture hook
+
+### 2026-07-10 — catch-the-falling-stars — conditional module.exports makes browser games unit-testable
+- **What happened:** Full 6-phase engagement on a zero-dependency canvas game. Structuring game.js as pure-logic → engine → DOM adapter, with `if (typeof module !== 'undefined') module.exports = {...}`, let Node run 21 real assertions (collision, difficulty, scoring, storage sanitization, end-of-round precedence) against the exact shipped file — no browser needed for the QA gate. The adversarial Plan Review Gate caught 8 timing/state edge cases (pause-drift, timer-vs-lives race, blur-from-non-PLAYING) before a line of code existed.
+- **Lesson:** Layer browser code so its pure logic is requireable, and run the plan through adversarial review first — both turn "should work" into command-output evidence cheaply. Also: security greps need manual triage (comments and `content=` attributes false-positive on innerHTML/on*= patterns).
+- **Rule going forward:** Every browser-JS deliverable exposes its pure logic via conditional module.exports and ships with a Node harness executed in Phase 4; grep-based security scans must show the matched lines, not just counts.
