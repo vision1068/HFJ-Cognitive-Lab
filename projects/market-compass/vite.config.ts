@@ -27,8 +27,8 @@ function yahooDevProxy() {
   }
 }
 
-export default defineConfig(({ command }) => ({
-  base: command === 'build' ? '/HFJ-Cognitive-Lab/market-compass/' : '/',
+export default defineConfig(() => ({
+  base: '/',
   plugins: [react(), tailwindcss(), yahooDevProxy()],
   resolve: {
     alias: {
