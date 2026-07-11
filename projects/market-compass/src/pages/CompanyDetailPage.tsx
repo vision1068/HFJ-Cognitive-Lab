@@ -6,13 +6,20 @@ import { PriceChange } from "@/components/ui/PriceChange";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 import { PriceChart } from "@/components/company/PriceChart";
 import { LoadingState, ErrorState, DataUnavailable, orNA } from "@/components/ui/DataState";
-import { useCompany } from "@/hooks/useMarketData";
+import { FinancialStatements } from "@/components/company/FinancialStatements";
+import { useCompany, useStatements } from "@/hooks/useMarketData";
 import { formatCurrency, formatCompactNumber, formatRelativeTime } from "@/lib/format";
 import { useAppStore } from "@/store/useAppStore";
 
 export function CompanyDetailPage() {
   const { ticker } = useParams<{ ticker: string }>();
   const { data: c, isLoading, isError, error, refetch } = useCompany(ticker);
+  // PSX symbols carry a `.KA` suffix so the statements service returns the honest
+  // "no free PSX statements source" state rather than attempting a Yahoo fetch.
+  // PSX companies -> `${symbol}.KA` (honest "no free PSX statements" N/A);
+  // global companies -> the raw symbol (real multi-year statements).
+  const statementsSymbol = c ? (c.isPsx ? `${c.psxSymbol}.KA` : c.ticker) : undefined;
+  const { data: statements, isLoading: statementsLoading } = useStatements(statementsSymbol);
   const watchlists = useAppStore((s) => s.watchlists);
   const toggleWatch = useAppStore((s) => s.toggleWatch);
   const [showWatchMenu, setShowWatchMenu] = useState(false);
@@ -101,6 +108,7 @@ export function CompanyDetailPage() {
         <p className="text-[11px] text-text-secondary mt-3">
           Price &amp; history: {c.priceSource}
           {c.fundamentalsSource ? ` · Fundamentals: ${c.fundamentalsSource}` : ""} · Updated {formatRelativeTime(c.lastUpdated)}
+          {c.asOf ? ` · Quote as of ${formatRelativeTime(c.asOf)}` : ""}
         </p>
       </section>
 
@@ -117,17 +125,18 @@ export function CompanyDetailPage() {
       <section className="card p-5">
         <h2 className="text-sm font-semibold text-text-primary mb-4">Analysis &amp; Scores</h2>
         <DataUnavailable
-          title="AI scores, health &amp; valuation analysis not available"
-          reason="Signal scores, financial-health breakdowns, fair-value estimates, and growth/risk ratings require paid fundamental and analyst-research feeds. Rather than fabricate them, they are omitted. The market data above (price, P/E, EPS, market cap, history) is real and live from PSX."
+          title="Health &amp; valuation scores not available"
+          reason="Financial-health breakdowns, fair-value estimates, and growth/risk ratings require paid fundamental and analyst-research feeds. Rather than fabricate them, they are omitted. The market data above (price, P/E, EPS, market cap, history) is real and live from PSX."
         />
       </section>
 
       <section className="card p-5">
         <h2 className="text-sm font-semibold text-text-primary mb-4">Financial Statements</h2>
-        <DataUnavailable
-          title="Detailed financial statements not available"
-          reason="Full income-statement / balance-sheet history (revenue, net profit, cash flow, ROE, margins by period) is not exposed by the free PSX or Yahoo endpoints for PSX tickers. Trailing EPS and P/E are shown in the overview above where PSX reports them."
-        />
+        <FinancialStatements data={statements} isLoading={statementsLoading} currency={c.currency} />
+        <p className="text-[11px] text-text-secondary mt-3">
+          Live fundamentals (P/E, EPS, market cap, 52-week range) are shown in the overview above where PSX reports them
+          {c.asOf ? `, as of ${formatRelativeTime(c.asOf)}` : ""}.
+        </p>
       </section>
 
       <section className="card p-5">

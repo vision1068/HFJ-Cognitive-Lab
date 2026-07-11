@@ -1,0 +1,11 @@
+[
+  { "symbol": "OGDC", "name": "Oil & Gas Development Company Limited", "sector": "OIL & GAS EXPLORATION COMPANIES" },
+  { "symbol": "OGTI", "name": "Ogti Placeholder Company Limited", "sector": "MISCELLANEOUS" },
+  { "symbol": "MEBL", "name": "Meezan Bank Limited", "sector": "COMMERCIAL BANKS" },
+  { "symbol": "HBL", "name": "Habib Bank Limited", "sector": "COMMERCIAL BANKS" },
+  { "symbol": "MCB", "name": "MCB Bank Limited", "sector": "COMMERCIAL BANKS" },
+  { "symbol": "UBL", "name": "United Bank Limited", "sector": "COMMERCIAL BANKS" },
+  { "symbol": "LUCK", "name": "Lucky Cement Limited", "sector": "CEMENT" },
+  { "symbol": "BANKX", "name": "Bank Example Holdings Limited", "sector": "COMMERCIAL BANKS" },
+  { "symbol": "BANKY", "name": "Bank Yonder Holdings Limited", "sector": "COMMERCIAL BANKS" }
+]

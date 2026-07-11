@@ -137,7 +137,7 @@ export function DashboardPage() {
             <h3 className="text-sm font-semibold text-text-primary mb-3">Signals, Sentiment &amp; Daily Briefing</h3>
             <DataUnavailable
               title="Not available on free PSX data"
-              reason="AI signal scores, market sentiment, analyst commentary, and the daily briefing require paid research feeds. Only live prices, indices, and PSX-reported fundamentals are shown in this build."
+              reason="Signal scores, market sentiment, analyst commentary, and the daily briefing require paid research feeds. Only live prices, indices, and PSX-reported fundamentals are shown in this build."
             />
           </section>
         </>

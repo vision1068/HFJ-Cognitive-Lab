@@ -4,6 +4,7 @@ import { Sidebar } from "./Sidebar";
 import { TopNav } from "./TopNav";
 import { MobileNav } from "./MobileNav";
 import { RightPanel } from "./RightPanel";
+import { DataAttribution } from "@/components/market/DataAttribution";
 import { useAppStore } from "@/store/useAppStore";
 
 export function AppLayout() {
@@ -21,6 +22,9 @@ export function AppLayout() {
         <TopNav />
         <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
           <Outlet />
+          <footer className="border-t border-border-subtle px-4 md:px-6 py-4 mt-4">
+            <DataAttribution />
+          </footer>
         </main>
       </div>
       <RightPanel />

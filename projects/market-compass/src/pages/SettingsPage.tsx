@@ -48,7 +48,7 @@ export function SettingsPage() {
           Market Compass shows only real, live data for the Pakistan Stock Exchange (PSX). Prices, price history, indices
           (KSE-100, KMI-30), and fundamentals (P/E, EPS, market cap) come from the PSX Data Portal (dps.psx.com.pk); the USD/PKR
           rate comes from Yahoo Finance. Data auto-refreshes every 60 seconds. Features that no free data source can support
-          (financial statements, AI scores, news, economic calendar) are clearly marked "data not available" rather than filled
+          (financial statements, signal scores, news, economic calendar) are clearly marked "data not available" rather than filled
           with estimated numbers.
         </p>
       </section>

@@ -5,7 +5,8 @@ import { DataStatusBadge } from "@/components/market/DataStatusBadge";
 import { MarketDataError } from "@/components/market/MarketDataError";
 import { useMarketAnalysis } from "@/hooks/useMarketData";
 import type { Timeframe } from "@/lib/fmpClient";
-import type { SignalStrength } from "@/lib/indicators";
+import { SignalPanel } from "@/components/analysis/SignalPanel";
+import { DataAttribution } from "@/components/market/DataAttribution";
 import { clsx } from "clsx";
 
 const TIMEFRAMES: { label: string; value: Timeframe }[] = [
@@ -17,14 +18,6 @@ const TIMEFRAMES: { label: string; value: Timeframe }[] = [
   { label: "4H", value: "4hour" },
   { label: "1D", value: "1day" },
 ];
-
-const SIGNAL_STYLES: Record<SignalStrength, string> = {
-  "Strong Buy": "bg-positive-bg text-positive border-positive/30",
-  Buy: "bg-positive-bg text-positive border-positive/20",
-  Neutral: "bg-neutral-bg text-neutral border-neutral/20",
-  Sell: "bg-negative-bg text-negative border-negative/20",
-  "Strong Sell": "bg-negative-bg text-negative border-negative/30",
-};
 
 export function LiveAnalysisPage() {
   const [symbolInput, setSymbolInput] = useState("AAPL");
@@ -45,7 +38,7 @@ export function LiveAnalysisPage() {
     <div>
       <PageHeader
         title="Live Market Analysis"
-        subtitle="Real-time prices, indicators, and signals — calculated only from live Financial Modeling Prep data."
+        subtitle="Live prices and technical indicators, calculated only from real market data (Yahoo Finance). Not financial advice."
         actions={<DataStatusBadge status={status} lastUpdated={lastUpdated} />}
       />
 
@@ -145,19 +138,12 @@ export function LiveAnalysisPage() {
 
           {/* Signal panel */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1 rounded-xl border border-border-subtle bg-bg-surface p-5">
-              <h3 className="text-sm font-semibold text-text-primary mb-3">Signal</h3>
-              <div className={clsx("rounded-lg border px-4 py-3 text-center mb-3", SIGNAL_STYLES[analysis.signal])}>
-                <div className="text-lg font-bold">{analysis.signal}</div>
-                <div className="text-xs mt-1">Confidence Score: {analysis.confidenceScore}/100</div>
-              </div>
-              <div className="text-xs text-text-secondary mb-2">Market structure: <span className="text-text-primary capitalize">{analysis.marketStructure}</span></div>
-              <ul className="space-y-1.5 text-xs text-text-secondary list-disc list-inside">
-                {analysis.signalReasons.map((r, i) => (
-                  <li key={i}>{r}</li>
-                ))}
-              </ul>
-            </div>
+            <SignalPanel
+              signal={analysis.signal}
+              confidenceScore={analysis.confidenceScore}
+              marketStructure={analysis.marketStructure}
+              signalReasons={analysis.signalReasons}
+            />
 
             <div className="lg:col-span-2 rounded-xl border border-border-subtle bg-bg-surface p-5">
               <h3 className="text-sm font-semibold text-text-primary mb-3">Indicators (latest value)</h3>
@@ -187,6 +173,8 @@ export function LiveAnalysisPage() {
               )}
             </div>
           </div>
+
+          <DataAttribution />
         </div>
       )}
     </div>
