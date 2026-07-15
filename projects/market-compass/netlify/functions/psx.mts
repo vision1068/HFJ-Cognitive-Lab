@@ -18,8 +18,14 @@ export default async function handler(req: Request, context: Context): Promise<R
       });
     }
 
-    // Strip the /.netlify/functions/psx prefix to get the upstream path.
-    const upstreamPath = rawPath.replace(/^\/.netlify\/functions\/psx/, "");
+    // Strip whichever prefix is present. Direct invocation sees
+    // /.netlify/functions/psx/...; invocation via the netlify.toml redirect
+    // (how the real app reaches this function, at /api/psx/*) sees the
+    // ORIGINAL pre-rewrite path, i.e. /api/psx/... — Netlify does not
+    // rewrite req.url for status=200 redirects to functions.
+    const upstreamPath = rawPath
+      .replace(/^\/\.netlify\/functions\/psx/, "")
+      .replace(/^\/api\/psx/, "");
     if (!upstreamPath.startsWith("/") || upstreamPath.includes("..") || upstreamPath.includes("@")) {
       return new Response(JSON.stringify({ error: "Illegal upstream path" }), {
         status: 400,
