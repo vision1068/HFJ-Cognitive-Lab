@@ -1,11 +1,27 @@
 import type { Currency } from "@/types";
 
-const CURRENCY_SYMBOLS: Record<Currency, string> = {
+const CURRENCY_SYMBOLS: Record<string, string> = {
   PKR: "Rs",
+  USD: "$",
+  EUR: "€",
+  GBP: "£",
+  JPY: "¥",
+  CAD: "C$",
+  AUD: "A$",
+  CHF: "CHF ",
+  CNY: "¥",
+  INR: "₹",
 };
 
+// Falls back to the ISO code prefix for any currency without a known glyph, so a
+// global company's price is never mislabelled with the PKR "Rs" symbol.
+function currencySymbol(currency: Currency): string {
+  if (!currency) return "";
+  return CURRENCY_SYMBOLS[currency] ?? `${currency} `;
+}
+
 export function formatCurrency(value: number, currency: Currency, opts?: { compact?: boolean }): string {
-  const symbol = CURRENCY_SYMBOLS[currency];
+  const symbol = currencySymbol(currency);
   if (opts?.compact) {
     return `${symbol}${formatCompactNumber(value)}`;
   }

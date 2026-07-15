@@ -1,4 +1,4 @@
-import { Bell, Moon, Sun, User } from "lucide-react";
+import { Bell, Moon, Sun, User, Telescope } from "lucide-react";
 import { GlobalSearch } from "./GlobalSearch";
 import { useAppStore } from "@/store/useAppStore";
 import { Link } from "react-router-dom";
@@ -15,6 +15,14 @@ export function TopNav() {
         <GlobalSearch />
       </div>
       <div className="flex items-center gap-1.5 ml-auto">
+        <Link
+          to="/predic"
+          className="flex items-center justify-center h-9 w-9 rounded-lg text-text-secondary hover:bg-bg-hover hover:text-text-primary transition-colors"
+          aria-label="Predic"
+          title="Predic"
+        >
+          <Telescope className="h-[18px] w-[18px]" />
+        </Link>
         <button
           onClick={toggleTheme}
           className="flex items-center justify-center h-9 w-9 rounded-lg text-text-secondary hover:bg-bg-hover hover:text-text-primary transition-colors"

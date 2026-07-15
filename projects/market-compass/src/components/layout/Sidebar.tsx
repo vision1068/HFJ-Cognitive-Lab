@@ -13,6 +13,7 @@ import {
   Bell,
   Settings,
   Compass,
+  Telescope,
   ChevronsLeft,
 } from "lucide-react";
 import { useAppStore } from "@/store/useAppStore";
@@ -22,6 +23,7 @@ const NAV_ITEMS = [
   { to: "/live-analysis", label: "Live Analysis", icon: Activity },
   { to: "/markets", label: "Markets", icon: Globe2 },
   { to: "/search", label: "Company Search", icon: Search },
+  { to: "/predic", label: "Predic", icon: Telescope },
   { to: "/screener", label: "Screener", icon: SlidersHorizontal },
   { to: "/watchlists", label: "Watchlists", icon: Eye },
   { to: "/portfolio", label: "Portfolio", icon: Briefcase },

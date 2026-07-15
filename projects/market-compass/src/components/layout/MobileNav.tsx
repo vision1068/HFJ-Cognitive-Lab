@@ -1,10 +1,11 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Search, Eye, Briefcase, Menu } from "lucide-react";
+import { LayoutDashboard, Search, Eye, Telescope, Briefcase, Menu } from "lucide-react";
 import { clsx } from "clsx";
 
 const ITEMS = [
   { to: "/dashboard", label: "Home", icon: LayoutDashboard },
   { to: "/search", label: "Search", icon: Search },
+  { to: "/predic", label: "Predic", icon: Telescope },
   { to: "/watchlists", label: "Watch", icon: Eye },
   { to: "/portfolio", label: "Portfolio", icon: Briefcase },
   { to: "/settings", label: "More", icon: Menu },

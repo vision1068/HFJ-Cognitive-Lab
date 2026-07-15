@@ -7,6 +7,7 @@ import { DashboardPage } from "@/pages/DashboardPage";
 import { LiveAnalysisPage } from "@/pages/LiveAnalysisPage";
 import { SearchPage } from "@/pages/SearchPage";
 import { CompanyDetailPage } from "@/pages/CompanyDetailPage";
+import { PredicPage } from "@/pages/PredicPage";
 import { MarketsPage } from "@/pages/MarketsPage";
 import { ScreenerPage } from "@/pages/ScreenerPage";
 import { WatchlistsPage } from "@/pages/WatchlistsPage";
@@ -36,6 +37,7 @@ function App() {
             <Route path="/live-analysis" element={<LiveAnalysisPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/company/:ticker" element={<CompanyDetailPage />} />
+            <Route path="/predic" element={<PredicPage />} />
             <Route path="/markets" element={<MarketsPage />} />
             <Route path="/screener" element={<ScreenerPage />} />
             <Route path="/watchlists" element={<WatchlistsPage />} />

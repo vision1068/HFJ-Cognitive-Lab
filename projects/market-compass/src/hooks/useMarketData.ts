@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchCompanyList, fetchCompanyListDetailed, fetchCompanyDetail } from "@/services/companies";
 import { fetchPsxIndices } from "@/services/psx";
-import { fetchUsdPkr } from "@/services/yahoo";
+import { fetchUniverse } from "@/services/universe";
+import { searchCompanies } from "@/services/search";
+import { fetchStatements } from "@/services/statements";
 import { fetchQuote, fetchHistoricalCandles, hasApiKey, describeFmpError, type Timeframe } from "@/lib/fmpClient";
-import { runTechnicalAnalysis } from "@/lib/indicators";
 
 const REFRESH_MS = 60_000; // 60s live refresh, per approved plan
 
@@ -35,24 +36,57 @@ export function useIndices() {
   return useQuery({ queryKey: ["psx", "indices"], queryFn: fetchPsxIndices, ...common });
 }
 
-export function useUsdPkr() {
-  return useQuery({ queryKey: ["fx", "usdpkr"], queryFn: fetchUsdPkr, ...common });
+// FR-4: the full PSX universe (live with committed-seed fallback). Rarely
+// changes, so it is cached far longer than the 60s quote refresh.
+export function useUniverse() {
+  return useQuery({
+    queryKey: ["psx", "universe"],
+    queryFn: fetchUniverse,
+    staleTime: 24 * 60 * 60_000,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+}
+
+// FR-5: merged local + global search. Runs against the live universe when
+// available, else the fallback seed baked into searchCompanies.
+export function useSearch(q: string) {
+  const universeQuery = useUniverse();
+  return useQuery({
+    queryKey: ["search", q, universeQuery.data ? "live" : "seed"],
+    queryFn: () => searchCompanies(q, universeQuery.data),
+    enabled: q.trim().length > 0,
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+  });
+}
+
+// FR-7: multi-year statements (global real, PSX honest N/A).
+export function useStatements(symbol: string | undefined) {
+  return useQuery({
+    queryKey: ["statements", symbol],
+    queryFn: () => fetchStatements(symbol as string),
+    enabled: Boolean(symbol),
+    staleTime: 24 * 60 * 60_000,
+    refetchOnWindowFocus: false,
+  });
 }
 
 export type DataConnectionStatus =
-  | "no-key" // key missing/placeholder — show setup screen
+  | "no-key" // key missing/placeholder — show setup screen (legacy FMP path only)
   | "loading" // "Loading Market Data"
   | "connected" // "Live Data Connected"
-  | "error" // "FMP API Error" (includes rate-limited, invalid key, network)
+  | "error" // upstream error (network, rate-limited)
   | "no-data"; // "No Data Available for This Symbol or Timeframe"
 
+// --- Optional legacy FMP hooks (augmentation only; the app is fully keyless) ---
 export function useLiveQuote(symbol: string) {
   return useQuery({
     queryKey: ["fmp", "quote", symbol],
     queryFn: () => fetchQuote(symbol),
     enabled: hasApiKey() && symbol.length > 0,
     staleTime: 15_000,
-    refetchInterval: 15_000, // real-time-ish polling within FMP's free-tier limits
+    refetchInterval: 15_000,
     retry: (failureCount, error) => {
       const { kind } = describeFmpError(error);
       if (kind === "invalid_key" || kind === "missing_key" || kind === "no_data") return false;
@@ -75,59 +109,3 @@ export function useHistoricalCandles(symbol: string, timeframe: Timeframe) {
   });
 }
 
-/**
- * Combined hook: real quote + real candles + calculated technical analysis.
- * Every field returned here traces back to an FMP API response — this hook
- * never fabricates a value. If real data isn't available, `status` reflects
- * that and `analysis`/`quote`/`candles` are left undefined for the UI to gate on.
- */
-export function useMarketAnalysis(symbol: string, timeframe: Timeframe) {
-  const quoteQuery = useLiveQuote(symbol);
-  const candlesQuery = useHistoricalCandles(symbol, timeframe);
-
-  const keyPresent = hasApiKey();
-
-  let status: DataConnectionStatus;
-  let errorMessage: string | undefined;
-
-  if (!keyPresent) {
-    status = "no-key";
-  } else if (quoteQuery.isLoading || candlesQuery.isLoading) {
-    status = "loading";
-  } else if (quoteQuery.isError || candlesQuery.isError) {
-    const err = quoteQuery.error ?? candlesQuery.error;
-    const { kind, message } = describeFmpError(err);
-    status = kind === "no_data" ? "no-data" : "error";
-    errorMessage = message;
-  } else if (!quoteQuery.data || !candlesQuery.data || candlesQuery.data.length < 50) {
-    status = "no-data";
-    errorMessage = "Not enough historical data was returned to calculate reliable indicators.";
-  } else {
-    status = "connected";
-  }
-
-  let analysis: ReturnType<typeof runTechnicalAnalysis> | undefined;
-  if (status === "connected" && candlesQuery.data) {
-    try {
-      analysis = runTechnicalAnalysis(candlesQuery.data);
-    } catch (e) {
-      status = "no-data";
-      errorMessage = e instanceof Error ? e.message : "Could not calculate indicators from the returned data.";
-    }
-  }
-
-  const lastUpdated = quoteQuery.dataUpdatedAt ? new Date(quoteQuery.dataUpdatedAt) : undefined;
-
-  return {
-    status,
-    errorMessage,
-    quote: quoteQuery.data,
-    candles: candlesQuery.data,
-    analysis,
-    lastUpdated,
-    refetch: () => {
-      quoteQuery.refetch();
-      candlesQuery.refetch();
-    },
-  };
-}

@@ -53,7 +53,7 @@ export function MarketDataError({
         <p className="text-sm text-text-secondary max-w-md mx-auto mb-4">
           {message ?? "FMP did not return market data for this selection. Try a different symbol or timeframe."}
         </p>
-        <p className="text-xs text-text-secondary">Buy/Sell signals are disabled until real data is available.</p>
+        <p className="text-xs text-text-secondary">Technical signals are disabled until real data is available.</p>
       </div>
     );
   }

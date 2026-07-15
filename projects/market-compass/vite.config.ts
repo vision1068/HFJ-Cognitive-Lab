@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
+import { handleYahooProxy } from './api/yahoo/_yahooProxy.js'
 
 // Browser CORS blocks direct calls to the PSX Data Portal and Yahoo Finance.
 // In dev we proxy through the Vite server; in production the same /api/* paths are
@@ -9,9 +10,26 @@ import path from 'path'
 const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
-export default defineConfig(({ command }) => ({
-  base: command === 'build' ? '/HFJ-Cognitive-Lab/market-compass/' : '/',
-  plugins: [react(), tailwindcss()],
+// Dev-server middleware that runs the IDENTICAL shared Yahoo proxy logic used in
+// production (crumb handshake, host-pin, allowlist, rate-limit) — NFR-5 parity.
+function yahooDevProxy() {
+  return {
+    name: 'yahoo-dev-proxy',
+    configureServer(server: { middlewares: { use: (fn: (req: any, res: any, next: () => void) => void) => void } }) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url && req.url.startsWith('/api/yahoo')) {
+          handleYahooProxy(req, res)
+          return
+        }
+        next()
+      })
+    },
+  }
+}
+
+export default defineConfig(() => ({
+  base: '/',
+  plugins: [react(), tailwindcss(), yahooDevProxy()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -19,6 +37,8 @@ export default defineConfig(({ command }) => ({
   },
   server: {
     proxy: {
+      // PSX stays a simple pass-through proxy; the fixed `target` pins the host
+      // to dps.psx.com.pk (parity with the serverless host-pin).
       '/api/psx': {
         target: 'https://dps.psx.com.pk',
         changeOrigin: true,
@@ -26,13 +46,8 @@ export default defineConfig(({ command }) => ({
         headers: { 'User-Agent': UA },
         rewrite: (p) => p.replace(/^\/api\/psx/, ''),
       },
-      '/api/yahoo': {
-        target: 'https://query1.finance.yahoo.com',
-        changeOrigin: true,
-        secure: true,
-        headers: { 'User-Agent': UA },
-        rewrite: (p) => p.replace(/^\/api\/yahoo/, ''),
-      },
+      // NOTE: /api/yahoo is intentionally NOT listed here — it is handled by the
+      // yahooDevProxy() middleware above so dev runs the same crumb logic as prod.
     },
   },
 }))

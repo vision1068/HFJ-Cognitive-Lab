@@ -1,0 +1,2102 @@
+[
+  {
+    "symbol": "ABL",
+    "name": "Allied Bank Limited",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "ABMCF",
+    "name": "Al-Ameen Fund",
+    "sector": "CLOSE - END MUTUAL FUND"
+  },
+  {
+    "symbol": "ABOT",
+    "name": "Abbott Laboratories (Pakistan) Limited",
+    "sector": "PHARMACEUTICALS"
+  },
+  {
+    "symbol": "ABSON",
+    "name": "Abson Industries Limited",
+    "sector": "MISCELLANEOUS"
+  },
+  {
+    "symbol": "ACPL",
+    "name": "Attock Cement Pakistan Limited",
+    "sector": "CEMENT"
+  },
+  {
+    "symbol": "ADMM",
+    "name": "Artistic Denim Mills Limited",
+    "sector": "TEXTILE SPINNING"
+  },
+  {
+    "symbol": "AGHA",
+    "name": "Agha Steel Industries Limited",
+    "sector": "ENGINEERING"
+  },
+  {
+    "symbol": "AGIL",
+    "name": "Agriauto Industries Limited",
+    "sector": "AUTOMOBILE PARTS & ACCESSORIES"
+  },
+  {
+    "symbol": "AGL",
+    "name": "Agritech Limited",
+    "sector": "FERTILIZER"
+  },
+  {
+    "symbol": "AGP",
+    "name": "AGP Limited",
+    "sector": "PHARMACEUTICALS"
+  },
+  {
+    "symbol": "AGSML",
+    "name": "Al-Ghazi Services Limited",
+    "sector": "MISCELLANEOUS"
+  },
+  {
+    "symbol": "AGTL",
+    "name": "Al-Ghazi Tractors Limited",
+    "sector": "AUTOMOBILE ASSEMBLER"
+  },
+  {
+    "symbol": "AICL",
+    "name": "Adamjee Insurance Company Limited",
+    "sector": "INSURANCE"
+  },
+  {
+    "symbol": "AIRLINK",
+    "name": "Air Link Communication Limited",
+    "sector": "TECHNOLOGY & COMMUNICATION"
+  },
+  {
+    "symbol": "AKBL",
+    "name": "Askari Bank Limited",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "AKD",
+    "name": "AKD Securities Limited",
+    "sector": "INVESTMENT BANKS / SECURITIES"
+  },
+  {
+    "symbol": "AKZO",
+    "name": "Akzo Nobel Pakistan Limited",
+    "sector": "CHEMICAL"
+  },
+  {
+    "symbol": "ALNRS",
+    "name": "Al-Noor Sugar Mills Limited",
+    "sector": "SUGAR & ALLIED INDUSTRIES"
+  },
+  {
+    "symbol": "ALTBA",
+    "name": "Allied Rental Modaraba",
+    "sector": "MODARABAS"
+  },
+  {
+    "symbol": "ALTN",
+    "name": "Altern Energy Limited",
+    "sector": "POWER GENERATION & DISTRIBUTION"
+  },
+  {
+    "symbol": "APL",
+    "name": "Attock Petroleum Limited",
+    "sector": "OIL & GAS MARKETING COMPANIES"
+  },
+  {
+    "symbol": "ARPL",
+    "name": "Archroma Pakistan Limited",
+    "sector": "CHEMICAL"
+  },
+  {
+    "symbol": "ASC",
+    "name": "Al Shaheer Corporation Limited",
+    "sector": "FOOD & PERSONAL CARE PRODUCTS"
+  },
+  {
+    "symbol": "ASHT",
+    "name": "Ashfaq Textiles",
+    "sector": "VANASPATI & ALLIED INDUSTRIES"
+  },
+  {
+    "symbol": "ASTL",
+    "name": "Amreli Steels Limited",
+    "sector": "ENGINEERING"
+  },
+  {
+    "symbol": "ATBA",
+    "name": "Atlas Battery Limited",
+    "sector": "AUTOMOBILE PARTS & ACCESSORIES"
+  },
+  {
+    "symbol": "ATIL",
+    "name": "Atlas Insurance Limited",
+    "sector": "INSURANCE"
+  },
+  {
+    "symbol": "ATRL",
+    "name": "Attock Refinery Limited",
+    "sector": "REFINERY"
+  },
+  {
+    "symbol": "AVN",
+    "name": "Avanceon Limited",
+    "sector": "TECHNOLOGY & COMMUNICATION"
+  },
+  {
+    "symbol": "AZTM",
+    "name": "Azgard Nine Limited",
+    "sector": "TEXTILE COMPOSITE"
+  },
+  {
+    "symbol": "BAFL",
+    "name": "Bank Alfalah Limited",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "BAHL",
+    "name": "Bank AL Habib Limited",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "BAPL",
+    "name": "Bawany Air Products Limited",
+    "sector": "CHEMICAL"
+  },
+  {
+    "symbol": "BATA",
+    "name": "Bata Pakistan Limited",
+    "sector": "LEATHER & TANNERIES"
+  },
+  {
+    "symbol": "BERGER",
+    "name": "Berger Paints Pakistan Limited",
+    "sector": "CHEMICAL"
+  },
+  {
+    "symbol": "BIPL",
+    "name": "BankIslami Pakistan Limited",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "BOK",
+    "name": "The Bank of Khyber",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "BOLAN",
+    "name": "Bolan Castings Limited",
+    "sector": "ENGINEERING"
+  },
+  {
+    "symbol": "BOP",
+    "name": "The Bank of Punjab",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "BROT",
+    "name": "Bannu Woollen Mills Limited",
+    "sector": "TEXTILE SPINNING"
+  },
+  {
+    "symbol": "BRRG",
+    "name": "BRR Guardian Modaraba",
+    "sector": "MODARABAS"
+  },
+  {
+    "symbol": "BWCL",
+    "name": "Bestway Cement Limited",
+    "sector": "CEMENT"
+  },
+  {
+    "symbol": "BWHL",
+    "name": "Baluchistan Wheels Limited",
+    "sector": "AUTOMOBILE PARTS & ACCESSORIES"
+  },
+  {
+    "symbol": "BYCO",
+    "name": "Byco Petroleum Pakistan Limited",
+    "sector": "REFINERY"
+  },
+  {
+    "symbol": "CEPB",
+    "name": "Century Paper & Board Mills Limited",
+    "sector": "PAPER & BOARD"
+  },
+  {
+    "symbol": "CHCC",
+    "name": "Cherat Cement Company Limited",
+    "sector": "CEMENT"
+  },
+  {
+    "symbol": "CJPL",
+    "name": "Crescent Jute Products Limited",
+    "sector": "JUTE"
+  },
+  {
+    "symbol": "CNERGY",
+    "name": "Cnergyico PK Limited",
+    "sector": "REFINERY"
+  },
+  {
+    "symbol": "COLG",
+    "name": "Colgate-Palmolive (Pakistan) Limited",
+    "sector": "FOOD & PERSONAL CARE PRODUCTS"
+  },
+  {
+    "symbol": "CPHL",
+    "name": "Citi Pharma Limited",
+    "sector": "PHARMACEUTICALS"
+  },
+  {
+    "symbol": "CPPL",
+    "name": "Cherat Packaging Limited",
+    "sector": "PAPER & BOARD"
+  },
+  {
+    "symbol": "CRTM",
+    "name": "Crescent Textile Mills Limited",
+    "sector": "TEXTILE SPINNING"
+  },
+  {
+    "symbol": "CSAP",
+    "name": "Crescent Steel & Allied Products Limited",
+    "sector": "ENGINEERING"
+  },
+  {
+    "symbol": "CTM",
+    "name": "Colony Textile Mills Limited",
+    "sector": "TEXTILE COMPOSITE"
+  },
+  {
+    "symbol": "DAWD",
+    "name": "Dawood Equities Limited",
+    "sector": "INVESTMENT BANKS / SECURITIES"
+  },
+  {
+    "symbol": "DAWH",
+    "name": "Dawood Hercules Corporation Limited",
+    "sector": "FERTILIZER"
+  },
+  {
+    "symbol": "DCL",
+    "name": "Dewan Cement Limited",
+    "sector": "CEMENT"
+  },
+  {
+    "symbol": "DCR",
+    "name": "Dolmen City REIT",
+    "sector": "REAL ESTATE INVESTMENT TRUST"
+  },
+  {
+    "symbol": "DFML",
+    "name": "Dewan Farooque Motors Limited",
+    "sector": "AUTOMOBILE ASSEMBLER"
+  },
+  {
+    "symbol": "DGKC",
+    "name": "D.G. Khan Cement Company Limited",
+    "sector": "CEMENT"
+  },
+  {
+    "symbol": "DINT",
+    "name": "Dewan Textile Mills Limited",
+    "sector": "SYNTHETIC & RAYON"
+  },
+  {
+    "symbol": "DSFL",
+    "name": "Dost Steels Limited",
+    "sector": "ENGINEERING"
+  },
+  {
+    "symbol": "DYNO",
+    "name": "Dynea Pakistan Limited",
+    "sector": "CHEMICAL"
+  },
+  {
+    "symbol": "EFERT",
+    "name": "Engro Fertilizers Limited",
+    "sector": "FERTILIZER"
+  },
+  {
+    "symbol": "EFOODS",
+    "name": "Engro Foods Limited",
+    "sector": "FOOD & PERSONAL CARE PRODUCTS"
+  },
+  {
+    "symbol": "EFUG",
+    "name": "EFU General Insurance Limited",
+    "sector": "INSURANCE"
+  },
+  {
+    "symbol": "EFUL",
+    "name": "EFU Life Assurance Limited",
+    "sector": "INSURANCE"
+  },
+  {
+    "symbol": "ELCOT",
+    "name": "Elahi Cotton Mills Limited",
+    "sector": "TEXTILE SPINNING"
+  },
+  {
+    "symbol": "EMCO",
+    "name": "Emco Industries Limited",
+    "sector": "GLASS & CERAMICS"
+  },
+  {
+    "symbol": "EMCOIND",
+    "name": "EMCO Industries Limited",
+    "sector": "CABLE & ELECTRICAL GOODS"
+  },
+  {
+    "symbol": "ENGRO",
+    "name": "Engro Corporation Limited",
+    "sector": "FERTILIZER"
+  },
+  {
+    "symbol": "ENGROH",
+    "name": "Engro Holdings Limited",
+    "sector": "FERTILIZER"
+  },
+  {
+    "symbol": "EPCL",
+    "name": "Engro Powergen Qadirpur Limited",
+    "sector": "POWER GENERATION & DISTRIBUTION"
+  },
+  {
+    "symbol": "EPCL2",
+    "name": "Engro Polymer & Chemicals Limited",
+    "sector": "CHEMICAL"
+  },
+  {
+    "symbol": "ESCORTS",
+    "name": "Escorts Investment Bank Limited",
+    "sector": "INVESTMENT BANKS / SECURITIES"
+  },
+  {
+    "symbol": "EXIDE",
+    "name": "Exide Pakistan Limited",
+    "sector": "AUTOMOBILE PARTS & ACCESSORIES"
+  },
+  {
+    "symbol": "FABL",
+    "name": "Faysal Bank Limited",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "FATIMA",
+    "name": "Fatima Fertilizer Company Limited",
+    "sector": "FERTILIZER"
+  },
+  {
+    "symbol": "FCCL",
+    "name": "Fauji Cement Company Limited",
+    "sector": "CEMENT"
+  },
+  {
+    "symbol": "FCEPL",
+    "name": "FrieslandCampina Engro Pakistan Limited",
+    "sector": "FOOD & PERSONAL CARE PRODUCTS"
+  },
+  {
+    "symbol": "FCSC",
+    "name": "First Capital Securities Corporation",
+    "sector": "INVESTMENT BANKS / SECURITIES"
+  },
+  {
+    "symbol": "FDMF",
+    "name": "First Dawood Mutual Fund",
+    "sector": "MODARABAS"
+  },
+  {
+    "symbol": "FEROZ",
+    "name": "Ferozsons Laboratories Limited",
+    "sector": "PHARMACEUTICALS"
+  },
+  {
+    "symbol": "FFBL",
+    "name": "Fauji Fertilizer Bin Qasim Limited",
+    "sector": "FERTILIZER"
+  },
+  {
+    "symbol": "FFC",
+    "name": "Fauji Fertilizer Company Limited",
+    "sector": "FERTILIZER"
+  },
+  {
+    "symbol": "FHAM",
+    "name": "First Habib Modaraba",
+    "sector": "MODARABAS"
+  },
+  {
+    "symbol": "FLYNG",
+    "name": "Flying Cement Company Limited",
+    "sector": "CEMENT"
+  },
+  {
+    "symbol": "FML",
+    "name": "Feroze1888 Mills Limited",
+    "sector": "TEXTILE COMPOSITE"
+  },
+  {
+    "symbol": "FNBM",
+    "name": "First National Bank Modaraba",
+    "sector": "MODARABAS"
+  },
+  {
+    "symbol": "FPJM",
+    "name": "First Punjab Modaraba",
+    "sector": "MODARABAS"
+  },
+  {
+    "symbol": "FRSM",
+    "name": "Frontier Ceramics Limited",
+    "sector": "GLASS & CERAMICS"
+  },
+  {
+    "symbol": "FTSM",
+    "name": "Fateh Textile Mills Limited",
+    "sector": "TEXTILE COMPOSITE"
+  },
+  {
+    "symbol": "FZCM",
+    "name": "Faran Sugar Mills Limited",
+    "sector": "SUGAR & ALLIED INDUSTRIES"
+  },
+  {
+    "symbol": "GADT",
+    "name": "Gadoon Textile Mills Limited",
+    "sector": "TEXTILE SPINNING"
+  },
+  {
+    "symbol": "GATI",
+    "name": "Gatron Industries Limited",
+    "sector": "SYNTHETIC & RAYON"
+  },
+  {
+    "symbol": "GATM",
+    "name": "Gul Ahmed Textile Mills Limited",
+    "sector": "TEXTILE COMPOSITE"
+  },
+  {
+    "symbol": "GGL",
+    "name": "Ghani Global Holdings Limited",
+    "sector": "CHEMICAL"
+  },
+  {
+    "symbol": "GHGL",
+    "name": "Ghani Glass Limited",
+    "sector": "GLASS & CERAMICS"
+  },
+  {
+    "symbol": "GHNI",
+    "name": "Ghandhara Nissan Limited",
+    "sector": "AUTOMOBILE ASSEMBLER"
+  },
+  {
+    "symbol": "GHNL",
+    "name": "Ghandhara Industries Limited",
+    "sector": "AUTOMOBILE ASSEMBLER"
+  },
+  {
+    "symbol": "GLAXO",
+    "name": "GlaxoSmithKline Pakistan Limited",
+    "sector": "PHARMACEUTICALS"
+  },
+  {
+    "symbol": "GLRT",
+    "name": "Globe Residency REIT",
+    "sector": "REAL ESTATE INVESTMENT TRUST"
+  },
+  {
+    "symbol": "GRAYS",
+    "name": "Grays of Cambridge (Pakistan)",
+    "sector": "MISCELLANEOUS"
+  },
+  {
+    "symbol": "GTYR",
+    "name": "The General Tyre & Rubber Company",
+    "sector": "AUTOMOBILE PARTS & ACCESSORIES"
+  },
+  {
+    "symbol": "GWLC",
+    "name": "Gharibwal Cement Limited",
+    "sector": "CEMENT"
+  },
+  {
+    "symbol": "HABSM",
+    "name": "Habib Sugar Mills Limited",
+    "sector": "SUGAR & ALLIED INDUSTRIES"
+  },
+  {
+    "symbol": "HALEON",
+    "name": "Haleon Pakistan Limited",
+    "sector": "PHARMACEUTICALS"
+  },
+  {
+    "symbol": "HALEONPK",
+    "name": "Haleon Pakistan",
+    "sector": "MISCELLANEOUS"
+  },
+  {
+    "symbol": "HASCOL",
+    "name": "Hascol Petroleum Limited",
+    "sector": "OIL & GAS MARKETING COMPANIES"
+  },
+  {
+    "symbol": "HBL",
+    "name": "Habib Bank Limited",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "HCAR",
+    "name": "Honda Atlas Cars (Pakistan) Limited",
+    "sector": "AUTOMOBILE ASSEMBLER"
+  },
+  {
+    "symbol": "HGFA",
+    "name": "HBL Growth Fund",
+    "sector": "CLOSE - END MUTUAL FUND"
+  },
+  {
+    "symbol": "HINOON",
+    "name": "Hinopak Motors Limited",
+    "sector": "AUTOMOBILE ASSEMBLER"
+  },
+  {
+    "symbol": "HINOON2",
+    "name": "Highnoon Laboratories Limited",
+    "sector": "PHARMACEUTICALS"
+  },
+  {
+    "symbol": "HMB",
+    "name": "Habib Metropolitan Bank Limited",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "HSPI",
+    "name": "Huffaz Seamless Pipe Industries Limited",
+    "sector": "ENGINEERING"
+  },
+  {
+    "symbol": "HTL",
+    "name": "Hi-Tech Lubricants Limited",
+    "sector": "OIL & GAS MARKETING COMPANIES"
+  },
+  {
+    "symbol": "HUBC",
+    "name": "The Hub Power Company Limited",
+    "sector": "POWER GENERATION & DISTRIBUTION"
+  },
+  {
+    "symbol": "IBFL",
+    "name": "Ibrahim Fibres Limited",
+    "sector": "SYNTHETIC & RAYON"
+  },
+  {
+    "symbol": "IBLHL",
+    "name": "IBL HealthCare Limited",
+    "sector": "PHARMACEUTICALS"
+  },
+  {
+    "symbol": "ICI",
+    "name": "ICI Pakistan Limited",
+    "sector": "CHEMICAL"
+  },
+  {
+    "symbol": "ICIB",
+    "name": "Image Textiles",
+    "sector": "SYNTHETIC & RAYON"
+  },
+  {
+    "symbol": "IGIHL",
+    "name": "IGI Holdings Limited",
+    "sector": "INSURANCE"
+  },
+  {
+    "symbol": "ILP",
+    "name": "Interloop Limited",
+    "sector": "TEXTILE COMPOSITE"
+  },
+  {
+    "symbol": "INDU",
+    "name": "Indus Motor Company Limited",
+    "sector": "AUTOMOBILE ASSEMBLER"
+  },
+  {
+    "symbol": "ISIL",
+    "name": "Ismail Industries Limited",
+    "sector": "FOOD & PERSONAL CARE PRODUCTS"
+  },
+  {
+    "symbol": "ISL",
+    "name": "International Steels Limited",
+    "sector": "ENGINEERING"
+  },
+  {
+    "symbol": "ISPL",
+    "name": "International Industries Limited",
+    "sector": "ENGINEERING"
+  },
+  {
+    "symbol": "ITTEFAQ",
+    "name": "Ittefaq Iron Industries Limited",
+    "sector": "ENGINEERING"
+  },
+  {
+    "symbol": "JDWS",
+    "name": "JDW Sugar Mills Limited",
+    "sector": "SUGAR & ALLIED INDUSTRIES"
+  },
+  {
+    "symbol": "JGICL",
+    "name": "Jubilee General Insurance Company",
+    "sector": "INSURANCE"
+  },
+  {
+    "symbol": "JLICL",
+    "name": "Jubilee Life Insurance Company Limited",
+    "sector": "INSURANCE"
+  },
+  {
+    "symbol": "JOPP",
+    "name": "Johnson & Phillips Pakistan Limited",
+    "sector": "CABLE & ELECTRICAL GOODS"
+  },
+  {
+    "symbol": "JSBL",
+    "name": "JS Bank Limited",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "JSCL",
+    "name": "Jahangir Siddiqui & Company Limited",
+    "sector": "INVESTMENT BANKS / SECURITIES"
+  },
+  {
+    "symbol": "KAPCO",
+    "name": "Kot Addu Power Company Limited",
+    "sector": "POWER GENERATION & DISTRIBUTION"
+  },
+  {
+    "symbol": "KASBB",
+    "name": "KASB Bank Limited",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "KASBM",
+    "name": "KASB Modaraba",
+    "sector": "MODARABAS"
+  },
+  {
+    "symbol": "KEL",
+    "name": "K-Electric Limited",
+    "sector": "POWER GENERATION & DISTRIBUTION"
+  },
+  {
+    "symbol": "KHTC",
+    "name": "Khyber Tobacco Company Limited",
+    "sector": "TOBACCO"
+  },
+  {
+    "symbol": "KOHC",
+    "name": "Kohat Cement Company Limited",
+    "sector": "CEMENT"
+  },
+  {
+    "symbol": "KSBP",
+    "name": "KSB Pumps Company Limited",
+    "sector": "ENGINEERING"
+  },
+  {
+    "symbol": "KTML",
+    "name": "Kohinoor Textile Mills Limited",
+    "sector": "TEXTILE COMPOSITE"
+  },
+  {
+    "symbol": "LEATHER",
+    "name": "Pakistan Leather Crafts Limited",
+    "sector": "LEATHER & TANNERIES"
+  },
+  {
+    "symbol": "LOADS",
+    "name": "Loads Limited",
+    "sector": "AUTOMOBILE PARTS & ACCESSORIES"
+  },
+  {
+    "symbol": "LOTCHEM",
+    "name": "Lotte Chemical Pakistan Limited",
+    "sector": "CHEMICAL"
+  },
+  {
+    "symbol": "LPL",
+    "name": "Lalpir Power Limited",
+    "sector": "POWER GENERATION & DISTRIBUTION"
+  },
+  {
+    "symbol": "LUCK",
+    "name": "Lucky Cement Limited",
+    "sector": "CEMENT"
+  },
+  {
+    "symbol": "MACTER",
+    "name": "Macter International Limited",
+    "sector": "PHARMACEUTICALS"
+  },
+  {
+    "symbol": "MARI",
+    "name": "Mari Petroleum Company Limited",
+    "sector": "OIL & GAS EXPLORATION COMPANIES"
+  },
+  {
+    "symbol": "MASFL",
+    "name": "Masood Textile Mills Limited",
+    "sector": "TEXTILE COMPOSITE"
+  },
+  {
+    "symbol": "MCB",
+    "name": "MCB Bank Limited",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "MDTL",
+    "name": "Media Times Limited",
+    "sector": "TECHNOLOGY & COMMUNICATION"
+  },
+  {
+    "symbol": "MEBL",
+    "name": "Meezan Bank Limited",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "MERIT",
+    "name": "Merit Packaging Limited",
+    "sector": "PAPER & BOARD"
+  },
+  {
+    "symbol": "MERIT2",
+    "name": "Merit Group",
+    "sector": "MISCELLANEOUS"
+  },
+  {
+    "symbol": "MFFL",
+    "name": "Mitchell's Fruit Farms Limited",
+    "sector": "FOOD & PERSONAL CARE PRODUCTS"
+  },
+  {
+    "symbol": "MLCF",
+    "name": "Maple Leaf Cement Factory Limited",
+    "sector": "CEMENT"
+  },
+  {
+    "symbol": "MRNS",
+    "name": "Mirpurkhas Sugar Mills Limited",
+    "sector": "SUGAR & ALLIED INDUSTRIES"
+  },
+  {
+    "symbol": "MTL",
+    "name": "Millat Tractors Limited",
+    "sector": "AUTOMOBILE ASSEMBLER"
+  },
+  {
+    "symbol": "MUGHAL",
+    "name": "Mughal Iron & Steel Industries Limited",
+    "sector": "ENGINEERING"
+  },
+  {
+    "symbol": "MUREB",
+    "name": "Murree Brewery Company Limited",
+    "sector": "FOOD & PERSONAL CARE PRODUCTS"
+  },
+  {
+    "symbol": "NATF",
+    "name": "National Foods Limited",
+    "sector": "FOOD & PERSONAL CARE PRODUCTS"
+  },
+  {
+    "symbol": "NBP",
+    "name": "National Bank of Pakistan",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "NCL",
+    "name": "Nishat (Chunian) Limited",
+    "sector": "TEXTILE COMPOSITE"
+  },
+  {
+    "symbol": "NCPL",
+    "name": "Nishat Chunian Power Limited",
+    "sector": "POWER GENERATION & DISTRIBUTION"
+  },
+  {
+    "symbol": "NESTLE",
+    "name": "Nestle Pakistan Limited",
+    "sector": "FOOD & PERSONAL CARE PRODUCTS"
+  },
+  {
+    "symbol": "NETSOL",
+    "name": "NetSol Technologies Limited",
+    "sector": "TECHNOLOGY & COMMUNICATION"
+  },
+  {
+    "symbol": "NEXT",
+    "name": "Next Capital Limited",
+    "sector": "INVESTMENT BANKS / SECURITIES"
+  },
+  {
+    "symbol": "NICL",
+    "name": "Nimir Industrial Chemicals Limited",
+    "sector": "CHEMICAL"
+  },
+  {
+    "symbol": "NML",
+    "name": "Nishat Mills Limited",
+    "sector": "TEXTILE COMPOSITE"
+  },
+  {
+    "symbol": "NONS",
+    "name": "Noon Sugar Mills Limited",
+    "sector": "SUGAR & ALLIED INDUSTRIES"
+  },
+  {
+    "symbol": "NPL",
+    "name": "Nishat Power Limited",
+    "sector": "POWER GENERATION & DISTRIBUTION"
+  },
+  {
+    "symbol": "NRL",
+    "name": "National Refinery Limited",
+    "sector": "REFINERY"
+  },
+  {
+    "symbol": "NRSL",
+    "name": "Nagina Group",
+    "sector": "MISCELLANEOUS"
+  },
+  {
+    "symbol": "OBOY",
+    "name": "Otsuka Pakistan Limited",
+    "sector": "PHARMACEUTICALS"
+  },
+  {
+    "symbol": "OCTOPUS",
+    "name": "Octopus Digital Limited",
+    "sector": "TECHNOLOGY & COMMUNICATION"
+  },
+  {
+    "symbol": "OGDC",
+    "name": "Oil & Gas Development Company Limited",
+    "sector": "OIL & GAS EXPLORATION COMPANIES"
+  },
+  {
+    "symbol": "ORIX",
+    "name": "ORIX Leasing Pakistan Limited",
+    "sector": "INVESTMENT BANKS / SECURITIES"
+  },
+  {
+    "symbol": "PACE",
+    "name": "Pace (Pakistan) Limited",
+    "sector": "MISCELLANEOUS"
+  },
+  {
+    "symbol": "PAEL",
+    "name": "Pak Elektron Limited",
+    "sector": "CABLE & ELECTRICAL GOODS"
+  },
+  {
+    "symbol": "PAKT",
+    "name": "Pakistan Tobacco Company Limited",
+    "sector": "TOBACCO"
+  },
+  {
+    "symbol": "PCAL",
+    "name": "Pak Cables Limited",
+    "sector": "CABLE & ELECTRICAL GOODS"
+  },
+  {
+    "symbol": "PGF",
+    "name": "PICIC Growth Fund",
+    "sector": "CLOSE - END MUTUAL FUND"
+  },
+  {
+    "symbol": "PIAA",
+    "name": "Pakistan International Airlines Corporation",
+    "sector": "TRANSPORT"
+  },
+  {
+    "symbol": "PIBTL",
+    "name": "Pakistan International Bulk Terminal",
+    "sector": "TRANSPORT"
+  },
+  {
+    "symbol": "PICT",
+    "name": "Pakistan International Container Terminal",
+    "sector": "SYNTHETIC & RAYON"
+  },
+  {
+    "symbol": "PICT2",
+    "name": "Pakistan International Container Terminal Limited",
+    "sector": "TRANSPORT"
+  },
+  {
+    "symbol": "PIF",
+    "name": "PICIC Investment Fund",
+    "sector": "CLOSE - END MUTUAL FUND"
+  },
+  {
+    "symbol": "PINL",
+    "name": "Pakistan Reinsurance Company Limited",
+    "sector": "INSURANCE"
+  },
+  {
+    "symbol": "PIOC",
+    "name": "Pioneer Cement Limited",
+    "sector": "CEMENT"
+  },
+  {
+    "symbol": "PKGP",
+    "name": "Pakgen Power Limited",
+    "sector": "POWER GENERATION & DISTRIBUTION"
+  },
+  {
+    "symbol": "PKGP2",
+    "name": "Pakistan Services Limited",
+    "sector": "MISCELLANEOUS"
+  },
+  {
+    "symbol": "PKGS",
+    "name": "Packages Limited",
+    "sector": "PAPER & BOARD"
+  },
+  {
+    "symbol": "PMI",
+    "name": "Punjab Oil Mills Limited",
+    "sector": "VANASPATI & ALLIED INDUSTRIES"
+  },
+  {
+    "symbol": "PMPK",
+    "name": "Philip Morris (Pakistan) Limited",
+    "sector": "TOBACCO"
+  },
+  {
+    "symbol": "PNSC",
+    "name": "Pakistan National Shipping Corporation",
+    "sector": "TRANSPORT"
+  },
+  {
+    "symbol": "POL",
+    "name": "Pakistan Oilfields Limited",
+    "sector": "OIL & GAS EXPLORATION COMPANIES"
+  },
+  {
+    "symbol": "POWER",
+    "name": "Power Cement Limited",
+    "sector": "CEMENT"
+  },
+  {
+    "symbol": "PPL",
+    "name": "Pakistan Petroleum Limited",
+    "sector": "OIL & GAS EXPLORATION COMPANIES"
+  },
+  {
+    "symbol": "PPP",
+    "name": "Pakistan Paper Products Limited",
+    "sector": "PAPER & BOARD"
+  },
+  {
+    "symbol": "PRL",
+    "name": "Pakistan Refinery Limited",
+    "sector": "REFINERY"
+  },
+  {
+    "symbol": "PSEL",
+    "name": "Pakistan Services Limited",
+    "sector": "MISCELLANEOUS"
+  },
+  {
+    "symbol": "PSMC",
+    "name": "Pak Suzuki Motor Company Limited",
+    "sector": "AUTOMOBILE ASSEMBLER"
+  },
+  {
+    "symbol": "PSO",
+    "name": "Pakistan State Oil Company Limited",
+    "sector": "OIL & GAS MARKETING COMPANIES"
+  },
+  {
+    "symbol": "PSX",
+    "name": "Pakistan Stock Exchange Limited",
+    "sector": "INVESTMENT BANKS / SECURITIES"
+  },
+  {
+    "symbol": "PTC",
+    "name": "Pakistan Telecommunication Company Limited",
+    "sector": "TECHNOLOGY & COMMUNICATION"
+  },
+  {
+    "symbol": "PTCL",
+    "name": "Pakistan Telecommunication Company Limited",
+    "sector": "TECHNOLOGY & COMMUNICATION"
+  },
+  {
+    "symbol": "QUICE",
+    "name": "Quice Food Industries Limited",
+    "sector": "FOOD & PERSONAL CARE PRODUCTS"
+  },
+  {
+    "symbol": "RCML",
+    "name": "Reliance Cotton Spinning Mills Limited",
+    "sector": "TEXTILE SPINNING"
+  },
+  {
+    "symbol": "RJML",
+    "name": "Rafhan Jute",
+    "sector": "JUTE"
+  },
+  {
+    "symbol": "RMPL",
+    "name": "Rafhan Maize Products Company",
+    "sector": "FOOD & PERSONAL CARE PRODUCTS"
+  },
+  {
+    "symbol": "ROSE",
+    "name": "Roshan Packages Limited",
+    "sector": "PAPER & BOARD"
+  },
+  {
+    "symbol": "RUPL",
+    "name": "Rupali Polyester Limited",
+    "sector": "SYNTHETIC & RAYON"
+  },
+  {
+    "symbol": "SALL",
+    "name": "Suraj Cotton Mills Limited",
+    "sector": "TEXTILE SPINNING"
+  },
+  {
+    "symbol": "SAZEW",
+    "name": "Sazgar Engineering Works Limited",
+    "sector": "AUTOMOBILE ASSEMBLER"
+  },
+  {
+    "symbol": "SCBPL",
+    "name": "Standard Chartered Bank (Pakistan) Limited",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "SEARL",
+    "name": "The Searle Company Limited",
+    "sector": "PHARMACEUTICALS"
+  },
+  {
+    "symbol": "SEARL2",
+    "name": "Searle Pakistan Limited",
+    "sector": "MISCELLANEOUS"
+  },
+  {
+    "symbol": "SEEDX001",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #1",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX002",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #2",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX003",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #3",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX004",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #4",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX005",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #5",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX006",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #6",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX007",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #7",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX008",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #8",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX009",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #9",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX010",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #10",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX011",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #11",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX012",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #12",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX013",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #13",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX014",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #14",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX015",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #15",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX016",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #16",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX017",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #17",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX018",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #18",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX019",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #19",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX020",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #20",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX021",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #21",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX022",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #22",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX023",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #23",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX024",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #24",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX025",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #25",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX026",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #26",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX027",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #27",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX028",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #28",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX029",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #29",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX030",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #30",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX031",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #31",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX032",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #32",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX033",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #33",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX034",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #34",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX035",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #35",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX036",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #36",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX037",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #37",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX038",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #38",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX039",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #39",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX040",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #40",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX041",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #41",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX042",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #42",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX043",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #43",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX044",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #44",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX045",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #45",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX046",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #46",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX047",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #47",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX048",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #48",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX049",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #49",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX050",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #50",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX051",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #51",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX052",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #52",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX053",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #53",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX054",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #54",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX055",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #55",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX056",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #56",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX057",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #57",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX058",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #58",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX059",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #59",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX060",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #60",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX061",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #61",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX062",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #62",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX063",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #63",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX064",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #64",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX065",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #65",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX066",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #66",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX067",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #67",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX068",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #68",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX069",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #69",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX070",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #70",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX071",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #71",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX072",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #72",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX073",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #73",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX074",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #74",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX075",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #75",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX076",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #76",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX077",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #77",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX078",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #78",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX079",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #79",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX080",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #80",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX081",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #81",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX082",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #82",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX083",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #83",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX084",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #84",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX085",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #85",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX086",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #86",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX087",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #87",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX088",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #88",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX089",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #89",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX090",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #90",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX091",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #91",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX092",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #92",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX093",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #93",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX094",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #94",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX095",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #95",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX096",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #96",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX097",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #97",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX098",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #98",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX099",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #99",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX100",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #100",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX101",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #101",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX102",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #102",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX103",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #103",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX104",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #104",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX105",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #105",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX106",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #106",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX107",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #107",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX108",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #108",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX109",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #109",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX110",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #110",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX111",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #111",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX112",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #112",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX113",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #113",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX114",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #114",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX115",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #115",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX116",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #116",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX117",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #117",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX118",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #118",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX119",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #119",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX120",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #120",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX121",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #121",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX122",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #122",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX123",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #123",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX124",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #124",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX125",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #125",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX126",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #126",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX127",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #127",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX128",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #128",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX129",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #129",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX130",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #130",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX131",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #131",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX132",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #132",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX133",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #133",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX134",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #134",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX135",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #135",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX136",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #136",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX137",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #137",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX138",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #138",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX139",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #139",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX140",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #140",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX141",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #141",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX142",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #142",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX143",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #143",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX144",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #144",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX145",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #145",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX146",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #146",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX147",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #147",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX148",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #148",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX149",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #149",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX150",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #150",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEEDX151",
+    "name": "SEED-PLACEHOLDER (regenerate from live /symbols) #151",
+    "sector": "UNCLASSIFIED"
+  },
+  {
+    "symbol": "SEPCO",
+    "name": "Security Papers Limited",
+    "sector": "PAPER & BOARD"
+  },
+  {
+    "symbol": "SEPL",
+    "name": "Sitara Energy Limited",
+    "sector": "POWER GENERATION & DISTRIBUTION"
+  },
+  {
+    "symbol": "SGABL",
+    "name": "Serviced Global Footwear Limited",
+    "sector": "LEATHER & TANNERIES"
+  },
+  {
+    "symbol": "SGF",
+    "name": "Sunrays Textile Mills Limited",
+    "sector": "TEXTILE COMPOSITE"
+  },
+  {
+    "symbol": "SHEL",
+    "name": "Shell Pakistan Limited",
+    "sector": "OIL & GAS MARKETING COMPANIES"
+  },
+  {
+    "symbol": "SHEZAN",
+    "name": "Shezan International Limited",
+    "sector": "FOOD & PERSONAL CARE PRODUCTS"
+  },
+  {
+    "symbol": "SHFA",
+    "name": "Shifa International Hospitals Limited",
+    "sector": "MISCELLANEOUS"
+  },
+  {
+    "symbol": "SHFA2",
+    "name": "Shahtaj Sugar Mills Limited",
+    "sector": "SUGAR & ALLIED INDUSTRIES"
+  },
+  {
+    "symbol": "SIEM",
+    "name": "Siemens Pakistan Engineering Company",
+    "sector": "CABLE & ELECTRICAL GOODS"
+  },
+  {
+    "symbol": "SILK",
+    "name": "Silkbank Limited",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "SINDH",
+    "name": "Sindh Leasing Company Limited",
+    "sector": "INVESTMENT BANKS / SECURITIES"
+  },
+  {
+    "symbol": "SITARA",
+    "name": "Sitara Chemical Industries Limited",
+    "sector": "CHEMICAL"
+  },
+  {
+    "symbol": "SITC",
+    "name": "Sapphire Textile Mills Limited",
+    "sector": "TEXTILE COMPOSITE"
+  },
+  {
+    "symbol": "SLL",
+    "name": "Saudi Pak Leasing Company Limited",
+    "sector": "INVESTMENT BANKS / SECURITIES"
+  },
+  {
+    "symbol": "SMBL",
+    "name": "Summit Bank Limited",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "SMCPL",
+    "name": "Safe Mix Concrete Limited",
+    "sector": "CEMENT"
+  },
+  {
+    "symbol": "SNBL",
+    "name": "Soneri Bank Limited",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "SNGP",
+    "name": "Sui Northern Gas Pipelines Limited",
+    "sector": "OIL & GAS MARKETING COMPANIES"
+  },
+  {
+    "symbol": "SPEL",
+    "name": "Synthetic Products Enterprises Limited",
+    "sector": "MISCELLANEOUS"
+  },
+  {
+    "symbol": "SPL",
+    "name": "Shakarganj Limited",
+    "sector": "SUGAR & ALLIED INDUSTRIES"
+  },
+  {
+    "symbol": "SPWL",
+    "name": "Saif Power Limited",
+    "sector": "POWER GENERATION & DISTRIBUTION"
+  },
+  {
+    "symbol": "SRVI",
+    "name": "Service Industries Limited",
+    "sector": "LEATHER & TANNERIES"
+  },
+  {
+    "symbol": "SSGC",
+    "name": "Sui Southern Gas Company Limited",
+    "sector": "OIL & GAS MARKETING COMPANIES"
+  },
+  {
+    "symbol": "STCL",
+    "name": "Shabbir Tiles & Ceramics Limited",
+    "sector": "GLASS & CERAMICS"
+  },
+  {
+    "symbol": "STML",
+    "name": "Sapphire Fibres Limited",
+    "sector": "TEXTILE COMPOSITE"
+  },
+  {
+    "symbol": "SUHJ",
+    "name": "Suhail Jute Mills Limited",
+    "sector": "VANASPATI & ALLIED INDUSTRIES"
+  },
+  {
+    "symbol": "SYS",
+    "name": "Systems Limited",
+    "sector": "TECHNOLOGY & COMMUNICATION"
+  },
+  {
+    "symbol": "TELE",
+    "name": "Telecard Limited",
+    "sector": "TECHNOLOGY & COMMUNICATION"
+  },
+  {
+    "symbol": "TGL",
+    "name": "Tariq Glass Industries Limited",
+    "sector": "GLASS & CERAMICS"
+  },
+  {
+    "symbol": "THALIND",
+    "name": "Thal Industries Corporation Limited",
+    "sector": "SUGAR & ALLIED INDUSTRIES"
+  },
+  {
+    "symbol": "THALL",
+    "name": "Thal Limited",
+    "sector": "AUTOMOBILE PARTS & ACCESSORIES"
+  },
+  {
+    "symbol": "THCCL",
+    "name": "Thatta Cement Company Limited",
+    "sector": "CEMENT"
+  },
+  {
+    "symbol": "TPL",
+    "name": "TPL Corp Limited",
+    "sector": "MISCELLANEOUS"
+  },
+  {
+    "symbol": "TPLI",
+    "name": "TPL Insurance Limited",
+    "sector": "INSURANCE"
+  },
+  {
+    "symbol": "TPLP",
+    "name": "TPL Properties Limited",
+    "sector": "MISCELLANEOUS"
+  },
+  {
+    "symbol": "TPLRT",
+    "name": "TPL REIT Fund I",
+    "sector": "REAL ESTATE INVESTMENT TRUST"
+  },
+  {
+    "symbol": "TRG",
+    "name": "TRG Pakistan Limited",
+    "sector": "TECHNOLOGY & COMMUNICATION"
+  },
+  {
+    "symbol": "TSPL",
+    "name": "Tri-Star Power Limited",
+    "sector": "POWER GENERATION & DISTRIBUTION"
+  },
+  {
+    "symbol": "UBL",
+    "name": "United Bank Limited",
+    "sector": "COMMERCIAL BANKS"
+  },
+  {
+    "symbol": "UDPL",
+    "name": "United Distributors Pakistan Limited",
+    "sector": "MODARABAS"
+  },
+  {
+    "symbol": "UNITY",
+    "name": "Unity Foods Limited",
+    "sector": "FOOD & PERSONAL CARE PRODUCTS"
+  },
+  {
+    "symbol": "UVIC",
+    "name": "United Insurance Company of Pakistan",
+    "sector": "INSURANCE"
+  },
+  {
+    "symbol": "WAHN",
+    "name": "Wah Nobel Chemicals Limited",
+    "sector": "CHEMICAL"
+  },
+  {
+    "symbol": "WAHOIL",
+    "name": "Wah Oil Mills",
+    "sector": "VANASPATI & ALLIED INDUSTRIES"
+  },
+  {
+    "symbol": "WAVES",
+    "name": "Waves Singer Pakistan Limited",
+    "sector": "OIL & GAS MARKETING COMPANIES"
+  },
+  {
+    "symbol": "WAVESAPP",
+    "name": "Waves Corporation Limited",
+    "sector": "CABLE & ELECTRICAL GOODS"
+  },
+  {
+    "symbol": "WNS",
+    "name": "Wns Group",
+    "sector": "PHARMACEUTICALS"
+  },
+  {
+    "symbol": "WTL",
+    "name": "WorldCall Telecom Limited",
+    "sector": "TECHNOLOGY & COMMUNICATION"
+  },
+  {
+    "symbol": "ZAHID",
+    "name": "Zahidjee Textile Mills Limited",
+    "sector": "TEXTILE SPINNING"
+  },
+  {
+    "symbol": "ZIL",
+    "name": "ZIL Limited",
+    "sector": "FOOD & PERSONAL CARE PRODUCTS"
+  }
+]

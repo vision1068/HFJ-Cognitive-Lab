@@ -5,8 +5,11 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { CompanyLogo } from "@/components/ui/CompanyLogo";
 import { PriceChange } from "@/components/ui/PriceChange";
 import { LoadingState, ErrorState } from "@/components/ui/DataState";
-import { useCompaniesDetailed } from "@/hooks/useMarketData";
-import { formatCurrency } from "@/lib/format";
+import { useCompanies } from "@/hooks/useMarketData";
+import { formatCurrency, formatRelativeTime } from "@/lib/format";
+
+const PE_MAX = 100; // slider max — at the extreme the P/E filter is inactive
+const PAGE_SIZE = 50;
 
 interface ReadyScreen {
   name: string;
@@ -23,28 +26,39 @@ const READY_SCREENS: ReadyScreen[] = [
 ];
 
 export function ScreenerPage() {
-  const { data: companies, isLoading, isError, error, refetch } = useCompaniesDetailed();
-  const list = companies ?? [];
+  // Full PSX universe with live Yahoo-batch fundamentals (P/E, EPS, market cap).
+  const { data: companies, isLoading, isError, error, refetch } = useCompanies();
+  const list = useMemo(() => companies ?? [], [companies]);
 
   const [activeScreen, setActiveScreen] = useState<string | null>(null);
   const [minMarketCap, setMinMarketCap] = useState(0);
-  const [maxPE, setMaxPE] = useState(100);
+  const [maxPE, setMaxPE] = useState(PE_MAX);
   const [sector, setSector] = useState("All");
+  const [visible, setVisible] = useState(PAGE_SIZE);
 
   const sectors = useMemo(() => ["All", ...Array.from(new Set(list.map((c) => c.sector))).sort()], [list]);
+
+  const asOf = useMemo(() => {
+    const times = list.map((c) => c.asOf).filter((t): t is string => Boolean(t));
+    return times.length ? times.reduce((a, b) => (a > b ? a : b)) : null;
+  }, [list]);
 
   const results = useMemo(() => {
     let out = list;
     const screen = READY_SCREENS.find((s) => s.name === activeScreen);
     if (screen) out = out.filter(screen.filter);
-    out = out.filter(
-      (c) =>
-        (c.marketCap ?? 0) >= minMarketCap &&
-        (c.peRatio == null || c.peRatio <= maxPE) &&
-        (sector === "All" || c.sector === sector)
-    );
+    // A numeric filter that is actively constraining EXCLUDES rows missing that
+    // fundamental — a null is never treated as 0 (which would pass min filters).
+    out = out.filter((c) => {
+      if (minMarketCap > 0 && !(c.marketCap != null && c.marketCap >= minMarketCap)) return false;
+      if (maxPE < PE_MAX && !(c.peRatio != null && c.peRatio <= maxPE)) return false;
+      if (sector !== "All" && c.sector !== sector) return false;
+      return true;
+    });
     return [...out].sort((a, b) => (b.marketCap ?? 0) - (a.marketCap ?? 0));
   }, [list, activeScreen, minMarketCap, maxPE, sector]);
+
+  const shown = results.slice(0, visible);
 
   return (
     <div className="p-4 md:p-6 max-w-[1400px] mx-auto">
@@ -86,7 +100,10 @@ export function ScreenerPage() {
 
       {list.length > 0 && (
         <>
-          <p className="text-xs text-text-secondary mb-3">{results.length} companies match your criteria</p>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs text-text-secondary">{results.length} companies match your criteria</p>
+            {asOf && <p className="text-xs text-text-secondary">Fundamentals as of {formatRelativeTime(asOf)}</p>}
+          </div>
           <div className="overflow-x-auto card">
             <table className="w-full text-sm">
               <thead>
@@ -100,7 +117,7 @@ export function ScreenerPage() {
                 </tr>
               </thead>
               <tbody>
-                {results.map((c) => (
+                {shown.map((c) => (
                   <tr key={c.ticker} className="border-b border-border-subtle/50 hover:bg-bg-hover">
                     <td className="py-2.5 px-4">
                       <Link to={`/company/${c.ticker}`} className="flex items-center gap-2.5">
@@ -122,6 +139,14 @@ export function ScreenerPage() {
             </table>
             {results.length === 0 && <p className="text-center text-sm text-text-secondary py-10">No companies match these filters.</p>}
           </div>
+          {visible < results.length && (
+            <button
+              onClick={() => setVisible((v) => v + PAGE_SIZE)}
+              className="mt-4 w-full rounded-lg border border-border-subtle bg-bg-elevated py-2.5 text-sm font-medium text-text-secondary hover:bg-bg-hover transition-colors"
+            >
+              Load more ({results.length - visible} remaining)
+            </button>
+          )}
         </>
       )}
     </div>
