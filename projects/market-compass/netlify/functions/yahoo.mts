@@ -76,7 +76,14 @@ function resolveUpstream(rawUrl: string): { ok: true; upstreamPath: string; need
     return { ok: false, status: 400, error: "Malformed request URL" };
   }
 
-  const upstreamPath = url.pathname.replace(/^\/.netlify\/functions\/yahoo/, "");
+  // Strip whichever prefix is present. Direct invocation sees
+  // /.netlify/functions/yahoo/...; invocation via the netlify.toml redirect
+  // (how the real app reaches this function, at /api/yahoo/*) sees the
+  // ORIGINAL pre-rewrite path, i.e. /api/yahoo/... — Netlify does not
+  // rewrite req.url for status=200 redirects to functions.
+  const upstreamPath = url.pathname
+    .replace(/^\/\.netlify\/functions\/yahoo/, "")
+    .replace(/^\/api\/yahoo/, "");
   if (!upstreamPath.startsWith("/")) {
     return { ok: false, status: 400, error: "Invalid upstream path" };
   }
