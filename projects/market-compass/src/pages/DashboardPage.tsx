@@ -6,14 +6,13 @@ import { CompanyLogo } from "@/components/ui/CompanyLogo";
 import { PriceChange } from "@/components/ui/PriceChange";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 import { LoadingState, ErrorState, DataUnavailable } from "@/components/ui/DataState";
-import { useCompanies, useIndices, useUsdPkr } from "@/hooks/useMarketData";
+import { useCompanies, useIndices } from "@/hooks/useMarketData";
 import { formatCurrency, formatCompactNumber } from "@/lib/format";
 import { useAppStore } from "@/store/useAppStore";
 
 export function DashboardPage() {
   const { data: companies, isLoading, isError, error, refetch } = useCompanies();
   const { data: indices } = useIndices();
-  const { data: usdPkr } = useUsdPkr();
 
   const list = companies ?? [];
   const gainers = useMemo(() => [...list].sort((a, b) => b.changePercent - a.changePercent).slice(0, 5), [list]);
@@ -60,15 +59,6 @@ export function DashboardPage() {
               <PriceChange percent={idx.changePercent} abs={idx.changeAbs} />
             </div>
           ))}
-          {usdPkr && (
-            <div className="card p-3.5">
-              <p className="text-xs text-text-secondary truncate">{usdPkr.pair}</p>
-              <p className="text-base font-semibold text-text-primary mt-1">
-                {usdPkr.rate.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-              </p>
-              <PriceChange percent={usdPkr.changePercent} />
-            </div>
-          )}
           {!indices && !isError && <div className="col-span-full"><LoadingState label="Loading live PSX indices…" /></div>}
         </div>
       </section>

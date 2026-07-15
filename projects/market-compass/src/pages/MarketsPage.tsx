@@ -6,7 +6,7 @@ import { PriceChange } from "@/components/ui/PriceChange";
 import { CompanyLogo } from "@/components/ui/CompanyLogo";
 import { Sparkline } from "@/components/ui/Sparkline";
 import { LoadingState, ErrorState } from "@/components/ui/DataState";
-import { useCompanies, useIndices, useUsdPkr } from "@/hooks/useMarketData";
+import { useCompanies, useIndices } from "@/hooks/useMarketData";
 import { formatCurrency, formatRelativeTime } from "@/lib/format";
 
 const PAGE_SIZE = 50;
@@ -14,7 +14,6 @@ const PAGE_SIZE = 50;
 export function MarketsPage() {
   const { data: companies, isLoading, isError, error, refetch } = useCompanies();
   const { data: indices } = useIndices();
-  const { data: usdPkr } = useUsdPkr();
   const list = useMemo(() => companies ?? [], [companies]);
 
   // "Load more" windowing keeps the DOM small even though the universe is
@@ -56,15 +55,6 @@ export function MarketsPage() {
             <PriceChange percent={idx.changePercent} abs={idx.changeAbs} />
           </div>
         ))}
-        {usdPkr && (
-          <div className="card p-4">
-            <p className="text-xs text-text-secondary">{usdPkr.pair}</p>
-            <p className="text-lg font-semibold text-text-primary mt-1">
-              {usdPkr.rate.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-            </p>
-            <PriceChange percent={usdPkr.changePercent} />
-          </div>
-        )}
       </div>
 
       {isError && <ErrorState error={error} onRetry={() => refetch()} />}
