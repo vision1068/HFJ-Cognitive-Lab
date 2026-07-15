@@ -1,4 +1,4 @@
-import type { Scorecard as ScorecardData, Verdict } from "@/services/predic/types";
+import type { Scorecard as ScorecardData, Verdict } from "@/services/predict/types";
 
 // Verdict → semantic colour. This is a DIVERGING status scale (good → bad), not a
 // brand accent: green poles for buy, amber neutral for hold, red poles for sell —
@@ -21,7 +21,7 @@ export function Scorecard({ scorecard }: { scorecard: ScorecardData }) {
   const scorable = categories.filter((c) => c.score10 !== null).length;
 
   return (
-    <section className="card p-5" aria-label="Predic scorecard">
+    <section className="card p-5" aria-label="Predict scorecard">
       {/* Headline: verdict + /100 */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>

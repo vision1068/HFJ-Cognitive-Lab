@@ -14,7 +14,7 @@ import {
   lookbackDays,
   smaWindow,
 } from "./durationPolicy";
-import type { PredicContext } from "./dataBinding";
+import type { PredictContext } from "./dataBinding";
 import {
   maxDrawdownPct,
   periodReturnPct,
@@ -89,7 +89,7 @@ function tierScore(v: number, tiers: ReadonlyArray<{ min: number; score: number 
 
 // ---- Category scoring (each returns 0..10 or null) --------------------------
 
-export function valuationScore(ctx: PredicContext): number | null {
+export function valuationScore(ctx: PredictContext): number | null {
   const c = ctx.company;
   const pe = c.peRatio;
   const peerMed = ctx.peerMedianPE;
@@ -114,7 +114,7 @@ export function valuationScore(ctx: PredicContext): number | null {
   return mean([peSub, eySub, posSub]);
 }
 
-export function sizeLiquidityScore(ctx: PredicContext): number | null {
+export function sizeLiquidityScore(ctx: PredictContext): number | null {
   const c = ctx.company;
   const mcSub = c.marketCap != null && c.marketCap > 0
     ? tierScore(c.marketCap, SCORING_CONFIG.marketCapTiersPkr)
@@ -125,7 +125,7 @@ export function sizeLiquidityScore(ctx: PredicContext): number | null {
   return mean([mcSub, volSub]);
 }
 
-export function momentumScore(ctx: PredicContext): number | null {
+export function momentumScore(ctx: PredictContext): number | null {
   const c = ctx.company;
   const h = c.priceHistory;
   const lb = lookbackDays(ctx.duration);
@@ -215,7 +215,7 @@ export function assembleScorecard(
 }
 
 /** Compute the full scorecard from a bound PSX context. */
-export function computeScorecard(ctx: PredicContext): Scorecard {
+export function computeScorecard(ctx: PredictContext): Scorecard {
   const scores: RawCategoryScores = {
     Valuation: valuationScore(ctx),
     SizeLiquidity: sizeLiquidityScore(ctx),

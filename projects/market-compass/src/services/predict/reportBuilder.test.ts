@@ -5,14 +5,14 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Company, PricePoint } from "@/types";
-import type { PredicContext } from "./dataBinding";
+import type { PredictContext } from "./dataBinding";
 
 const buildContext = vi.fn();
 vi.mock("./dataBinding", () => ({
   buildContext: (t: string, d: string) => buildContext(t, d),
 }));
 
-import { generatePredicReport } from "./reportBuilder";
+import { generatePredictReport } from "./reportBuilder";
 import { isValue } from "./realDataGuard";
 
 function makeHistory(n: number): PricePoint[] {
@@ -45,7 +45,7 @@ function makeCompany(): Company {
   };
 }
 
-function makeCtx(): PredicContext {
+function makeCtx(): PredictContext {
   const company = makeCompany();
   const last = company.priceHistory[company.priceHistory.length - 1].date;
   return {
@@ -63,7 +63,7 @@ beforeEach(() => {
 
 describe("AC-1 report: no rendered value figure lacks source + asOf", () => {
   it("every value figure across the whole report is guarded", async () => {
-    const report = await generatePredicReport("OGDC", "1Y");
+    const report = await generatePredictReport("OGDC", "1Y");
     let valueCount = 0;
     for (const section of report.sections) {
       for (const { figure } of section.figures) {
@@ -80,7 +80,7 @@ describe("AC-1 report: no rendered value figure lacks source + asOf", () => {
   });
 
   it("price-derived figures are dated by the EOD date, not fetch time", async () => {
-    const report = await generatePredicReport("OGDC", "1Y");
+    const report = await generatePredictReport("OGDC", "1Y");
     const overview = report.sections.find((s) => s.id === 1);
     const lastPrice = overview?.figures.find((f) => f.label === "Last Price")?.figure;
     expect(lastPrice && isValue(lastPrice)).toBe(true);
@@ -94,7 +94,7 @@ describe("AC-1 report: no rendered value figure lacks source + asOf", () => {
 
 describe("AC-2 report: statement/governance sections render honest na", () => {
   it("renders sections 3, 4, 5, 6, 9 as na", async () => {
-    const report = await generatePredicReport("OGDC", "1Y");
+    const report = await generatePredictReport("OGDC", "1Y");
     for (const id of [3, 4, 5, 6, 9]) {
       const s = report.sections.find((sec) => sec.id === id);
       expect(s, `section ${id} present`).toBeDefined();
@@ -109,7 +109,7 @@ describe("AC-2 report: statement/governance sections render honest na", () => {
 
 describe("AC-8 report: carries registry + policy versions and generatedAt", () => {
   it("stamps versions and a valid ISO generatedAt", async () => {
-    const report = await generatePredicReport("OGDC", "1Y");
+    const report = await generatePredictReport("OGDC", "1Y");
     expect(report.registryVersion).toBe("1.0.0");
     expect(report.policyVersion).toBe("1.0.0");
     expect(Number.isFinite(Date.parse(report.generatedAt))).toBe(true);

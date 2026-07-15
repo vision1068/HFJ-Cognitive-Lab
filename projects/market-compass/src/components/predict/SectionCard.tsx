@@ -1,4 +1,4 @@
-import type { SectionResult } from "@/services/predic/types";
+import type { SectionResult } from "@/services/predict/types";
 import { Badge } from "@/components/ui/Badge";
 import { SourcedFigureView } from "./SourcedFigureView";
 

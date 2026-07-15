@@ -1,4 +1,4 @@
-// Predic investment-report ENGINE — public type surface.
+// Predict investment-report ENGINE — public type surface.
 //
 // PSX-ONLY, HONEST-AND-THIN. Every rendered numeric figure is a `SourcedFigure`.
 // The `value` variant is structurally impossible to construct without a `source`
@@ -77,7 +77,7 @@ export interface NaSection {
   reason: string;
 }
 
-export interface PredicReport {
+export interface PredictReport {
   ticker: string;
   companyName: string;
   duration: Duration;

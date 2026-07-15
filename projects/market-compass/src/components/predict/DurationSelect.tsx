@@ -1,4 +1,4 @@
-import type { Duration } from "@/services/predic/types";
+import type { Duration } from "@/services/predict/types";
 
 // Exactly the five in-scope horizons. The label is human-readable; the value is
 // the engine's Duration code.
@@ -13,7 +13,7 @@ const DURATION_OPTIONS: { value: Duration; label: string }[] = [
 export function DurationSelect({
   value,
   onChange,
-  id = "predic-duration",
+  id = "predict-duration",
 }: {
   value: Duration;
   onChange: (d: Duration) => void;

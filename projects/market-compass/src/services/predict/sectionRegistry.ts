@@ -14,7 +14,7 @@ import type {
   SourcedFigure,
 } from "./types";
 import { sourced, na, isValue } from "./realDataGuard";
-import type { PredicContext } from "./dataBinding";
+import type { PredictContext } from "./dataBinding";
 import { lookbackDays, smaWindow } from "./durationPolicy";
 import {
   annualizedVolPct,
@@ -26,7 +26,7 @@ import {
 
 export const REGISTRY_VERSION = "1.0.0";
 
-export type Builder = (ctx: PredicContext) => SectionResult;
+export type Builder = (ctx: PredictContext) => SectionResult;
 
 const VALUATION_SMA_WINDOW = 200; // fixed long-run SMA for the valuation view
 
@@ -38,7 +38,7 @@ const ONE_MONTH_DAYS = 21;
 
 /** Price-derived figure: dated by the true EOD date, sourced "PSX Data Portal". */
 function priceFig(
-  ctx: PredicContext,
+  ctx: PredictContext,
   value: number | null,
   unit: string,
   provenance: "fact" | "derived",
@@ -59,7 +59,7 @@ function priceFig(
 
 /** Snapshot-fundamental figure: dated by lastUpdated, sourced "(snapshot)". */
 function snapFig(
-  ctx: PredicContext,
+  ctx: PredictContext,
   value: number | null,
   unit: string,
   provenance: "fact" | "derived",
@@ -84,7 +84,7 @@ function snapFig(
  * maxDrawdownPct clamping), but the label must say so — otherwise a ~1-year
  * price series silently masquerades as a 20-year one.
  */
-function horizonCoverageNote(ctx: PredicContext, nominalLookbackDays: number): string | undefined {
+function horizonCoverageNote(ctx: PredictContext, nominalLookbackDays: number): string | undefined {
   const availableDays = Math.max(0, ctx.company.priceHistory.length - 1);
   if (availableDays >= nominalLookbackDays) return undefined;
   return (
@@ -127,7 +127,7 @@ function naSection(id: SectionId, title: string, reason: string): SectionResult 
   };
 }
 
-function earningsYieldPct(ctx: PredicContext): SourcedFigure {
+function earningsYieldPct(ctx: PredictContext): SourcedFigure {
   const c = ctx.company;
   if (c.eps != null && c.eps > 0 && c.price > 0) {
     return snapFig(ctx, (c.eps / c.price) * 100, "%", "derived", {
@@ -144,7 +144,7 @@ function earningsYieldPct(ctx: PredicContext): SourcedFigure {
   return na("No PSX EPS or P/E to derive earnings yield");
 }
 
-function pricePositionFig(ctx: PredicContext): SourcedFigure {
+function pricePositionFig(ctx: PredictContext): SourcedFigure {
   const c = ctx.company;
   const pos = pricePosition52wk(c.price, c.week52Low, c.week52High);
   if (pos == null) return na("No PSX 52-week range available");

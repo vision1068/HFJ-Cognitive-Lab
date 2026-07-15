@@ -21,7 +21,7 @@ export function Disclaimer({ compact = false, className }: { compact?: boolean; 
   );
 }
 
-// Prominent NOT-FINANCIAL-ADVICE disclaimer for the Predic report. Rendered
+// Prominent NOT-FINANCIAL-ADVICE disclaimer for the Predict report. Rendered
 // directly above the verdict/scorecard so a reader never sees the /100 score or
 // the Buy/Sell label without this framing first. Deliberately stronger than the
 // generic Disclaimer above.

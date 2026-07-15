@@ -1,16 +1,16 @@
 import { AlertTriangle } from "lucide-react";
-import type { PredicReport } from "@/services/predic/types";
+import type { PredictReport } from "@/services/predict/types";
 import { AdviceDisclaimer } from "@/components/ui/Disclaimer";
 import { Scorecard } from "./Scorecard";
 import { SectionCard } from "./SectionCard";
 
-// Renders a full Predic report. Ordering, top to bottom:
+// Renders a full Predict report. Ordering, top to bottom:
 //   1. AdviceDisclaimer  — prominent, DIRECTLY above the verdict/scorecard.
 //   2. Scorecard         — /100, verdict, per-category /10.
 //   3. Low-confidence banner (only when coverage < 0.5).
 //   4. Data-reliability summary — coverage % + the explicit list of N/A sections.
 //   5. Every section, ordered by id (na sections stay visible).
-export function ReportView({ report }: { report: PredicReport }) {
+export function ReportView({ report }: { report: PredictReport }) {
   const sections = [...report.sections].sort((a, b) => a.id - b.id);
 
   return (

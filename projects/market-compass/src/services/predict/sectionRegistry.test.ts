@@ -5,7 +5,7 @@
 
 import { describe, it, expect } from "vitest";
 import type { Company, PricePoint } from "@/types";
-import type { PredicContext } from "./dataBinding";
+import type { PredictContext } from "./dataBinding";
 import { SECTION_BUILDERS } from "./sectionRegistry";
 
 function makeHistory(n: number): PricePoint[] {
@@ -38,7 +38,7 @@ function makeCompany(historyDays: number): Company {
   };
 }
 
-function makeCtx(duration: PredicContext["duration"], historyDays: number): PredicContext {
+function makeCtx(duration: PredictContext["duration"], historyDays: number): PredictContext {
   const company = makeCompany(historyDays);
   const last = company.priceHistory[company.priceHistory.length - 1].date;
   return {

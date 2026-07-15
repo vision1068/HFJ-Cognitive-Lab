@@ -1,6 +1,6 @@
 import { Info } from "lucide-react";
-import type { SourcedFigure } from "@/services/predic/types";
-import { isValue } from "@/services/predic/realDataGuard";
+import type { SourcedFigure } from "@/services/predict/types";
+import { isValue } from "@/services/predict/realDataGuard";
 
 // Formats a plain numeric figure value. Kept local (not currency-aware) because a
 // SourcedFigure carries its own optional unit — percentages, ratios, counts, PKR.
