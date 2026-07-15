@@ -98,7 +98,6 @@ export function DashboardPage() {
           <section className="card p-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-text-primary">Watchlist Summary</h3>
-              <Link to="/watchlists" className="text-xs text-brand-400 hover:underline">Manage watchlists →</Link>
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>

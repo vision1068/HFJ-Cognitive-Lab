@@ -1,13 +1,13 @@
 // reportBuilder — top-level engine entry point.
 //
-// generatePredicReport(ticker, duration): builds the PSX context, runs every
+// generatePredictReport(ticker, duration): builds the PSX context, runs every
 // in-scope section builder, re-guards every figure (AC-1 belt & suspenders so no
 // rendered number can escape without source + asOf), computes the scorecard, and
 // stamps the report with the registry + policy versions and render time.
 
 import type {
   Duration,
-  PredicReport,
+  PredictReport,
   SectionResult,
   SectionFigure,
   NaSection,
@@ -24,10 +24,10 @@ function naReasonOf(section: SectionResult): string {
   return section.note ?? "No PSX source available";
 }
 
-export async function generatePredicReport(
+export async function generatePredictReport(
   ticker: string,
   duration: Duration,
-): Promise<PredicReport> {
+): Promise<PredictReport> {
   const ctx = await buildContext(ticker, duration);
 
   const sections: SectionResult[] = [];

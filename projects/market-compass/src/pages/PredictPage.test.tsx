@@ -3,22 +3,22 @@ import { render, screen, within, waitFor, fireEvent } from "@testing-library/rea
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import type { Mock } from "vitest";
-import type { Duration, PredicReport } from "@/services/predic/types";
+import type { Duration, PredictReport } from "@/services/predict/types";
 
 // Mock the ENGINE — the page/report UI is what is under test here, not the
 // report builder (which has its own 35 green tests).
-vi.mock("@/services/predic/reportBuilder", () => ({
-  generatePredicReport: vi.fn(),
+vi.mock("@/services/predict/reportBuilder", () => ({
+  generatePredictReport: vi.fn(),
 }));
 
-import { generatePredicReport } from "@/services/predic/reportBuilder";
-import { PredicPage } from "./PredicPage";
+import { generatePredictReport } from "@/services/predict/reportBuilder";
+import { PredictPage } from "./PredictPage";
 
-const mockGenerate = generatePredicReport as unknown as Mock;
+const mockGenerate = generatePredictReport as unknown as Mock;
 
 // A report that mixes a real (full) section with an explicit na section so the
 // "honest N/A, never a number" behaviour is exercisable.
-function makeReport(duration: Duration): PredicReport {
+function makeReport(duration: Duration): PredictReport {
   return {
     ticker: "ENGROH",
     companyName: "Engro Holdings Limited",
@@ -89,13 +89,13 @@ function renderPage() {
   return render(
     <QueryClientProvider client={client}>
       <MemoryRouter>
-        <PredicPage />
+        <PredictPage />
       </MemoryRouter>
     </QueryClientProvider>
   );
 }
 
-describe("PredicPage (Predic panel — honest N/A + disclaimer)", () => {
+describe("PredictPage (Predict panel — honest N/A + disclaimer)", () => {
   beforeEach(() => {
     mockGenerate.mockReset();
     mockGenerate.mockImplementation((_t: string, d: Duration) => Promise.resolve(makeReport(d)));

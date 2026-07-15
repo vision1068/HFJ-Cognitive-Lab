@@ -31,7 +31,7 @@ export interface PeerSnapshot {
   asOf: string; // peer's snapshot timestamp (lastUpdated)
 }
 
-export interface PredicContext {
+export interface PredictContext {
   ticker: string;
   duration: Duration;
   company: Company;
@@ -58,7 +58,7 @@ function lastPriceDate(company: Company): string | null {
  * Promise.allSettled — a peer that fails to load simply drops from the
  * comparison and NEVER fails the report.
  */
-export async function buildContext(ticker: string, duration: Duration): Promise<PredicContext> {
+export async function buildContext(ticker: string, duration: Duration): Promise<PredictContext> {
   const company = await fetchCompanyDetail(ticker);
 
   // Anchor the sector on the curated label when we have one, so peer matching is

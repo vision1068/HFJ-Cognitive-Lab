@@ -3,13 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { LoadingState, ErrorState } from "@/components/ui/DataState";
 import { Disclaimer } from "@/components/ui/Disclaimer";
-import { DurationSelect } from "@/components/predic/DurationSelect";
-import { ReportView } from "@/components/predic/ReportView";
+import { DurationSelect } from "@/components/predict/DurationSelect";
+import { ReportView } from "@/components/predict/ReportView";
 import { psxTickers } from "@/data/psxTickers";
-import { generatePredicReport } from "@/services/predic/reportBuilder";
-import type { Duration } from "@/services/predic/types";
+import { generatePredictReport } from "@/services/predict/reportBuilder";
+import type { Duration } from "@/services/predict/types";
 
-export function PredicPage() {
+export function PredictPage() {
   const [ticker, setTicker] = useState<string>(psxTickers[0]?.ticker ?? "");
   const [duration, setDuration] = useState<Duration>("1Y");
 
@@ -20,8 +20,8 @@ export function PredicPage() {
     error,
     refetch,
   } = useQuery({
-    queryKey: ["predic", ticker, duration],
-    queryFn: () => generatePredicReport(ticker, duration),
+    queryKey: ["predict", ticker, duration],
+    queryFn: () => generatePredictReport(ticker, duration),
     enabled: Boolean(ticker),
     refetchOnWindowFocus: false,
     retry: 1,
@@ -30,18 +30,18 @@ export function PredicPage() {
   return (
     <div className="p-4 md:p-6 max-w-[1200px] mx-auto">
       <PageHeader
-        title="Predic"
+        title="Predict"
         subtitle="A mechanical, source-cited read on a PSX company. Every figure is either real PSX Data Portal data or an explicit N/A — nothing in between."
       />
 
       {/* Selectors */}
       <div className="card p-4 mb-5 grid sm:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="predic-company" className="text-xs text-text-secondary mb-1.5 block">
+          <label htmlFor="predict-company" className="text-xs text-text-secondary mb-1.5 block">
             Company (PSX)
           </label>
           <select
-            id="predic-company"
+            id="predict-company"
             aria-label="Company"
             value={ticker}
             onChange={(e) => setTicker(e.target.value)}
@@ -60,12 +60,12 @@ export function PredicPage() {
       {/* States */}
       {!ticker ? (
         <div className="card p-6 text-center text-sm text-text-secondary">
-          Select a PSX company to generate a Predic report.
+          Select a PSX company to generate a Predict report.
         </div>
       ) : isLoading ? (
-        <LoadingState label={`Building Predic report for ${ticker}…`} />
+        <LoadingState label={`Building Predict report for ${ticker}…`} />
       ) : isError ? (
-        <ErrorState error={error ?? new Error("Could not build the Predic report.")} onRetry={() => refetch()} />
+        <ErrorState error={error ?? new Error("Could not build the Predict report.")} onRetry={() => refetch()} />
       ) : report ? (
         <ReportView report={report} />
       ) : (

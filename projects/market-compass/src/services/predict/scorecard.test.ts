@@ -10,7 +10,7 @@ import {
   type RawCategoryScores,
 } from "./scorecard";
 import type { CategoryKey } from "./durationPolicy";
-import type { PredicContext } from "./dataBinding";
+import type { PredictContext } from "./dataBinding";
 import type { Company, PricePoint } from "@/types";
 
 function weights(
@@ -110,7 +110,7 @@ function makeCompany(): Company {
   };
 }
 
-function makeCtx(): PredicContext {
+function makeCtx(): PredictContext {
   const company = makeCompany();
   const last = company.priceHistory[company.priceHistory.length - 1].date;
   return {
