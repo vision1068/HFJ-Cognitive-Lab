@@ -1,0 +1,61 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vm="clr-namespace:GoldSignalAnalyzer.Desktop.Presentation.Screens;assembly=GoldSignalAnalyzer.Desktop"
+                    xmlns:v="clr-namespace:GoldSignalAnalyzer.Desktop.Views;assembly=GoldSignalAnalyzer.Desktop">
+    <!-- Gate R3: one VM->View DataTemplate per §30 screen. This dictionary is a LOOSE (Resource,
+         not markup-compiled) XAML, merged at runtime by App via XamlReader, so the same-assembly
+         screen VM/View types resolve at load time (explicit ;assembly= makes the reference
+         unambiguous for both the runtime app merge and DataTemplateCoverageTests). Missing a
+         template leaves a blank ContentControl; the R3 test reconciles this list to all 17. -->
+    <DataTemplate DataType="{x:Type vm:DashboardHomeViewModel}">
+        <v:DashboardHomeView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:ConnectionWizardViewModel}">
+        <v:ConnectionWizardView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:SymbolSelectionMappingViewModel}">
+        <v:SymbolSelectionMappingView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:AdvancedChartViewModel}">
+        <v:AdvancedChartView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:IndicatorPanelViewModel}">
+        <v:IndicatorPanelView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:SignalDetailViewModel}">
+        <v:SignalDetailView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:MarketRegimeViewModel}">
+        <v:MarketRegimeView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:RiskPlanViewModel}">
+        <v:RiskPlanView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:NewsCalendarFilterViewModel}">
+        <v:NewsCalendarFilterView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:NotificationsCenterViewModel}">
+        <v:NotificationsCenterView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:BacktestingSetupViewModel}">
+        <v:BacktestingSetupView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:BacktestResultsViewModel}">
+        <v:BacktestResultsView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:PaperTradingViewModel}">
+        <v:PaperTradingView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:TradeJournalViewModel}">
+        <v:TradeJournalView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+        <v:SettingsView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:DiagnosticsLogsViewModel}">
+        <v:DiagnosticsLogsView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:DisclaimerAboutViewModel}">
+        <v:DisclaimerAboutView />
+    </DataTemplate>
+</ResourceDictionary>

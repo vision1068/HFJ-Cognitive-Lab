@@ -1,0 +1,57 @@
+# === Secrets — never commit (C2 / NFR-1) ===
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+*.key
+secrets.json
+
+# === Node ===
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+coverage/
+**/coverage/
+
+# === Flutter / Dart ===
+.dart_tool/
+**/.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+
+# === OS / editor ===
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# === Claude worktrees (transient) ===
+.claude/worktrees/
+
+# === .NET build artefacts (gold-signal-analyzer, Phase 3 / gate R4) ===
+bin/
+obj/
+*.user
+*.suo
+.vs/
+TestResults/
+[Dd]ebug/
+[Rr]elease/
+
+# === Gold Signal Analyzer local runtime (per-user, never committed) ===
+**/logs/
+*.db
+*.db-shm
+*.db-wal
+*.db-journal

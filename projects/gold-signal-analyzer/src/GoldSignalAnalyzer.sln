@@ -1,0 +1,94 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoldSignalAnalyzer.Application", "GoldSignalAnalyzer.Application\GoldSignalAnalyzer.Application.csproj", "{7AAE9877-B3DD-4E7F-B6A2-7CFF5CE422DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoldSignalAnalyzer.Backtesting", "GoldSignalAnalyzer.Backtesting\GoldSignalAnalyzer.Backtesting.csproj", "{BB056CB4-E659-4E21-B3B5-CE245D2C7367}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoldSignalAnalyzer.Desktop", "GoldSignalAnalyzer.Desktop\GoldSignalAnalyzer.Desktop.csproj", "{ACCA9AC6-59A8-44B8-A7F6-24B370BEA921}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoldSignalAnalyzer.Domain", "GoldSignalAnalyzer.Domain\GoldSignalAnalyzer.Domain.csproj", "{B9593FE8-01E1-4762-B482-6AAC8A744E2C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoldSignalAnalyzer.Indicators", "GoldSignalAnalyzer.Indicators\GoldSignalAnalyzer.Indicators.csproj", "{C79B9C3C-A340-476E-A8B4-09989A3F3652}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoldSignalAnalyzer.Infrastructure", "GoldSignalAnalyzer.Infrastructure\GoldSignalAnalyzer.Infrastructure.csproj", "{D867EF0D-A5FA-4F88-A0E5-CC41DE1D5FAE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoldSignalAnalyzer.MarketData", "GoldSignalAnalyzer.MarketData\GoldSignalAnalyzer.MarketData.csproj", "{52FA6C2B-5DFD-40F2-9431-8694C816D05D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoldSignalAnalyzer.MT5Bridge", "GoldSignalAnalyzer.MT5Bridge\GoldSignalAnalyzer.MT5Bridge.csproj", "{6983790E-AAE5-44CE-B0B1-B14FFEB5697C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoldSignalAnalyzer.Notifications", "GoldSignalAnalyzer.Notifications\GoldSignalAnalyzer.Notifications.csproj", "{F3037C43-A62D-4D02-9A32-3514D9D50106}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoldSignalAnalyzer.PaperTrading", "GoldSignalAnalyzer.PaperTrading\GoldSignalAnalyzer.PaperTrading.csproj", "{278D8D10-09D0-4080-9117-34AABC448C93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoldSignalAnalyzer.Persistence", "GoldSignalAnalyzer.Persistence\GoldSignalAnalyzer.Persistence.csproj", "{DA62669A-E81D-4308-A171-900F0244DCDE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoldSignalAnalyzer.Signals", "GoldSignalAnalyzer.Signals\GoldSignalAnalyzer.Signals.csproj", "{42C4AD8E-3A70-4107-8ECC-F98B420041B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoldSignalAnalyzer.Tests", "GoldSignalAnalyzer.Tests\GoldSignalAnalyzer.Tests.csproj", "{F95122C0-5A19-4217-A87B-93E3035CB073}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7AAE9877-B3DD-4E7F-B6A2-7CFF5CE422DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AAE9877-B3DD-4E7F-B6A2-7CFF5CE422DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AAE9877-B3DD-4E7F-B6A2-7CFF5CE422DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AAE9877-B3DD-4E7F-B6A2-7CFF5CE422DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB056CB4-E659-4E21-B3B5-CE245D2C7367}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB056CB4-E659-4E21-B3B5-CE245D2C7367}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB056CB4-E659-4E21-B3B5-CE245D2C7367}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB056CB4-E659-4E21-B3B5-CE245D2C7367}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACCA9AC6-59A8-44B8-A7F6-24B370BEA921}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACCA9AC6-59A8-44B8-A7F6-24B370BEA921}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACCA9AC6-59A8-44B8-A7F6-24B370BEA921}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACCA9AC6-59A8-44B8-A7F6-24B370BEA921}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9593FE8-01E1-4762-B482-6AAC8A744E2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9593FE8-01E1-4762-B482-6AAC8A744E2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9593FE8-01E1-4762-B482-6AAC8A744E2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9593FE8-01E1-4762-B482-6AAC8A744E2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C79B9C3C-A340-476E-A8B4-09989A3F3652}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C79B9C3C-A340-476E-A8B4-09989A3F3652}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C79B9C3C-A340-476E-A8B4-09989A3F3652}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C79B9C3C-A340-476E-A8B4-09989A3F3652}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D867EF0D-A5FA-4F88-A0E5-CC41DE1D5FAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D867EF0D-A5FA-4F88-A0E5-CC41DE1D5FAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D867EF0D-A5FA-4F88-A0E5-CC41DE1D5FAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D867EF0D-A5FA-4F88-A0E5-CC41DE1D5FAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52FA6C2B-5DFD-40F2-9431-8694C816D05D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52FA6C2B-5DFD-40F2-9431-8694C816D05D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52FA6C2B-5DFD-40F2-9431-8694C816D05D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52FA6C2B-5DFD-40F2-9431-8694C816D05D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6983790E-AAE5-44CE-B0B1-B14FFEB5697C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6983790E-AAE5-44CE-B0B1-B14FFEB5697C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6983790E-AAE5-44CE-B0B1-B14FFEB5697C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6983790E-AAE5-44CE-B0B1-B14FFEB5697C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3037C43-A62D-4D02-9A32-3514D9D50106}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3037C43-A62D-4D02-9A32-3514D9D50106}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3037C43-A62D-4D02-9A32-3514D9D50106}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3037C43-A62D-4D02-9A32-3514D9D50106}.Release|Any CPU.Build.0 = Release|Any CPU
+		{278D8D10-09D0-4080-9117-34AABC448C93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{278D8D10-09D0-4080-9117-34AABC448C93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{278D8D10-09D0-4080-9117-34AABC448C93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{278D8D10-09D0-4080-9117-34AABC448C93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA62669A-E81D-4308-A171-900F0244DCDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA62669A-E81D-4308-A171-900F0244DCDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA62669A-E81D-4308-A171-900F0244DCDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA62669A-E81D-4308-A171-900F0244DCDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42C4AD8E-3A70-4107-8ECC-F98B420041B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42C4AD8E-3A70-4107-8ECC-F98B420041B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42C4AD8E-3A70-4107-8ECC-F98B420041B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42C4AD8E-3A70-4107-8ECC-F98B420041B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F95122C0-5A19-4217-A87B-93E3035CB073}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F95122C0-5A19-4217-A87B-93E3035CB073}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F95122C0-5A19-4217-A87B-93E3035CB073}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F95122C0-5A19-4217-A87B-93E3035CB073}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GoldSignalAnalyzer.Domain\GoldSignalAnalyzer.Domain.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.Application\GoldSignalAnalyzer.Application.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.Infrastructure\GoldSignalAnalyzer.Infrastructure.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.Persistence\GoldSignalAnalyzer.Persistence.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.MarketData\GoldSignalAnalyzer.MarketData.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.MT5Bridge\GoldSignalAnalyzer.MT5Bridge.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.Indicators\GoldSignalAnalyzer.Indicators.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.Signals\GoldSignalAnalyzer.Signals.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.Backtesting\GoldSignalAnalyzer.Backtesting.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.PaperTrading\GoldSignalAnalyzer.PaperTrading.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.Notifications\GoldSignalAnalyzer.Notifications.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- ScreenTemplates.xaml holds VM->View DataTemplates for same-assembly screen types. Markup-
+         compiled (Page) XAML in this toolchain cannot resolve same-assembly types via x:Type, so it
+         is shipped as a LOOSE Resource and merged at runtime by App via XamlReader (arch §7, gate R3). -->
+    <Page Remove="Views\ScreenTemplates.xaml" />
+    <Resource Include="Views\ScreenTemplates.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+  </ItemGroup>
+</Project>
