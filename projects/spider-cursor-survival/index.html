@@ -168,6 +168,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:5px}
 .slbl{font-size:.63rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin-bottom:9px}
 .dgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:420px}
+.lgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:100%;max-width:420px}
+.lvb{padding:10px 4px;border-radius:12px;border:2px solid transparent;
+  background:rgba(255,255,255,.04);color:var(--txt);cursor:pointer;text-align:center;
+  transition:all .2s;font-family:inherit}
+.lvb:hover{background:rgba(255,255,255,.08)}
+.lvb.active{border-color:#c084fc;background:rgba(192,132,252,.12)}
+.lvb .lvn{font-size:1.05rem;font-weight:800;display:block}
+.lvb.active .lvn{color:#c084fc}
+.lvb .lvo{font-size:.54rem;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);display:block;margin-top:2px}
+.lvb.boss .lvo{color:#f87171}
 .db{padding:13px 8px;border-radius:12px;border:2px solid transparent;
   background:rgba(255,255,255,.04);color:var(--txt);cursor:pointer;text-align:center;
   transition:all .2s;font-family:inherit}
@@ -332,7 +342,7 @@ body.shake{animation:shake .55s cubic-bezier(.36,.07,.19,.97) both}
 
 <!-- Level intro -->
 <div id="li-wrap" class="hidden">
-  <span id="li-num">LEVEL 1 OF 20</span>
+  <span id="li-num">LEVEL 1 OF 10</span>
   <span id="li-name">First Steps</span>
   <span id="li-sub"></span>
   <span id="li-boss">💀 BOSS LEVEL</span>
@@ -342,7 +352,7 @@ body.shake{animation:shake .55s cubic-bezier(.36,.07,.19,.97) both}
 <!-- MAIN MENU -->
 <div id="scr-menu" class="screen">
   <div class="sfloat">🕷️</div>
-  <div><div class="gtitle">Spider Cursor Survival</div><div class="gsub">20 LEVELS · BOSS SPIDERS · POWER-UPS</div></div>
+  <div><div class="gtitle">Spider Cursor Survival</div><div class="gsub">10 LEVELS · BOSS SPIDERS · POWER-UPS</div></div>
   <div id="hsd">
     <div class="hsc easy">Easy <span class="hv2" id="hs-easy">—</span></div>
     <div class="hsc normal">Normal <span class="hv2" id="hs-normal">—</span></div>
@@ -365,9 +375,13 @@ body.shake{animation:shake .55s cubic-bezier(.36,.07,.19,.97) both}
     <div class="slbl">Difficulty</div>
     <div class="dgrid">
       <button class="db easy" data-d="easy"><span class="di">🕷️</span><span class="dn">EASY</span><span class="dd">Slow spiders. Great for beginners.</span></button>
-      <button class="db normal active" data-d="normal"><span class="di">🕷️🕷️</span><span class="dn">NORMAL</span><span class="dd">Fair challenge. 20 levels to beat.</span></button>
+      <button class="db normal active" data-d="normal"><span class="di">🕷️🕷️</span><span class="dn">NORMAL</span><span class="dd">Fair challenge. 10 levels to beat.</span></button>
       <button class="db nightmare" data-d="nightmare"><span class="di">🕷️🕷️🕷️</span><span class="dn">NIGHTMARE</span><span class="dd">Blazing speed. Legends only.</span></button>
     </div>
+  </div>
+  <div style="width:100%;max-width:420px;margin-top:16px">
+    <div class="slbl">Starting Level</div>
+    <div class="lgrid" id="lvl-grid"></div>
   </div>
 </div>
 
@@ -378,7 +392,7 @@ body.shake{animation:shake .55s cubic-bezier(.36,.07,.19,.97) both}
   <div class="acard"><h3>How to Play</h3><ul>
     <li>Move your cursor away from all spiders.</li>
     <li>Spiders spawn from every edge &amp; corner, chasing you.</li>
-    <li>Survive the timer each level to advance. 20 levels total.</li>
+    <li>Survive the timer each level to advance. 10 levels total.</li>
     <li>In the last 12 seconds of each level, spiders go berserk.</li>
   </ul></div>
   <div class="acard"><h3>💊 Red Bottle — Spider Slayer</h3><ul>
@@ -389,7 +403,7 @@ body.shake{animation:shake .55s cubic-bezier(.36,.07,.19,.97) both}
     <li>Click to activate a <strong>protective shield</strong>.</li>
     <li>The shield absorbs <strong>one spider collision</strong> — saving your life!</li>
   </ul></div>
-  <div class="acard"><h3>💀 Boss Spiders (Levels 5, 10, 15, 20)</h3><ul>
+  <div class="acard"><h3>💀 Boss Spiders (Levels 5, 10)</h3><ul>
     <li>A giant Boss Spider appears on every 5th level.</li>
     <li>Bosses take <strong>3 Slayer hits</strong> to kill and earn massive score.</li>
   </ul></div>
@@ -426,7 +440,7 @@ body.shake{animation:shake .55s cubic-bezier(.36,.07,.19,.97) both}
 <!-- VICTORY -->
 <div id="scr-win" class="screen hidden">
   <div class="ricon">🏆</div>
-  <div class="rtitle win">ALL 20 LEVELS BEATEN!</div>
+  <div class="rtitle win">ALL 10 LEVELS BEATEN!</div>
   <p class="rsub">You are the ultimate spider survivor. Legendary.</p>
   <div class="srow" id="vc-stats"></div>
   <div id="vc-hsbadge" style="display:none" class="hsbadge">🏅 NEW HIGH SCORE!</div>
@@ -457,37 +471,27 @@ const toastsEl=$('toasts');
 const dots=[1,2,3].map(i=>$('dot'+i));
 
 const LEVELS=[
-  {name:'First Steps',    tier:'Intro',    dur:18,spd:0.9, max:3, si:3.8,wb:0.00},
   {name:'Awakening',      tier:'Intro',    dur:20,spd:1.1, max:5, si:3.4,wb:0.00},
-  {name:'Stirring',       tier:'Intro',    dur:20,spd:1.3, max:6, si:3.1,wb:0.02},
   {name:'Crawlers',       tier:'Novice',   dur:22,spd:1.5, max:8, si:2.8,wb:0.05},
-  {name:'The Hunt Begins',tier:'Novice',   dur:22,spd:1.75,max:10,si:2.5,wb:0.08},
   {name:'Skittering',     tier:'Novice',   dur:24,spd:2.0, max:12,si:2.2,wb:0.11},
-  {name:'Many Legs',      tier:'Skilled',  dur:24,spd:2.3, max:14,si:2.0,wb:0.15},
   {name:'Web of Fear',    tier:'Skilled',  dur:26,spd:2.6, max:16,si:1.8,wb:0.20},
-  {name:'The Hunt',       tier:'Skilled',  dur:26,spd:2.9, max:18,si:1.6,wb:0.26},
   {name:'Darkness Falls', tier:'Skilled',  dur:28,spd:3.2, max:20,si:1.4,wb:0.32},
-  {name:'Frenzy',         tier:'Veteran',  dur:28,spd:3.55,max:22,si:1.25,wb:0.38},
   {name:'Swarm Rising',   tier:'Veteran',  dur:30,spd:3.9, max:24,si:1.1,wb:0.44},
-  {name:'Infestation',    tier:'Veteran',  dur:30,spd:4.25,max:26,si:0.95,wb:0.50},
   {name:'Feeding Ground', tier:'Expert',   dur:32,spd:4.65,max:28,si:0.82,wb:0.57},
-  {name:'Overrun',        tier:'Expert',   dur:32,spd:5.1, max:30,si:0.70,wb:0.64},
   {name:'Nightmare',      tier:'Expert',   dur:34,spd:5.6, max:32,si:0.59,wb:0.71},
-  {name:'Arachnid Hell',  tier:'Master',   dur:35,spd:6.1, max:35,si:0.50,wb:0.79},
   {name:'The Swarm',      tier:'Master',   dur:36,spd:6.8, max:38,si:0.42,wb:0.87},
-  {name:'Final Stand',    tier:'Master',   dur:38,spd:7.6, max:42,si:0.36,wb:0.93},
   {name:'Apocalypse',     tier:'LEGEND',   dur:40,spd:8.8, max:48,si:0.30,wb:1.00},
 ];
-const BOSS_LEVELS=new Set([4,9,14,19]);
+const BOSS_LEVELS=new Set([4,9]);
 
 const DIFF={
-  easy:     {label:'Easy',     m:.52},
-  normal:   {label:'Normal',   m:1.0},
-  nightmare:{label:'Nightmare',m:1.78},
+  easy:     {label:'Easy',     m:.65},
+  normal:   {label:'Normal',   m:1.2},
+  nightmare:{label:'Nightmare',m:2.15},
 };
 
 let G={
-  diff:'normal',lvl:0,active:false,
+  diff:'normal',lvl:0,startLvl:0,active:false,
   timeLeft:0,spiders:[],parts:[],spawnT:0,
   lastTs:0,frameId:null,timerIntv:null,
   totalSpiders:0,maxSim:0,bottlesCollected:0,
@@ -504,7 +508,7 @@ const getHS=d=>parseInt(localStorage.getItem(hsKey(d))||localStorage.getItem(`sc
 function setHS(d,lvl){if(lvl>getHS(d)){localStorage.setItem(hsKey(d),lvl);return true;}return false;}
 function refreshHS(){
   ['easy','normal','nightmare'].forEach(d=>{
-    const v=getHS(d);$(`hs-${d}`).textContent=v?`Lv ${v}/20`:'—';
+    const v=getHS(d);$(`hs-${d}`).textContent=v?`Lv ${v}/${LEVELS.length}`:'—';
   });
 }
 
@@ -515,8 +519,8 @@ const ACHV={
   bossKill:  {title:'👑 Boss Slayer',    desc:'Defeated a Boss Spider',      color:'#ff8800'},
   shieldSave:{title:'🛡️ Iron Skin',      desc:'Blocked a hit with your shield',color:'#7df9ff'},
   lvl5:      {title:'🌟 Survivor',       desc:'Reached Level 5',             color:'#4ade80'},
-  lvl10:     {title:'⚡ Halfway There',  desc:'Reached Level 10',            color:'#facc15'},
-  lvl20:     {title:'🏆 Legend',         desc:'Defeated all 20 levels',      color:'#c084fc'},
+  lvl10:     {title:'⚡ Almost There',   desc:'Reached Level 7',             color:'#facc15'},
+  lvl20:     {title:'🏆 Legend',         desc:'Defeated all 10 levels',      color:'#c084fc'},
 };
 let unlockedAchv=JSON.parse(localStorage.getItem('scs4_achv')||'{}');
 
@@ -927,7 +931,7 @@ function startLevel(idx){
   timerEl.textContent=LEVELS[idx].dur;timerEl.classList.remove('danger');
   dbadge.className=G.diff;dbadge.textContent=DIFF[G.diff].label;
   if(idx>=4)unlockAchievement('lvl5');
-  if(idx>=9)unlockAchievement('lvl10');
+  if(idx>=6)unlockAchievement('lvl10');
   levelIntro(idx,()=>{
     G.active=true;G.lastTs=performance.now();
     startTimer();startHB(1600);G.frameId=requestAnimationFrame(loop);
@@ -937,7 +941,7 @@ function startLevel(idx){
 function newGame(){
   audio();G.totalSpiders=0;G.maxSim=0;G.bottlesCollected=0;
   G.score=0;G.totalKills=0;scoreEl.textContent='0';
-  startLevel(0);
+  startLevel(G.startLvl);
 }
 
 // ── Game over ─────────────────────────────────────────────
@@ -951,7 +955,7 @@ function doGameOver(){
     hud.style.display='none';burstBar.style.opacity='0';clearSpiders();
     $('go-lv').textContent=G.lvl+1;
     $('go-stats').innerHTML=sboxes([
-      ['Level',`${G.lvl+1}/20`],['Score',G.score.toLocaleString()],
+      ['Level',`${G.lvl+1}/${LEVELS.length}`],['Score',G.score.toLocaleString()],
       ['Survived',`${Math.round(surv)}s`],['Kills',G.totalKills],
     ]);
     show('gameover');
@@ -972,7 +976,7 @@ function doLvlComplete(){
     setTimeout(()=>{
       hud.style.display='none';burstBar.style.opacity='0';clearSpiders();
       $('vc-stats').innerHTML=sboxes([
-        ['Levels','20/20'],['Score',G.score.toLocaleString()],
+        ['Levels',`${LEVELS.length}/${LEVELS.length}`],['Score',G.score.toLocaleString()],
         ['Spiders',G.totalSpiders],['Kills',G.totalKills],['Mode',DIFF[G.diff].label],
       ]);
       $('vc-hsbadge').style.display=newHS?'block':'none';
@@ -1030,6 +1034,21 @@ document.querySelectorAll('.db').forEach(btn=>{
     document.querySelectorAll('.db').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');G.diff=btn.dataset.d;
   };
+});
+
+// ── Level select grid ────────────────────────────────────
+const lvlGrid=$('lvl-grid');
+LEVELS.forEach((lv,i)=>{
+  const btn=document.createElement('button');
+  btn.className='lvb'+(BOSS_LEVELS.has(i)?' boss':'')+(i===0?' active':'');
+  btn.dataset.i=i;
+  btn.innerHTML=`<span class="lvn">${i+1}</span><span class="lvo">${BOSS_LEVELS.has(i)?'💀 boss':lv.tier}</span>`;
+  btn.title=lv.name;
+  btn.onclick=()=>{
+    document.querySelectorAll('.lvb').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');G.startLvl=i;
+  };
+  lvlGrid.appendChild(btn);
 });
 
 document.addEventListener('keydown',e=>{
