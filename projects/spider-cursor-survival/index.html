@@ -168,6 +168,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:5px}
 .slbl{font-size:.63rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin-bottom:9px}
 .dgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:420px}
+.lgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:100%;max-width:420px}
+.lvb{padding:10px 4px;border-radius:12px;border:2px solid transparent;
+  background:rgba(255,255,255,.04);color:var(--txt);cursor:pointer;text-align:center;
+  transition:all .2s;font-family:inherit}
+.lvb:hover{background:rgba(255,255,255,.08)}
+.lvb.active{border-color:#c084fc;background:rgba(192,132,252,.12)}
+.lvb .lvn{font-size:1.05rem;font-weight:800;display:block}
+.lvb.active .lvn{color:#c084fc}
+.lvb .lvo{font-size:.54rem;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);display:block;margin-top:2px}
+.lvb.boss .lvo{color:#f87171}
 .db{padding:13px 8px;border-radius:12px;border:2px solid transparent;
   background:rgba(255,255,255,.04);color:var(--txt);cursor:pointer;text-align:center;
   transition:all .2s;font-family:inherit}
@@ -369,6 +379,10 @@ body.shake{animation:shake .55s cubic-bezier(.36,.07,.19,.97) both}
       <button class="db nightmare" data-d="nightmare"><span class="di">🕷️🕷️🕷️</span><span class="dn">NIGHTMARE</span><span class="dd">Blazing speed. Legends only.</span></button>
     </div>
   </div>
+  <div style="width:100%;max-width:420px;margin-top:16px">
+    <div class="slbl">Starting Level</div>
+    <div class="lgrid" id="lvl-grid"></div>
+  </div>
 </div>
 
 <!-- ABOUT -->
@@ -477,7 +491,7 @@ const DIFF={
 };
 
 let G={
-  diff:'normal',lvl:0,active:false,
+  diff:'normal',lvl:0,startLvl:0,active:false,
   timeLeft:0,spiders:[],parts:[],spawnT:0,
   lastTs:0,frameId:null,timerIntv:null,
   totalSpiders:0,maxSim:0,bottlesCollected:0,
@@ -927,7 +941,7 @@ function startLevel(idx){
 function newGame(){
   audio();G.totalSpiders=0;G.maxSim=0;G.bottlesCollected=0;
   G.score=0;G.totalKills=0;scoreEl.textContent='0';
-  startLevel(0);
+  startLevel(G.startLvl);
 }
 
 // ── Game over ─────────────────────────────────────────────
@@ -1020,6 +1034,21 @@ document.querySelectorAll('.db').forEach(btn=>{
     document.querySelectorAll('.db').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');G.diff=btn.dataset.d;
   };
+});
+
+// ── Level select grid ────────────────────────────────────
+const lvlGrid=$('lvl-grid');
+LEVELS.forEach((lv,i)=>{
+  const btn=document.createElement('button');
+  btn.className='lvb'+(BOSS_LEVELS.has(i)?' boss':'')+(i===0?' active':'');
+  btn.dataset.i=i;
+  btn.innerHTML=`<span class="lvn">${i+1}</span><span class="lvo">${BOSS_LEVELS.has(i)?'💀 boss':lv.tier}</span>`;
+  btn.title=lv.name;
+  btn.onclick=()=>{
+    document.querySelectorAll('.lvb').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');G.startLvl=i;
+  };
+  lvlGrid.appendChild(btn);
 });
 
 document.addEventListener('keydown',e=>{
