@@ -1,0 +1,63 @@
+name: RM2 read-only bridge gate
+
+# Phase 2.5 review, Group C2 (BLOCKER) — the no-order allowlist proof must run as
+# a merge-blocking check, and fail if the RM2 test is RED *or MISSING*. This
+# workflow proves the invariant with no MetaTrader5 install and no pytest (stdlib
+# unittest only), on Python 3.9 and 3.14, over the whole bridge package.
+#
+# NOTE: making this check actually block merges requires GitHub branch protection
+# ("Require status checks to pass" → this job) on the default branch — a
+# repo-Settings toggle only the human owner can flip. This file defines the
+# check; branch protection makes it binding (see market-compass lesson).
+
+on:
+  push:
+    paths:
+      - 'projects/gold-signal-analyzer/src/GoldSignalAnalyzer.MT5Bridge/python/**'
+      - '.github/workflows/rm2-readonly-gate.yml'
+  pull_request:
+    paths:
+      - 'projects/gold-signal-analyzer/src/GoldSignalAnalyzer.MT5Bridge/python/**'
+      - '.github/workflows/rm2-readonly-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  rm2-gate:
+    name: RM2 no-order allowlist proof
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.9', '3.14']
+    env:
+      BRIDGE_DIR: projects/gold-signal-analyzer/src/GoldSignalAnalyzer.MT5Bridge/python
+      RM2_TEST: projects/gold-signal-analyzer/src/GoldSignalAnalyzer.MT5Bridge/python/bridge/tests/test_readonly_allowlist.py
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
+
+      # Fail LOUDLY if the launch-gate test is missing (deletion must break CI,
+      # not silently pass). Phase 2.5 cond C2: "fails if red OR missing."
+      - name: Assert RM2 launch-gate test is present
+        run: |
+          test -f "$RM2_TEST" || { echo "::error::RM2 launch-gate test missing: $RM2_TEST"; exit 1; }
+
+      # No MetaTrader5, no pytest — the RM2 proof reads source as TEXT via AST and
+      # runs a FakeGateway. A live SDK install would defeat the point of the proof.
+      - name: Run RM2 + server-protocol suite (stdlib unittest)
+        working-directory: ${{ env.BRIDGE_DIR }}
+        run: |
+          python --version
+          python -m unittest discover -s . -v

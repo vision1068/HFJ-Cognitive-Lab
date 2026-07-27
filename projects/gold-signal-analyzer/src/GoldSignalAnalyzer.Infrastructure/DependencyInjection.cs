@@ -5,6 +5,7 @@ using GoldSignalAnalyzer.Infrastructure.Configuration;
 using GoldSignalAnalyzer.Infrastructure.Logging;
 using GoldSignalAnalyzer.Infrastructure.Security;
 using GoldSignalAnalyzer.Infrastructure.Time;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -54,11 +55,20 @@ public static class DependencyInjection
         return services;
     }
 
-    /// <summary>UTC clock + the throwing (deferred) credential store (arch §4, gate R6).</summary>
+    /// <summary>
+    /// UTC clock + the Cycle-2 DPAPI-backed credential store (arch §5, FR-37). This replaces the
+    /// Cycle-1 throwing <see cref="NotImplementedCredentialStore"/> binding; the store holds the
+    /// tool's own bridge token only and never a broker credential (arch §5.2).
+    ///
+    /// Declared <c>[SupportedOSPlatform("windows")]</c> because it composes the DPAPI-backed
+    /// <see cref="WindowsCredentialStore"/>; callers (the WPF net8.0-windows Desktop host and the
+    /// net8.0-windows test project) are already Windows-targeted, so CA1416 does not cascade.
+    /// </summary>
+    [SupportedOSPlatform("windows")]
     public static IServiceCollection AddGsaInfrastructure(this IServiceCollection services)
     {
         services.AddSingleton<IClock, SystemClock>();
-        services.AddSingleton<ICredentialStore, NotImplementedCredentialStore>();
+        services.AddSingleton<ICredentialStore>(_ => new WindowsCredentialStore());
         return services;
     }
 }

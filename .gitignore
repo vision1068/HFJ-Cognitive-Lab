@@ -49,6 +49,20 @@ TestResults/
 [Dd]ebug/
 [Rr]elease/
 
+# === Python (gold-signal-analyzer MT5 bridge, Cycle 2 / Phase 2.5 cond D1) ===
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+**/.venv/
+venv/
+env/
+.pytest_cache/
+**/.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
 # === Gold Signal Analyzer local runtime (per-user, never committed) ===
 **/logs/
 *.db

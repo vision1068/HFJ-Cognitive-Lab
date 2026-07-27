@@ -53,7 +53,7 @@ public static class GsaHost
                         .AddGsaLogging(logDirectory)
                         .AddGsaInfrastructure()
                         .AddGsaPersistence()
-                        .AddGsaMarketData()
+                        .AddGsaMarketData(context.HostingEnvironment)
                         .AddGsaApplication()
                         .AddGsaIndicators()
                         .AddGsaSignals()

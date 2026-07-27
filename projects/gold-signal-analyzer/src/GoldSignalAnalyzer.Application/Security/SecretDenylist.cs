@@ -15,6 +15,7 @@ public static class SecretDenylist
         "password",
         "pwd",
         "token",
+        "bridgetoken",
         "apikey",
         "apitoken",
         "accesstoken",

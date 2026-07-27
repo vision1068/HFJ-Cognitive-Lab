@@ -7,28 +7,31 @@ using Xunit;
 namespace GoldSignalAnalyzer.Tests;
 
 /// <summary>
-/// GATE R6 (A07 — auth-bypass-by-default): the deferred <see cref="ICredentialStore"/> must have NO
-/// benign no-op Cycle-1 binding. This test proves (a) the DI-resolved binding IS the throwing type
-/// (not a silently-swapped null/empty no-op), and (b) EVERY member throws. A regression that made,
-/// e.g., GetSecretAsync return null — the exact bypass R6 exists to prevent — turns this suite red.
-/// (Closes QA Phase-4 finding: R6 was code-correct but previously untested.)
+/// GATE R6 (A07 — auth-bypass-by-default). The credential port must never be a benign no-op.
+/// Cycle 1 upheld this with a throwing binding; Cycle 2 (FR-37) upholds it with a REAL DPAPI store
+/// (<see cref="WindowsCredentialStore"/>) resolved by DI — still not a silent null/empty no-op.
+/// The retained <see cref="NotImplementedCredentialStore"/> fallback type is unit-tested here to
+/// document the "never a silent no-op" invariant it was built to guarantee.
 /// </summary>
 public sealed class NotImplementedCredentialStoreTests
 {
     [Fact]
-    public void R6_DI_resolved_credential_store_is_the_throwing_type_not_a_noop()
+    public void R6_DI_resolved_credential_store_is_the_real_dpapi_store_not_a_noop()
     {
         using var scratch = new ScratchDb();
         using var host = GsaHost.CreateHostBuilder(scratch.DbPath, scratch.LogDir).Build();
 
         var store = host.Services.GetRequiredService<ICredentialStore>();
 
-        Assert.IsType<NotImplementedCredentialStore>(store);
+        // Cycle-2: DI resolves the real DPAPI-backed store (not the throwing type, not a no-op).
+        Assert.IsType<WindowsCredentialStore>(store);
     }
 
     [Fact]
-    public async Task R6_every_member_throws_and_never_returns_a_value()
+    public async Task R6_fallback_type_every_member_throws_and_never_returns_a_value()
     {
+        // The retained fallback type still fails loud on every member — proving the invariant it
+        // guards (an unbuilt store must never silently bypass secret handling).
         ICredentialStore store = new NotImplementedCredentialStore();
 
         await Assert.ThrowsAsync<NotImplementedException>(() => store.GetSecretAsync("anyKey"));

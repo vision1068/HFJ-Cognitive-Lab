@@ -1,0 +1,30 @@
+# CODEOWNERS — change-control wrapper for RM2-critical paths.
+#
+# Rationale (Phase 2.5 review, Group C2 — BLOCKER; ott-app lesson): the read-only
+# allowlist and its structural proof are only as strong as their change-control.
+# "The switch without the wrapper is theatre." Every edit to the paths below
+# MUST be reviewed by the owner before merge. Enforcement of this file requires
+# GitHub branch protection with "Require review from Code Owners" enabled on the
+# default branch — that is a repo-Settings toggle only the human owner can flip
+# (see market-compass lesson, 2026-07-02). This file declares intent; branch
+# protection makes it binding.
+
+# --- RM2 launch gate: the read-only allowlist + its structural proof ----------
+# A change here can widen what the bridge can reach into the live money account.
+/projects/gold-signal-analyzer/src/GoldSignalAnalyzer.MT5Bridge/python/bridge/commands.py         @vision1068
+/projects/gold-signal-analyzer/src/GoldSignalAnalyzer.MT5Bridge/python/bridge/mt5_gateway.py       @vision1068
+/projects/gold-signal-analyzer/src/GoldSignalAnalyzer.MT5Bridge/python/bridge/tests/test_readonly_allowlist.py  @vision1068
+
+# --- Bridge transport / auth surface -----------------------------------------
+/projects/gold-signal-analyzer/src/GoldSignalAnalyzer.MT5Bridge/python/bridge/server.py            @vision1068
+/projects/gold-signal-analyzer/src/GoldSignalAnalyzer.MT5Bridge/python/bridge/handlers.py          @vision1068
+/projects/gold-signal-analyzer/src/GoldSignalAnalyzer.MT5Bridge/python/bridge/run_bridge.py        @vision1068
+
+# --- Secrets-by-construction surface (RM1 / RM3) -----------------------------
+/projects/gold-signal-analyzer/src/GoldSignalAnalyzer.Application/Security/SecretDenylist.cs        @vision1068
+/projects/gold-signal-analyzer/src/GoldSignalAnalyzer.Infrastructure/Security/WindowsCredentialStore.cs  @vision1068
+
+# --- The governance wrapper itself -------------------------------------------
+/.github/CODEOWNERS                 @vision1068
+/.github/workflows/                 @vision1068
+/.gitignore                         @vision1068
