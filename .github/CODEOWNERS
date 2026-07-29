@@ -24,6 +24,29 @@
 /projects/gold-signal-analyzer/src/GoldSignalAnalyzer.Application/Security/SecretDenylist.cs        @vision1068
 /projects/gold-signal-analyzer/src/GoldSignalAnalyzer.Infrastructure/Security/WindowsCredentialStore.cs  @vision1068
 
+# --- .NET bridge CLIENT surface (Cycle 2 Slice 2, Phase 2.5 cond C2 — BLOCKER) -
+# The Mt5BridgeClient will later drive a LIVE money account: it holds the bearer
+# token, spawns the child process, and enforces the loopback-127.0.0.1 literal
+# (ADR-14) and token-via-stdin-only (ADR-15) invariants. An unreviewed edit could
+# add a configurable host, move the token to args/env, or rebind the keyless
+# default IMarketDataProvider to the bridge (an ambient "go live"). All .cs under
+# MT5Bridge (client, transport, process, protocol, DI) is therefore owner-gated,
+# as is the MarketData DI that binds the keyless default (the AC-49.1 stop-the-line
+# lock). Same enforcement caveat as above: inert until branch protection is armed.
+/projects/gold-signal-analyzer/src/GoldSignalAnalyzer.MT5Bridge/**                                  @vision1068
+/projects/gold-signal-analyzer/src/GoldSignalAnalyzer.MarketData/DependencyInjection.cs             @vision1068
+
+# --- Go-live CALL SITE + FR-40 secret-posture surface (Phase 5 audit, Finding 6 — MAJOR) -----
+# CODEOWNERS above gates the MECHANISM (the bridge client + MarketData DI). But the file that
+# actually FLIPS "go live" is the composition ROOT (GsaHost) — a Desktop-only PR could call
+# AddGsaMt5Bridge(enableLiveBridge:true) or rebind the keyless default without the mechanism files
+# ever changing. Gate the call site and the FR-40 secret-posture files (wizard inputs/validator) +
+# the shared masking primitive (RM1/RM3). Scoped to the load-bearing files, not all UI churn.
+/projects/gold-signal-analyzer/src/GoldSignalAnalyzer.Desktop/GsaHost.cs                            @vision1068
+/projects/gold-signal-analyzer/src/GoldSignalAnalyzer.Desktop/Presentation/Screens/ConnectionWizardInputModel.cs  @vision1068
+/projects/gold-signal-analyzer/src/GoldSignalAnalyzer.Desktop/Validation/ConnectionInputValidator.cs @vision1068
+/projects/gold-signal-analyzer/src/GoldSignalAnalyzer.Infrastructure/Logging/**                     @vision1068
+
 # --- The governance wrapper itself -------------------------------------------
 /.github/CODEOWNERS                 @vision1068
 /.github/workflows/                 @vision1068

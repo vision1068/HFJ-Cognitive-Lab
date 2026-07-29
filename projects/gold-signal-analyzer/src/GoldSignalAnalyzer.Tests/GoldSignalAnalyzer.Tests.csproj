@@ -16,11 +16,15 @@
     <ProjectReference Include="..\GoldSignalAnalyzer.Indicators\GoldSignalAnalyzer.Indicators.csproj" />
     <ProjectReference Include="..\GoldSignalAnalyzer.Signals\GoldSignalAnalyzer.Signals.csproj" />
     <ProjectReference Include="..\GoldSignalAnalyzer.MarketData\GoldSignalAnalyzer.MarketData.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.MT5Bridge\GoldSignalAnalyzer.MT5Bridge.csproj" />
     <ProjectReference Include="..\GoldSignalAnalyzer.Desktop\GoldSignalAnalyzer.Desktop.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="xunit" Version="2.6.6" />
+    <!-- Honest runtime skips (xunit v2 has no Assert.Skip): the real-Python spawn smoke test reports
+         Skipped — never a vacuous Pass — when no interpreter is present (Phase 4 QA advisory). -->
+    <PackageReference Include="Xunit.SkippableFact" Version="1.4.13" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

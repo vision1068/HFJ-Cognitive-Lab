@@ -1,0 +1,79 @@
+name: .NET bridge client gate
+
+# Phase 2.5 review (Cycle 2 Slice 2), condition C3 (BLOCKER) — until this slice
+# there was NO .NET CI at all: the RM2 gate triggers only on the Python bridge
+# (`.../MT5Bridge/python/**`), so the new .NET Mt5BridgeClient — which will later
+# drive a LIVE money account, holds the bearer token, and enforces the
+# loopback-127.0.0.1 literal (ADR-14), token-via-stdin-only (ADR-15), and the
+# keyless-default-stays-Null "stop-the-line" lock (AC-49.1) — had zero
+# merge-blocking representation. This job builds and tests the .NET side so a
+# merge that regresses those invariants fails CI.
+#
+# Runs on windows-latest: the solution includes a WPF (net8.0-windows) Desktop
+# project that only builds on Windows.
+#
+# NOTE: making this check actually block merges requires GitHub branch protection
+# ("Require status checks to pass" → this job, alongside rm2-gate) on the default
+# branch — a repo-Settings toggle only the human owner can flip. This file defines
+# the check; branch protection makes it binding (market-compass / ott-app lesson).
+# Verify build warnings with --no-incremental, never a plain incremental "0/0"
+# (gold-signal-analyzer lesson, 2026-07-26).
+
+on:
+  push:
+    paths:
+      - 'projects/gold-signal-analyzer/src/GoldSignalAnalyzer.MT5Bridge/**'
+      - 'projects/gold-signal-analyzer/src/GoldSignalAnalyzer.MarketData/**'
+      - 'projects/gold-signal-analyzer/src/GoldSignalAnalyzer.Application/Ports/**'
+      # Phase 5 audit Finding 6: the go-live CALL SITE (GsaHost) + FR-40 secret-posture files live in
+      # Desktop; the masking primitive in Infrastructure/Logging. Trigger on them so a Desktop/Infra
+      # PR still runs DiCompositionTests + ConnectionWizardModelTests.
+      - 'projects/gold-signal-analyzer/src/GoldSignalAnalyzer.Desktop/**'
+      - 'projects/gold-signal-analyzer/src/GoldSignalAnalyzer.Infrastructure/**'
+      - 'projects/gold-signal-analyzer/src/GoldSignalAnalyzer.Tests/**'
+      - '.github/workflows/dotnet-gate.yml'
+  pull_request:
+    paths:
+      - 'projects/gold-signal-analyzer/src/GoldSignalAnalyzer.MT5Bridge/**'
+      - 'projects/gold-signal-analyzer/src/GoldSignalAnalyzer.MarketData/**'
+      - 'projects/gold-signal-analyzer/src/GoldSignalAnalyzer.Application/Ports/**'
+      # Phase 5 audit Finding 6: the go-live CALL SITE (GsaHost) + FR-40 secret-posture files live in
+      # Desktop; the masking primitive in Infrastructure/Logging. Trigger on them so a Desktop/Infra
+      # PR still runs DiCompositionTests + ConnectionWizardModelTests.
+      - 'projects/gold-signal-analyzer/src/GoldSignalAnalyzer.Desktop/**'
+      - 'projects/gold-signal-analyzer/src/GoldSignalAnalyzer.Infrastructure/**'
+      - 'projects/gold-signal-analyzer/src/GoldSignalAnalyzer.Tests/**'
+      - '.github/workflows/dotnet-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dotnet-gate:
+    name: .NET build + bridge/DI/port tests
+    runs-on: windows-latest
+    env:
+      SRC_DIR: projects/gold-signal-analyzer/src
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # Clean build so warnings are re-emitted for every file (an incremental
+      # "0 warnings" is a stale-cache artifact, not evidence).
+      - name: Build (--no-incremental)
+        working-directory: ${{ env.SRC_DIR }}
+        run: dotnet build --no-incremental -warnaserror
+
+      # Run the FULL suite — no --filter (Phase 5 audit Finding 7: a filter silently excludes the
+      # wizard secret-masking + Null-provider suites and risks omitting future invariant tests). The
+      # whole suite runs in ~1s locally; a red here is a stop-the-line defect (an ambient live swap, a
+      # reshaped read-only port, a leaked secret, or a broken masking control). The real-Python spawn
+      # smoke test runs when an interpreter is present on the runner and honestly SKIPS otherwise.
+      - name: Test (full suite)
+        working-directory: ${{ env.SRC_DIR }}
+        run: dotnet test --no-build

@@ -10,4 +10,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
   </ItemGroup>
+  <!-- Expose internal statics (ToBridgeTimeframe / TimeframeDuration) to the test assembly so the
+       AC-47.4 fail-loud-timeframe unit tests can exercise them directly. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="GoldSignalAnalyzer.Tests" />
+  </ItemGroup>
 </Project>
