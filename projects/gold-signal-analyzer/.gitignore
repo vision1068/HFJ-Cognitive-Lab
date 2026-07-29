@@ -1,0 +1,22 @@
+# --- .NET build output ---
+bin/
+obj/
+*.user
+.vs/
+
+# --- Python ---
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# --- Secrets / credentials (NFR-1) — never commit these ---
+.env
+.env.local
+*.secret
+creds/
+*.token
+
+# --- OS noise ---
+Thumbs.db
+.DS_Store
