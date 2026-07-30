@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <!--
+    Thin XAML shell (net8.0-windows). Contains NO testable logic — all view-model
+    logic lives in the net8.0 Presentation project. References Infrastructure only
+    at the composition root (App) to construct the durable SqliteJournalStore.
+    This project is intentionally NOT referenced by the test project.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\GoldSignalAnalyzer.Domain\GoldSignalAnalyzer.Domain.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.Application\GoldSignalAnalyzer.Application.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.Infrastructure\GoldSignalAnalyzer.Infrastructure.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.Presentation\GoldSignalAnalyzer.Presentation.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -27,6 +27,7 @@
     <ProjectReference Include="..\GoldSignalAnalyzer.Application\GoldSignalAnalyzer.Application.csproj" />
     <ProjectReference Include="..\GoldSignalAnalyzer.Infrastructure\GoldSignalAnalyzer.Infrastructure.csproj" />
     <ProjectReference Include="..\GoldSignalAnalyzer.Testing\GoldSignalAnalyzer.Testing.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.Presentation\GoldSignalAnalyzer.Presentation.csproj" />
   </ItemGroup>
 
 </Project>

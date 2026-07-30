@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoldSignalAnalyzer.Testing"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoldSignalAnalyzer.Tests", "GoldSignalAnalyzer.Tests\GoldSignalAnalyzer.Tests.csproj", "{44BB298B-2EAB-45D5-A1DA-A0A6C01A4E8D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoldSignalAnalyzer.Presentation", "GoldSignalAnalyzer.Presentation\GoldSignalAnalyzer.Presentation.csproj", "{73662422-970F-4C99-8A8F-DE8227EB0527}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoldSignalAnalyzer.Wpf", "GoldSignalAnalyzer.Wpf\GoldSignalAnalyzer.Wpf.csproj", "{36C09547-62FB-422C-B17C-05B36FA3E78E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +46,13 @@ Global
 		{44BB298B-2EAB-45D5-A1DA-A0A6C01A4E8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44BB298B-2EAB-45D5-A1DA-A0A6C01A4E8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44BB298B-2EAB-45D5-A1DA-A0A6C01A4E8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73662422-970F-4C99-8A8F-DE8227EB0527}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73662422-970F-4C99-8A8F-DE8227EB0527}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73662422-970F-4C99-8A8F-DE8227EB0527}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73662422-970F-4C99-8A8F-DE8227EB0527}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36C09547-62FB-422C-B17C-05B36FA3E78E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36C09547-62FB-422C-B17C-05B36FA3E78E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36C09547-62FB-422C-B17C-05B36FA3E78E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36C09547-62FB-422C-B17C-05B36FA3E78E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

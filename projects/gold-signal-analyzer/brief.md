@@ -72,13 +72,31 @@ Cycle 2 extends this brief with the analytical pipeline. Full FR/AC text lives i
 | FR-16…FR-25 | Regime, independent scoring, veto, guards, confidence, explanation, risk plan | ✅ DONE (tested) |
 | FR-31 | Look-ahead-safe backtest + metrics + walk-forward | ✅ DONE (tested) |
 | FR-32/33 | Paper trading + journal + no-order guard | ✅ DONE — SQLite journal adapter built + round-trip tested (C-2 closed) |
-| FR-26/27/28 | Dashboard / charts / wizard | ⛔ UNTOUCHED (no WPF shell on this branch) |
+| FR-26 | Dashboard (signal + scores + journal display) | ✅ DONE — Cycle 3 (WPF shell, tested) |
+| FR-27/28 | Charts / setup wizard | ⛔ UNTOUCHED (deferred) |
 | FR-30 | Notifications | ⛔ UNTOUCHED |
-| FR-34/35 | Packaging / disclaimer flow | ⛔ UNTOUCHED |
+| FR-34 | Packaging / installer | ⛔ UNTOUCHED |
+| FR-35 | First-run disclaimer flow (C-1) | ✅ DONE — Cycle 3 (gate + banner, tested; C-1 CLOSED) |
 
-Test evidence: 143 xUnit + 19 Python green in Release (137 + 6 SQLite journal
+Test evidence (Cycle 2): 143 xUnit + 19 Python green in Release (137 + 6 SQLite journal
 round-trip tests added when C-2 was closed); safety invariants (no-order-path,
 no-fabrication, Testing.dll absent from production) re-verified.
+
+## Cycle 3 — UI/Dashboard Shell status (added 2026-07-30)
+
+Cycle 3 adds the presentation layer. Full FR/AC text in `cycle3-spec.md`; design +
+evidence in `phase-2-arch-cycle3.md` / `phase-3-tech-cycle3.md`; sign-off in
+`phase-6-ceo-cycle3.md`. Built as a **testable-VM (net8.0 `Presentation`) + dumb-XAML
+(net8.0-windows `Wpf`)** split so UI logic is unit-tested headlessly; a pure
+`Application/Analysis/SignalAnalysisService` facade composes the existing stages.
+**Read-only display only — no order/execution surface introduced.**
+
+Test evidence (Cycle 3): 158 xUnit (143 → 158, +15) + 19 Python green in Release;
+full solution incl. WPF builds 0/0; `GoldSignalAnalyzer.Wpf.exe` produced; Testing.dll
+absent from the shipped app; INV-1/FR-22 grep = 0.
+
+**Condition state:** C-1 ✅ CLOSED (disclaimer ships with the UI). C-2 ✅ CLOSED
+(Cycle 2). C-3 remains OUT (live seam / any order capability — named-approver gate).
 
 ## `[NEEDS CLARIFICATION]`
 None outstanding — scope was fixed by the owner (S-1…S-3). Live-attach behaviour is deliberately deferred, not ambiguous.

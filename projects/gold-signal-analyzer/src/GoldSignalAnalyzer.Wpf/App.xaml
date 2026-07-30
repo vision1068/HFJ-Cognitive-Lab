@@ -1,0 +1,7 @@
+<Application x:Class="GoldSignalAnalyzer.Wpf.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- No StartupUri: startup is driven in code so the first-run disclaimer gate
+         (FR-35) runs before the dashboard is shown. -->
+    <Application.Resources />
+</Application>
