@@ -15,6 +15,11 @@ public sealed record Candle
     public decimal Close { get; }
     public decimal Volume { get; }
 
+    /// <summary>FR-11.5: whether this bar is closed (<see cref="CandleStatus.Completed"/>)
+    /// or still forming (<see cref="CandleStatus.Provisional"/>). Defaults to Completed
+    /// so existing callers are unaffected.</summary>
+    public CandleStatus Status { get; }
+
     public Candle(
         NormalizedSymbol symbol,
         TimeFrame timeFrame,
@@ -23,7 +28,8 @@ public sealed record Candle
         decimal high,
         decimal low,
         decimal close,
-        decimal volume)
+        decimal volume,
+        CandleStatus status = CandleStatus.Completed)
     {
         Symbol = symbol ?? throw new ArgumentNullException(nameof(symbol));
         if (open <= 0 || high <= 0 || low <= 0 || close <= 0)
@@ -35,5 +41,10 @@ public sealed record Candle
         TimeFrame = timeFrame;
         OpenTimeUtc = openTimeUtc.ToUniversalTime();
         Open = open; High = high; Low = low; Close = close; Volume = volume;
+        Status = status;
     }
+
+    /// <summary>Returns a copy of this candle re-tagged with the given status.</summary>
+    public Candle WithStatus(CandleStatus status) =>
+        new(Symbol, TimeFrame, OpenTimeUtc, Open, High, Low, Close, Volume, status);
 }

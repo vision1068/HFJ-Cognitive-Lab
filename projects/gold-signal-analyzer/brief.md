@@ -58,5 +58,27 @@
 | **NFR-5** | Never fabricate market facts/prices. | Live seam throws when not Connected; providers flagged `IsLive`; freshness treats future/unknown as not-fresh. |
 | **NFR-10** | Pure calc/logic isolated and unit-testable without a live terminal; test provider gated out of production. | Domain/Application are pure; test provider in a separate assembly not referenced by production. |
 
+## Cycle 2 — Analytical Core status (added 2026-07-30)
+
+Cycle 2 extends this brief with the analytical pipeline. Full FR/AC text lives in
+`cycle2-spec.md`; this table tracks status. Diagram + evidence in
+`phase-3-tech-cycle2.md`; sign-off in `phase-6-ceo-cycle2.md`.
+
+| ID | Area | Status |
+|----|------|--------|
+| FR-11.3/11.4/11.5 | Candle build / aggregate / provisional | ✅ DONE (tested) |
+| FR-12.4 | Freshness/veto reuse | ✅ DONE (Cycle 1) |
+| FR-13/14/15 | Indicator engine, MTF, category caps | ✅ DONE (tested) |
+| FR-16…FR-25 | Regime, independent scoring, veto, guards, confidence, explanation, risk plan | ✅ DONE (tested) |
+| FR-31 | Look-ahead-safe backtest + metrics + walk-forward | ✅ DONE (tested) |
+| FR-32/33 | Paper trading + journal + no-order guard | ✅ DONE — SQLite journal adapter built + round-trip tested (C-2 closed) |
+| FR-26/27/28 | Dashboard / charts / wizard | ⛔ UNTOUCHED (no WPF shell on this branch) |
+| FR-30 | Notifications | ⛔ UNTOUCHED |
+| FR-34/35 | Packaging / disclaimer flow | ⛔ UNTOUCHED |
+
+Test evidence: 143 xUnit + 19 Python green in Release (137 + 6 SQLite journal
+round-trip tests added when C-2 was closed); safety invariants (no-order-path,
+no-fabrication, Testing.dll absent from production) re-verified.
+
 ## `[NEEDS CLARIFICATION]`
 None outstanding — scope was fixed by the owner (S-1…S-3). Live-attach behaviour is deliberately deferred, not ambiguous.
