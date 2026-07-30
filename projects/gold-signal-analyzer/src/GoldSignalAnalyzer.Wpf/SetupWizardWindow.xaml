@@ -34,7 +34,7 @@
             <!-- hidden-header TabControl driven by CurrentStepIndex (NFR-SETUP-3): the
                  selected tab's content shows while all TabItem headers are collapsed,
                  so no custom value converter is needed. -->
-            <TabControl SelectedIndex="{Binding CurrentStepIndex}" BorderThickness="0" Background="Transparent">
+            <TabControl SelectedIndex="{Binding CurrentStepIndex, Mode=OneWay}" BorderThickness="0" Background="Transparent">
                 <TabControl.ItemContainerStyle>
                     <Style TargetType="TabItem">
                         <Setter Property="Visibility" Value="Collapsed"/>

@@ -72,7 +72,52 @@ lesson) — it held.
    step before asserting. Rerun → **200/200**. (The product behaved correctly throughout — the
    fix hardened the test, and it now also asserts `Next` cannot advance past a blocked source.)
 
+## Addendum — manual end-to-end run (post-gate, real product defects found + fixed)
+
+The 200/0 xUnit result above exercises view-model and store logic headlessly; it does not render
+actual XAML bindings or drive the real `App.OnStartup` composition root. Running the built
+`GoldSignalAnalyzer.Wpf.exe` end-to-end (fresh profile, no `disclaimer.ack`/`setup.json`) via
+Windows UI Automation surfaced **three real defects that the automated suite could not catch**,
+all pure WPF plumbing bugs — the wizard's own validation/navigation logic behaved correctly at
+every step once these were fixed:
+
+1. **Crash on wizard open.** `SetupWizardWindow.xaml` bound `TabControl.SelectedIndex` to
+   `CurrentStepIndex` with WPF's default `TwoWay` mode, but `CurrentStepIndex` has a `private set`
+   — `ShowDialog()` threw `InvalidOperationException` immediately. Fixed: `Mode=OneWay` (the VM,
+   not the TabControl, owns step navigation; headers are hidden so there is no user-driven
+   `SelectedIndex` change to receive).
+2. **App silently exits after the wizard (or the disclaimer alone, on a truly fresh machine) closes,
+   before the dashboard ever shows.** Neither `App.xaml` nor `App.xaml.cs` set a `ShutdownMode`, so
+   the default `OnLastWindowClose` tore the `Application` down the moment the sole open gate dialog
+   closed — before the subsequent `MainWindow.Show()` call in `OnStartup` ran. This is a pre-existing
+   gap, not new to this cycle: it would have broken the Cycle 3 disclaimer-only gate too on a
+   genuinely fresh profile; it went uncaught because no prior cycle's QA ran the exe interactively
+   from a clean `%LOCALAPPDATA%` state. Fixed: `ShutdownMode = OnExplicitShutdown` at the top of
+   `OnStartup`, switched to `OnMainWindowClose` right before `MainWindow.Show()`.
+3. **Crash when the dashboard renders an actionable notification.** `MainWindow.xaml`'s
+   `<Run Text="{Binding Headline}"/>` / `Time` bindings (Cycle 4) hit the same read-only-property
+   trap as #1 — `Run.Text` also binds `TwoWay` by default, and `NotificationViewModel.Headline`/
+   `Time` are get-only. Fixed: `Mode=OneWay` on both. This was a **Cycle 4 defect**, latent until
+   this cycle's manual run was the first to actually reach the dashboard with an actionable signal.
+
+All three were reproduced, fixed, and **re-verified by manually driving the full fresh-install
+flow twice** (disclaimer → wizard Welcome→DataSource(Mt5Live confirmed blocked, SampleDemo
+selected)→Symbol(XAUUSD ranked 1.00)→Connection(loopback validated live, non-loopback rejected
+live)→Account→Review→Finish → dashboard renders signal/chart/notification/journal correctly →
+close → relaunch → both gates correctly skipped straight to the dashboard). `dotnet test` was
+rerun after all three fixes: still **200/0**. No AC, NFR, or invariant required a behavior change —
+these were binding-mode/shutdown-mode defects orthogonal to the wizard's design.
+
+**Process gap to carry forward:** add a manual "run the actual exe from a clean profile" pass to
+the QA gate for any cycle touching `.xaml` bindings or `App.OnStartup`, since headless xUnit tests
+structurally cannot exercise XAML binding-mode or `Application.ShutdownMode` behavior. Recorded in
+`.claude/memory/lessons-learned.md`.
+
 ## QA verdict: **PASS**
 All ACs (AC-28.1…AC-28.7) and NFRs (NFR-SETUP-1/2/3) are covered by named, passing tests;
 build/test/python evidence is real command output; every safety invariant is re-proven on this
-config slice; the one defect was a test-only issue, fixed in-gate with the suite green at 200/0.
+config slice; the one xUnit-suite defect was a test-only issue, fixed in-gate with the suite green
+at 200/0. **Three additional real WPF defects** (binding-mode + shutdown-mode) were found and fixed
+via manual end-to-end execution of the built exe, per the addendum above — the shipped app now
+actually completes the fresh-install flow end-to-end, confirmed by direct interactive verification,
+not build success alone.

@@ -25,6 +25,13 @@ public partial class App // base System.Windows.Application supplied by the XAML
     {
         base.OnStartup(e);
 
+        // The disclaimer/setup gate dialogs below are shown via ShowDialog() before
+        // MainWindow exists. With the default ShutdownMode (OnLastWindowClose), closing
+        // whichever gate dialog happens to be the sole open window tears the
+        // Application down before MainWindow.Show() runs. Stay explicit until the
+        // dashboard is actually up, then hand shutdown back to the main window closing.
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
         var dataDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "GoldSignalAnalyzer");
@@ -96,6 +103,7 @@ public partial class App // base System.Windows.Application supplied by the XAML
         var mainVm = new MainViewModel(signalVm, journalVm, chartVm, notifier);
 
         MainWindow = new MainWindow { DataContext = mainVm };
+        ShutdownMode = ShutdownMode.OnMainWindowClose;
         MainWindow.Show();
     }
 

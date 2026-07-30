@@ -142,9 +142,9 @@
                                     <Border BorderBrush="#FFEEEEEE" BorderThickness="0,0,0,1" Padding="0,6">
                                         <StackPanel>
                                             <TextBlock FontWeight="Bold">
-                                                <Run Text="{Binding Headline}"/>
+                                                <Run Text="{Binding Headline, Mode=OneWay}"/>
                                                 <Run Text="  "/>
-                                                <Run Text="{Binding Time}" Foreground="#FF888888"/>
+                                                <Run Text="{Binding Time, Mode=OneWay}" Foreground="#FF888888"/>
                                             </TextBlock>
                                             <TextBlock Text="{Binding Reason}" TextWrapping="Wrap" FontStyle="Italic"/>
                                             <StackPanel Orientation="Horizontal">
