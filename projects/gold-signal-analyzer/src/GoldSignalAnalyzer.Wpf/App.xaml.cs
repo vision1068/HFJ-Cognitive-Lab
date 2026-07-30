@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using GoldSignalAnalyzer.Application.Analysis;
+using GoldSignalAnalyzer.Application.Charting;
 using GoldSignalAnalyzer.Application.Scoring;
 using GoldSignalAnalyzer.Domain;
 using GoldSignalAnalyzer.Infrastructure.Persistence;
@@ -62,7 +63,16 @@ public partial class App // base System.Windows.Application supplied by the XAML
         var signalVm = new SignalViewModel();
         signalVm.Load(analysis);
         var journalVm = new JournalViewModel(journalStore);
-        var mainVm = new MainViewModel(signalVm, journalVm);
+
+        // --- FR-27: candle chart + EMA overlays over the SAME (non-live) candles ---
+        var chartVm = new ChartViewModel();
+        chartVm.Load(new ChartSeriesBuilder().Build(candles));
+
+        // --- FR-30: in-app notification for the current actionable signal ----------
+        var notifier = new SignalNotifier(SystemClock.Instance);
+        notifier.Observe(analysis);   // raises only if the classification is actionable
+
+        var mainVm = new MainViewModel(signalVm, journalVm, chartVm, notifier);
 
         MainWindow = new MainWindow { DataContext = mainVm };
         MainWindow.Show();

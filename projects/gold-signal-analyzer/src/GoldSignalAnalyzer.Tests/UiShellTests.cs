@@ -214,7 +214,8 @@ public class UiShellTests
         Assert.False(string.IsNullOrWhiteSpace(DisclaimerText.Banner));
         Assert.Contains("NOT INVESTMENT ADVICE", DisclaimerText.Banner);
         Assert.Contains(DisclaimerText.Banner, new MainViewModel(new SignalViewModel(),
-            new JournalViewModel(new InMemoryJournalStore())).DisclaimerBanner);
+            new JournalViewModel(new InMemoryJournalStore()), new ChartViewModel(),
+            new SignalNotifier(new ManualClock(DateTimeOffset.UtcNow))).DisclaimerBanner);
     }
 
     [Fact] // AC-35.2: the gate starts un-acknowledged and only clears after the command

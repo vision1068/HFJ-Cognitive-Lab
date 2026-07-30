@@ -73,8 +73,9 @@ Cycle 2 extends this brief with the analytical pipeline. Full FR/AC text lives i
 | FR-31 | Look-ahead-safe backtest + metrics + walk-forward | ✅ DONE (tested) |
 | FR-32/33 | Paper trading + journal + no-order guard | ✅ DONE — SQLite journal adapter built + round-trip tested (C-2 closed) |
 | FR-26 | Dashboard (signal + scores + journal display) | ✅ DONE — Cycle 3 (WPF shell, tested) |
-| FR-27/28 | Charts / setup wizard | ⛔ UNTOUCHED (deferred) |
-| FR-30 | Notifications | ⛔ UNTOUCHED |
+| FR-27 | Charts (candle chart + EMA overlays) | ✅ DONE — Cycle 4 (testable geometry VM + dumb Canvas, tested) |
+| FR-28 | Setup wizard | ⛔ UNTOUCHED (deferred) |
+| FR-30 | Notifications (in-app signal alerts) | ✅ DONE — Cycle 4 (passive `SignalNotifier`, dedupe/cooldown, tested) |
 | FR-34 | Packaging / installer | ⛔ UNTOUCHED |
 | FR-35 | First-run disclaimer flow (C-1) | ✅ DONE — Cycle 3 (gate + banner, tested; C-1 CLOSED) |
 
@@ -97,6 +98,22 @@ absent from the shipped app; INV-1/FR-22 grep = 0.
 
 **Condition state:** C-1 ✅ CLOSED (disclaimer ships with the UI). C-2 ✅ CLOSED
 (Cycle 2). C-3 remains OUT (live seam / any order capability — named-approver gate).
+
+## Cycle 4 — Charts & Notifications status (added 2026-07-30)
+
+Cycle 4 adds a candle chart with EMA overlays (FR-27) and an in-app signal notifier
+(FR-30) to the read-only shell. Full FR/AC text in `cycle4-spec.md`; design in
+`phase-2-arch-cycle4.md`; build/evidence in `phase-3-tech-cycle4.md`; QA in
+`phase-4-qa-cycle4.md`; audit in `phase-5-audit-cycle4.md`; sign-off in
+`phase-6-ceo-cycle4.md`. Same testable-VM / dumb-XAML split; **zero new NuGet
+packages** (chart drawn with built-in WPF `Canvas`/`Polyline`, not a charting lib).
+Notifications are **in-app only** — external channels (email/SMS/push) and OS toast
+explicitly OUT of scope (D4-2). **Read-only display only — no order/execution surface.**
+
+Test evidence (Cycle 4): 178 xUnit (158 → 178, +20) + 19 Python green in Release;
+full solution incl. WPF builds 0/0; `GoldSignalAnalyzer.Wpf.exe` produced; Testing.dll
+absent from the shipped app; order-surface grep = 0; percent/probability grep = 0;
+disclaimer banner re-verified always-visible. C-3 boundary untouched.
 
 ## `[NEEDS CLARIFICATION]`
 None outstanding — scope was fixed by the owner (S-1…S-3). Live-attach behaviour is deliberately deferred, not ambiguous.
