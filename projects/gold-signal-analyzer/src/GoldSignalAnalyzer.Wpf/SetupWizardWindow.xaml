@@ -1,0 +1,151 @@
+<Window x:Class="GoldSignalAnalyzer.Wpf.SetupWizardWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Gold Signal Analyzer — First-Run Setup"
+        Height="600" Width="720"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        ShowInTaskbar="True"
+        WindowStyle="SingleBorderWindow">
+    <Border Padding="20" Background="#FFFDF6E3">
+        <DockPanel LastChildFill="True">
+
+            <!-- header -->
+            <TextBlock DockPanel.Dock="Top"
+                       Text="{Binding StepProgressLabel}"
+                       FontSize="20" FontWeight="Bold"
+                       Foreground="#FF8A1C1C" Margin="0,0,0,12"/>
+
+            <!-- footer: validation message + navigation -->
+            <StackPanel DockPanel.Dock="Bottom" Margin="0,14,0,0">
+                <TextBlock Text="{Binding CurrentError}"
+                           Foreground="#FFB00020" TextWrapping="Wrap"
+                           FontWeight="SemiBold" Margin="0,0,0,8"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Back" Command="{Binding BackCommand}"
+                            Width="90" Height="34" Margin="0,0,8,0"/>
+                    <Button Content="Next" Command="{Binding NextCommand}"
+                            Width="90" Height="34" Margin="0,0,8,0"/>
+                    <Button Content="Finish" Command="{Binding FinishCommand}"
+                            Width="110" Height="34" FontWeight="SemiBold"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- hidden-header TabControl driven by CurrentStepIndex (NFR-SETUP-3): the
+                 selected tab's content shows while all TabItem headers are collapsed,
+                 so no custom value converter is needed. -->
+            <TabControl SelectedIndex="{Binding CurrentStepIndex}" BorderThickness="0" Background="Transparent">
+                <TabControl.ItemContainerStyle>
+                    <Style TargetType="TabItem">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                    </Style>
+                </TabControl.ItemContainerStyle>
+
+                <!-- 0 Welcome -->
+                <TabItem>
+                    <StackPanel>
+                        <TextBlock TextWrapping="Wrap" FontSize="14" LineHeight="20"
+                                   Text="Welcome. This short setup captures your (non-secret) configuration — data source, gold symbol, connection settings and account balance — and saves it locally. It performs NO live connection, stores NO password or secret, and has NO order/trade capability. Click Next to begin."/>
+                    </StackPanel>
+                </TabItem>
+
+                <!-- 1 Data Source -->
+                <TabItem>
+                    <StackPanel>
+                        <TextBlock Text="Choose the data to analyse. Live MT5 is listed but disabled in this build."
+                                   TextWrapping="Wrap" Margin="0,0,0,10"/>
+                        <ListBox ItemsSource="{Binding DataSourceOptions}"
+                                 SelectedItem="{Binding SelectedDataSourceOption}"
+                                 Height="130">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="IsEnabled" Value="{Binding IsSelectable}"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Label}" Padding="4"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                            <TextBlock Text="CSV path: " VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding CsvPath, UpdateSourceTrigger=PropertyChanged}" Width="440"/>
+                        </StackPanel>
+                    </StackPanel>
+                </TabItem>
+
+                <!-- 2 Symbol -->
+                <TabItem>
+                    <StackPanel>
+                        <TextBlock Text="Select your broker's gold instrument. The match confidence is the detector's 0..1 score (not a probability of profit)."
+                                   TextWrapping="Wrap" Margin="0,0,0,10"/>
+                        <ListBox ItemsSource="{Binding SymbolChoices}"
+                                 SelectedItem="{Binding SelectedSymbol}"
+                                 Height="200">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Raw}" FontWeight="SemiBold" Width="140"/>
+                                        <TextBlock Text="{Binding MatchConfidenceLabel}" Foreground="#FF555555"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </TabItem>
+
+                <!-- 3 Connection -->
+                <TabItem>
+                    <StackPanel>
+                        <TextBlock Text="Connection settings are captured and validated (loopback-only) but NO connection is attempted."
+                                   TextWrapping="Wrap" Margin="0,0,0,10"/>
+                        <CheckBox Content="Use Mode B (configured read-only) — requires a non-secret login + server. Unchecked = Mode A (attach existing session)."
+                                  IsChecked="{Binding IsModeB}" Margin="0,0,0,8"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Host: " VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding EndpointHost, UpdateSourceTrigger=PropertyChanged}" Width="160" Margin="0,0,16,0"/>
+                            <TextBlock Text="Port: " VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding EndpointPort, UpdateSourceTrigger=PropertyChanged}" Width="90"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Account login (Mode B): " VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding AccountLogin, UpdateSourceTrigger=PropertyChanged}" Width="160"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Server name (Mode B): " VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding ServerName, UpdateSourceTrigger=PropertyChanged}" Width="240"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Credential key name (optional, non-secret): " VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding CredentialKey, UpdateSourceTrigger=PropertyChanged}" Width="200"/>
+                        </StackPanel>
+                    </StackPanel>
+                </TabItem>
+
+                <!-- 4 Account -->
+                <TabItem>
+                    <StackPanel>
+                        <TextBlock Text="Account balance used to size the (paper-only) risk plan. Must be greater than zero."
+                                   TextWrapping="Wrap" Margin="0,0,0,10"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Account balance: " VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding AccountBalance, UpdateSourceTrigger=PropertyChanged}" Width="160"/>
+                        </StackPanel>
+                    </StackPanel>
+                </TabItem>
+
+                <!-- 5 Review -->
+                <TabItem>
+                    <StackPanel>
+                        <TextBlock Text="Review your settings, then click Finish to save."
+                                   TextWrapping="Wrap" Margin="0,0,0,10"/>
+                        <Border Background="#FFFFFDF0" BorderBrush="#FFDDD6B8" BorderThickness="1" Padding="12">
+                            <TextBlock Text="{Binding ReviewSummary}" FontFamily="Consolas" FontSize="13"/>
+                        </Border>
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
+        </DockPanel>
+    </Border>
+</Window>

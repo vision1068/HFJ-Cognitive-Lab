@@ -3,6 +3,7 @@ using GoldSignalAnalyzer.Application.Abstractions;
 using GoldSignalAnalyzer.Application.Bridge;
 using GoldSignalAnalyzer.Domain;
 using GoldSignalAnalyzer.Infrastructure.Providers;
+using GoldSignalAnalyzer.Presentation.Setup;
 using GoldSignalAnalyzer.Testing;
 using Xunit;
 
@@ -47,11 +48,16 @@ public class ProductionGatingTests
         Assert.Equal(expectedLive, (bool)isLiveProp.GetValue(instance)!);
     }
 
-    [Fact] // NFR-1: connection options must carry NO secret/credential field.
-    public void Connection_options_have_no_secret_field()
+    // NFR-1 / NFR-SETUP-1: every persisted CONFIG record must carry NO secret/credential
+    // field. The same reflection guard now covers the Cycle-5 SetupProfile (extended with
+    // "otp"), so "no secret member" can never regress on either type.
+    [Theory]
+    [InlineData(typeof(Mt5ConnectionOptions))]
+    [InlineData(typeof(SetupProfile))]
+    public void Config_records_have_no_secret_field(Type configType)
     {
-        string[] forbidden = { "password", "passwd", "pwd", "secret", "investor", "pin", "token", "apikey" };
-        var members = typeof(Mt5ConnectionOptions).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+        string[] forbidden = { "password", "passwd", "pwd", "secret", "investor", "pin", "token", "apikey", "otp" };
+        var members = configType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Select(p => p.Name.ToLowerInvariant());
         foreach (var m in members)
             Assert.DoesNotContain(forbidden, bad => m.Contains(bad));
