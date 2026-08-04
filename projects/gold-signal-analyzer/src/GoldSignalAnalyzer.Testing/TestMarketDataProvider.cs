@@ -61,6 +61,13 @@ public sealed class TestMarketDataProvider : IMarketDataProvider
     public Task<MarketTick?> GetLatestTickAsync(NormalizedSymbol symbol, CancellationToken ct = default)
         => Task.FromResult(_tick);
 
+    /// <summary>The timeframe of the most recent <see cref="GetCandlesAsync"/> call, so a
+    /// test can assert the coordinator re-pulled at a newly-selected timeframe (Cycle 8 FR-40).</summary>
+    public TimeFrame? LastRequestedTimeFrame { get; private set; }
+
     public Task<IReadOnlyList<Candle>> GetCandlesAsync(NormalizedSymbol symbol, TimeFrame timeFrame, int count, CancellationToken ct = default)
-        => Task.FromResult<IReadOnlyList<Candle>>(_candles.TakeLast(count).ToList());
+    {
+        LastRequestedTimeFrame = timeFrame;
+        return Task.FromResult<IReadOnlyList<Candle>>(_candles.TakeLast(count).ToList());
+    }
 }

@@ -41,6 +41,27 @@
             </StackPanel>
         </Border>
 
+        <!-- FR-39: runtime timeframe selector. Docked outside the ScrollViewer so it
+             stays visible while scrolling. Changing it recalculates the signal + chart
+             for both the sample and the live path (INV-4: the prior signal is cleared
+             first; a result is only ever shown labeled at the selected timeframe). -->
+        <Border DockPanel.Dock="Top" Padding="12,8" Background="#FFF3F3F3"
+                BorderBrush="#FFDDDDDD" BorderThickness="0,0,0,1"
+                DataContext="{Binding TimeFrameSelection}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding Label, Mode=OneWay}" VerticalAlignment="Center"
+                           FontWeight="SemiBold" FontSize="13"/>
+                <ComboBox Margin="8,0,0,0" Width="90" VerticalAlignment="Center"
+                          ItemsSource="{Binding Choices}"
+                          DisplayMemberPath="Label"
+                          SelectedValuePath="Value"
+                          SelectedValue="{Binding Selected, Mode=TwoWay}"/>
+                <TextBlock Text="  (signal + chart recalculate on change)"
+                           VerticalAlignment="Center" Foreground="#FF666666"
+                           FontSize="12" Margin="8,0,0,0"/>
+            </StackPanel>
+        </Border>
+
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <Grid Margin="16">
                 <Grid.RowDefinitions>

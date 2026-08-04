@@ -1,4 +1,5 @@
 using GoldSignalAnalyzer.Application.Live;
+using GoldSignalAnalyzer.Domain;
 using GoldSignalAnalyzer.Presentation.Mvvm;
 
 namespace GoldSignalAnalyzer.Presentation;
@@ -51,6 +52,19 @@ public sealed class LiveStatusViewModel : ViewModelBase
 
     /// <summary>Mark the session as live before the first refresh completes.</summary>
     public void MarkLive() { IsLive = true; Banner = "Connecting to live MT5 feed…"; }
+
+    /// <summary>
+    /// Cycle 8 (FR-40): the user switched timeframe; show a PAUSED "recalculating" state
+    /// until the next live poll produces a result at the new timeframe. Marking it
+    /// suppressed (not "fresh/green") means the switch gap can never read as an actionable
+    /// call while the prior signal is cleared (INV-4).
+    /// </summary>
+    public void MarkRecalculating(TimeFrame timeFrame)
+    {
+        IsLive = true;
+        IsSuppressed = true;
+        Banner = $"Recalculating at {timeFrame} — waiting for the next live refresh…";
+    }
 
     /// <summary>Apply the outcome of one live refresh.</summary>
     public void Update(LiveRefreshResult result)

@@ -14,7 +14,8 @@ public sealed class MainViewModel : ViewModelBase
         JournalViewModel journal,
         ChartViewModel chart,
         SignalNotifier notifier,
-        LiveStatusViewModel? liveStatus = null)
+        LiveStatusViewModel? liveStatus = null,
+        TimeFrameSelectionViewModel? timeFrameSelection = null)
     {
         Signal = signal ?? throw new ArgumentNullException(nameof(signal));
         Journal = journal ?? throw new ArgumentNullException(nameof(journal));
@@ -23,6 +24,9 @@ public sealed class MainViewModel : ViewModelBase
         // Cycle 7: null for the non-live (sample/CSV) shell; a live status strip when
         // the session runs against the live MT5 source.
         LiveStatus = liveStatus ?? new LiveStatusViewModel();
+        // Cycle 8 (FR-39): the runtime timeframe selector, shown in both sample and live
+        // sessions (default H1 when not supplied).
+        TimeFrameSelection = timeFrameSelection ?? new TimeFrameSelectionViewModel();
     }
 
     /// <summary>FR-35.2: structurally always present in the window chrome.</summary>
@@ -41,4 +45,7 @@ public sealed class MainViewModel : ViewModelBase
 
     /// <summary>FR-37: live-feed status/veto strip (passive; empty/idle for non-live sessions).</summary>
     public LiveStatusViewModel LiveStatus { get; }
+
+    /// <summary>FR-39: runtime timeframe selector (passive; recalculates on change).</summary>
+    public TimeFrameSelectionViewModel TimeFrameSelection { get; }
 }

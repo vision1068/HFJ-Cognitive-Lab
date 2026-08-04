@@ -93,6 +93,13 @@ public partial class App // base System.Windows.Application supplied by the XAML
         var notifier = new SignalNotifier(SystemClock.Instance);
         var liveStatusVm = new LiveStatusViewModel();
 
+        // --- Cycle 8 (FR-39): runtime timeframe selector -----------------------
+        // Default H1 (unchanged first-paint behaviour). Both the sample and the live
+        // path below re-run the analytical core at the newly-selected timeframe when
+        // this changes, clearing the prior signal first (INV-4: never a prior-timeframe
+        // result under the new label).
+        var timeFrameVm = new TimeFrameSelectionViewModel(TimeFrame.H1);
+
         if (profile is not null && profile.DataSource == DataSourceKind.Mt5Live)
         {
             // --- Cycle 7 (FR-36/FR-37/FR-38): LIVE read-only feed --------------
@@ -101,27 +108,36 @@ public partial class App // base System.Windows.Application supplied by the XAML
             // surface showed and when.
             var auditLog = new JsonlFileLiveSignalAuditLog(
                 Path.Combine(dataDir, "live-signal-audit.jsonl"));
-            StartLiveFeed(profile, journalStore, signalVm, chartVm, notifier, liveStatusVm, auditLog);
+            StartLiveFeed(profile, journalStore, signalVm, chartVm, notifier, liveStatusVm, auditLog, timeFrameVm);
         }
         else
         {
-            // --- non-live sample path (unchanged) ------------------------------
-            var candles = BuildSampleCandles();
-            var analysis = new SignalAnalysisService(SystemClock.Instance).Analyze(
-                NormalizedSymbol.Gold,
-                TimeFrame.H1,
-                candles,
-                SymbolSpec.Gold(),
-                accountBalance: profile?.AccountBalance ?? 10_000m,
-                context: new SignalContext(HtfDirection: SignalDirection.Buy),
-                hasOpenPosition: journalStore.GetOpen() is not null);
+            // --- non-live sample path (Cycle 8: timeframe-aware) ---------------
+            // Rebuilds the demo series at the selected timeframe and re-runs the tested
+            // core each time the timeframe changes. Synchronous, so the repaint is atomic
+            // (the signal panel is never left showing a prior-timeframe result — INV-4).
+            void RunSample(TimeFrame tf)
+            {
+                var candles = SampleCandleSeries.Build(tf);
+                var analysis = new SignalAnalysisService(SystemClock.Instance).Analyze(
+                    NormalizedSymbol.Gold,
+                    tf,
+                    candles,
+                    SymbolSpec.Gold(),
+                    accountBalance: profile?.AccountBalance ?? 10_000m,
+                    context: new SignalContext(HtfDirection: SignalDirection.Buy),
+                    hasOpenPosition: journalStore.GetOpen() is not null);
 
-            signalVm.Load(analysis);
-            chartVm.Load(new ChartSeriesBuilder().Build(candles));
-            notifier.Observe(analysis);   // raises only if the classification is actionable
+                signalVm.Load(analysis);
+                chartVm.Load(new ChartSeriesBuilder().Build(candles));
+                notifier.Observe(analysis);   // raises only if the classification is actionable
+            }
+
+            RunSample(timeFrameVm.Selected);
+            timeFrameVm.Changed += (_, tf) => RunSample(tf);
         }
 
-        var mainVm = new MainViewModel(signalVm, journalVm, chartVm, notifier, liveStatusVm);
+        var mainVm = new MainViewModel(signalVm, journalVm, chartVm, notifier, liveStatusVm, timeFrameVm);
 
         MainWindow = new MainWindow { DataContext = mainVm };
         ShutdownMode = ShutdownMode.OnMainWindowClose;
@@ -145,7 +161,8 @@ public partial class App // base System.Windows.Application supplied by the XAML
         ChartViewModel chartVm,
         SignalNotifier notifier,
         LiveStatusViewModel liveStatusVm,
-        ILiveSignalAuditLog auditLog)
+        ILiveSignalAuditLog auditLog,
+        TimeFrameSelectionViewModel timeFrameVm)
     {
         liveStatusVm.MarkLive();
         signalVm.Load(null); // no signal until the gate allows one (no fabrication)
@@ -163,7 +180,9 @@ public partial class App // base System.Windows.Application supplied by the XAML
         MetaTrader5MarketDataProvider provider;
         LiveSignalCoordinator coordinator;
         NormalizedSymbol liveSymbol = NormalizedSymbol.Gold;
-        const TimeFrame liveTimeFrame = TimeFrame.H1;
+        // Cycle 8 (FR-40): the live timeframe now starts from the selector (default H1)
+        // and can be switched at runtime — no longer a const.
+        TimeFrame liveTimeFrame = timeFrameVm.Selected;
         try
         {
             endpoint = BridgeEndpoint.Loopback(profile.EndpointPort);
@@ -189,12 +208,29 @@ public partial class App // base System.Windows.Application supplied by the XAML
             return;
         }
 
+        // Cycle 8 (FR-40): switching the timeframe re-points the coordinator and clears the
+        // signal immediately, so the prior-timeframe signal is never shown under the new
+        // label (INV-4). The next poll (≤5s) re-pulls candles at the new timeframe through
+        // the SAME freshness/veto gate. Freshness state is NOT reset — it is tick-recency
+        // keyed, so a switch cannot bypass suppression. Runs on the UI thread (same as the
+        // timer tick), so there is no concurrency with the poll.
+        timeFrameVm.Changed += (_, tf) =>
+        {
+            coordinator.SetTimeFrame(tf);
+            signalVm.Load(null);                 // clear now — no stale/prior-TF signal
+            liveStatusVm.MarkRecalculating(tf);  // paused strip until the next poll paints the new TF
+        };
+
         var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
         bool busy = false;
         timer.Tick += async (_, _) =>
         {
             if (busy) return;   // never overlap a slow poll
             busy = true;
+            // Capture the timeframe THIS poll runs at, so the audit trail records the
+            // timeframe the refresh actually used (not whatever it may have become by the
+            // time the poll completes) — FR-40 / INV-4.
+            var tfThisPoll = coordinator.CurrentTimeFrame;
             try
             {
                 if (provider.State != ConnectionState.Connected)
@@ -203,11 +239,22 @@ public partial class App // base System.Windows.Application supplied by the XAML
                 var result = await coordinator.RefreshAsync(
                     hasOpenPosition: journalStore.GetOpen() is not null);
 
+                // FR-40 / INV-4: if the user switched timeframe while this poll was in
+                // flight, its result is for a now-superseded timeframe — discard it and stay
+                // Neutral. The next poll paints the newly-selected timeframe. Never paint or
+                // audit a result under a timeframe the user has already moved off.
+                if (tfThisPoll != coordinator.CurrentTimeFrame)
+                {
+                    signalVm.Load(null);
+                    return;
+                }
+
                 liveStatusVm.Update(result);
 
-                // FR-38: record what this refresh showed (or why it was paused), append-only.
+                // FR-38: record what this refresh showed (or why it was paused), append-only,
+                // labeled with the timeframe this poll actually used.
                 auditLog.Record(LiveSignalAuditEntry.From(
-                    result, liveSymbol, liveTimeFrame, SystemClock.Instance.UtcNow));
+                    result, liveSymbol, tfThisPoll, SystemClock.Instance.UtcNow));
 
                 if (result.SignalAllowed && result.Analysis is not null)
                 {
@@ -229,7 +276,7 @@ public partial class App // base System.Windows.Application supplied by the XAML
                 var errorResult = NotReady($"Live feed error: {ex.Message}");
                 liveStatusVm.Update(errorResult);
                 auditLog.Record(LiveSignalAuditEntry.From(
-                    errorResult, liveSymbol, liveTimeFrame, SystemClock.Instance.UtcNow));
+                    errorResult, liveSymbol, tfThisPoll, SystemClock.Instance.UtcNow));
                 signalVm.Load(null);
             }
             finally
@@ -263,27 +310,4 @@ public partial class App // base System.Windows.Application supplied by the XAML
         new BrokerSymbol("EURUSD", "Euro vs US Dollar"),
         new BrokerSymbol("XAGUSD", "Silver vs US Dollar"),
     };
-
-    /// <summary>
-    /// Deterministic rising sample series so the shell has something to display.
-    /// This is explicitly NOT live data (the analytical core treats it as Csv/Test
-    /// grade). It fabricates no "live" price and claims none.
-    /// </summary>
-    private static IReadOnlyList<Candle> BuildSampleCandles()
-    {
-        var list = new List<Candle>();
-        var start = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
-        decimal basePrice = 1900m;
-        for (int i = 0; i < 80; i++)
-        {
-            decimal open = basePrice + i * 1.5m;
-            decimal close = open + 1.0m;
-            decimal high = close + 0.5m;
-            decimal low = open - 0.5m;
-            list.Add(new Candle(
-                NormalizedSymbol.Gold, TimeFrame.H1, start.AddHours(i),
-                open, high, low, close, volume: 1000 + i));
-        }
-        return list;
-    }
 }

@@ -57,7 +57,11 @@ public sealed class LiveSignalCoordinator
     private readonly SignalAnalysisService _analysis;
     private readonly SignalGate _gate;
     private readonly DataFreshnessMonitor _freshness;
-    private readonly LiveSignalOptions _options;
+    // Cycle 8 (FR-40): the timeframe is now settable at runtime, so `_options` is no
+    // longer readonly. Every refresh SNAPSHOTS it at the start (see RefreshAsync) so a
+    // SetTimeFrame during an in-flight poll can never change the timeframe that poll
+    // pulls/analyses — no mid-poll mislabel (INV-4).
+    private LiveSignalOptions _options;
     private readonly bool _hasSymbolMapping;
 
     public LiveSignalCoordinator(
@@ -76,8 +80,28 @@ public sealed class LiveSignalCoordinator
         _hasSymbolMapping = hasSymbolMapping;
     }
 
+    /// <summary>
+    /// Cycle 8 (FR-40): the timeframe the NEXT refresh will pull/analyse. Not an order
+    /// surface — it only chooses the candle bucket size (INV-1 intact).
+    /// </summary>
+    public TimeFrame CurrentTimeFrame => _options.TimeFrame;
+
+    /// <summary>
+    /// Cycle 8 (FR-40): switch the analysis timeframe at runtime. The next
+    /// <see cref="RefreshAsync"/> re-pulls candles at this timeframe through the SAME
+    /// FR-12 freshness/veto gate. Freshness state is deliberately NOT reset — it is keyed
+    /// on tick recency (not candle timeframe), so a switch can never bypass suppression.
+    /// An in-flight refresh is unaffected (it snapshots the timeframe at its start).
+    /// </summary>
+    public void SetTimeFrame(TimeFrame timeFrame)
+        => _options = _options with { TimeFrame = timeFrame };
+
     public async Task<LiveRefreshResult> RefreshAsync(bool hasOpenPosition, CancellationToken ct = default)
     {
+        // Snapshot the mutable options ONCE so a runtime SetTimeFrame mid-await cannot
+        // change the timeframe this refresh pulls/analyses (FR-40 / INV-4).
+        var options = _options;
+
         // 1. Not connected → suppress immediately; never touch the data calls
         //    (the live provider would throw, and we must not fabricate anyway).
         var state = _provider.State;
@@ -89,11 +113,11 @@ public sealed class LiveSignalCoordinator
         }
 
         // 2. Pull a tick (best-effort) to drive freshness, then the candle window.
-        MarketTick? tick = await _provider.GetLatestTickAsync(_options.Symbol, ct).ConfigureAwait(false);
+        MarketTick? tick = await _provider.GetLatestTickAsync(options.Symbol, ct).ConfigureAwait(false);
         if (tick is not null) _freshness.RecordTick(tick.TimestampUtc);
 
         IReadOnlyList<Candle> candles =
-            await _provider.GetCandlesAsync(_options.Symbol, _options.TimeFrame, _options.CandleCount, ct)
+            await _provider.GetCandlesAsync(options.Symbol, options.TimeFrame, options.CandleCount, ct)
                 .ConfigureAwait(false);
 
         // Fall back to the newest candle's time for freshness if no tick was available.
@@ -112,8 +136,8 @@ public sealed class LiveSignalCoordinator
 
         // 4. Gate allowed and we have real, fresh candles → run the tested core.
         var analysis = _analysis.Analyze(
-            _options.Symbol, _options.TimeFrame, candles, _options.Spec,
-            _options.AccountBalance, _options.Context, hasOpenPosition);
+            options.Symbol, options.TimeFrame, candles, options.Spec,
+            options.AccountBalance, options.Context, hasOpenPosition);
 
         return new LiveRefreshResult(decision, analysis, candles, freshness, state);
     }
