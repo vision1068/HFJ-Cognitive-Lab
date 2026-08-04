@@ -13,6 +13,34 @@
                        TextWrapping="Wrap" FontSize="13"/>
         </Border>
 
+        <!-- FR-37: live-feed status/veto strip. Always visible in a live session,
+             red when the FR-12 gate is pausing signals so a paused feed can never
+             read as an actionable call (INV-4). Hidden for non-live sessions. -->
+        <Border DockPanel.Dock="Top" Padding="12,6" DataContext="{Binding LiveStatus}">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Background" Value="#FF1B5E20"/>
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsLive}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsSuppressed}" Value="True">
+                            <Setter Property="Background" Value="#FFB00020"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="LIVE FEED: " Foreground="White" FontWeight="Bold" FontSize="13"/>
+                <TextBlock Text="{Binding Banner, Mode=OneWay}" Foreground="White"
+                           FontWeight="SemiBold" TextWrapping="Wrap" FontSize="13"/>
+                <TextBlock Text="   (freshness: " Foreground="#FFEEEEEE" FontSize="12"/>
+                <TextBlock Text="{Binding Freshness, Mode=OneWay}" Foreground="#FFEEEEEE" FontSize="12"/>
+                <TextBlock Text=")" Foreground="#FFEEEEEE" FontSize="12"/>
+            </StackPanel>
+        </Border>
+
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <Grid Margin="16">
                 <Grid.RowDefinitions>
@@ -60,7 +88,7 @@
                         Padding="16" Margin="0,0,0,12" CornerRadius="4"
                         DataContext="{Binding Chart}">
                     <StackPanel>
-                        <TextBlock Text="Price Chart (candles + EMA overlays — simulated/sample data)"
+                        <TextBlock Text="Price Chart (candles + EMA overlays)"
                                    FontSize="16" FontWeight="Bold" Margin="0,0,0,4"/>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                             <TextBlock Text="{Binding PriceRangeLabel}" FontWeight="SemiBold"/>

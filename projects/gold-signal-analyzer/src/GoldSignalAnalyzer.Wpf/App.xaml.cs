@@ -1,10 +1,18 @@
 using System.IO;
+using System.Net.Http;
 using System.Windows;
+using System.Windows.Threading;
 using GoldSignalAnalyzer.Application.Analysis;
+using GoldSignalAnalyzer.Application.Bridge;
 using GoldSignalAnalyzer.Application.Charting;
+using GoldSignalAnalyzer.Application.Freshness;
+using GoldSignalAnalyzer.Application.Live;
 using GoldSignalAnalyzer.Application.Scoring;
+using GoldSignalAnalyzer.Application.Symbols;
 using GoldSignalAnalyzer.Domain;
+using GoldSignalAnalyzer.Infrastructure.Bridge;
 using GoldSignalAnalyzer.Infrastructure.Persistence;
+using GoldSignalAnalyzer.Infrastructure.Providers;
 using GoldSignalAnalyzer.Infrastructure.Time;
 using GoldSignalAnalyzer.Presentation;
 using GoldSignalAnalyzer.Presentation.Setup;
@@ -15,9 +23,11 @@ namespace GoldSignalAnalyzer.Wpf;
 /// Composition root and the ONLY place startup wiring lives. It:
 ///  1. enforces the first-run disclaimer gate (FR-35) before showing the dashboard;
 ///  2. opens the durable SQLite paper journal;
-///  3. runs the pure SignalAnalysisService over demo candles (Csv/Test-grade sample
-///     data, never live — INV-4) to populate the signal panel.
-/// There is no order/execution path anywhere in this shell (INV-1).
+///  3. populates the signal panel either from demo candles (Csv/Test-grade sample data)
+///     OR, when the user chose the live MT5 source, from the Cycle-7 read-only live feed
+///     (FR-36/FR-37) — authorized by the owner in cycle7-spec.md / phase-6-ceo-cycle7.md.
+/// Nothing is ever labelled live unless it came from the live provider through the
+/// freshness/veto gate (INV-4). There is no order/execution path anywhere (INV-1).
 /// </summary>
 public partial class App // base System.Windows.Application supplied by the XAML-generated partial
 {
@@ -73,39 +83,170 @@ public partial class App // base System.Windows.Application supplied by the XAML
 
         // --- durable paper journal ---------------------------------------------
         var journalStore = new SqliteJournalStore(Path.Combine(dataDir, "journal.db"));
-
-        // --- current signal from sample (non-live) data ------------------------
-        var candles = BuildSampleCandles();
-        var analysis = new SignalAnalysisService(SystemClock.Instance).Analyze(
-            NormalizedSymbol.Gold,
-            TimeFrame.H1,
-            candles,
-            SymbolSpec.Gold(),
-            // Use the balance captured by the setup wizard (falls back to a sample).
-            accountBalance: profile?.AccountBalance ?? 10_000m,
-            // Sample higher-timeframe context is up; this is clearly-labelled demo
-            // data, not a live feed.
-            context: new SignalContext(HtfDirection: SignalDirection.Buy),
-            hasOpenPosition: journalStore.GetOpen() is not null);
-
-        var signalVm = new SignalViewModel();
-        signalVm.Load(analysis);
         var journalVm = new JournalViewModel(journalStore);
 
-        // --- FR-27: candle chart + EMA overlays over the SAME (non-live) candles ---
+        // The SAME view-models are populated by either the sample path or the live
+        // feed — the dashboard is source-agnostic (INV-4: nothing labelled live unless
+        // it came from the live provider through the freshness/veto gate).
+        var signalVm = new SignalViewModel();
         var chartVm = new ChartViewModel();
-        chartVm.Load(new ChartSeriesBuilder().Build(candles));
-
-        // --- FR-30: in-app notification for the current actionable signal ----------
         var notifier = new SignalNotifier(SystemClock.Instance);
-        notifier.Observe(analysis);   // raises only if the classification is actionable
+        var liveStatusVm = new LiveStatusViewModel();
 
-        var mainVm = new MainViewModel(signalVm, journalVm, chartVm, notifier);
+        if (profile is not null && profile.DataSource == DataSourceKind.Mt5Live)
+        {
+            // --- Cycle 7 (FR-36/FR-37/FR-38): LIVE read-only feed --------------
+            // FR-38: every live refresh (allowed OR suppressed) is written to a durable,
+            // append-only, per-user audit trail so there is a record of what the advisory
+            // surface showed and when.
+            var auditLog = new JsonlFileLiveSignalAuditLog(
+                Path.Combine(dataDir, "live-signal-audit.jsonl"));
+            StartLiveFeed(profile, journalStore, signalVm, chartVm, notifier, liveStatusVm, auditLog);
+        }
+        else
+        {
+            // --- non-live sample path (unchanged) ------------------------------
+            var candles = BuildSampleCandles();
+            var analysis = new SignalAnalysisService(SystemClock.Instance).Analyze(
+                NormalizedSymbol.Gold,
+                TimeFrame.H1,
+                candles,
+                SymbolSpec.Gold(),
+                accountBalance: profile?.AccountBalance ?? 10_000m,
+                context: new SignalContext(HtfDirection: SignalDirection.Buy),
+                hasOpenPosition: journalStore.GetOpen() is not null);
+
+            signalVm.Load(analysis);
+            chartVm.Load(new ChartSeriesBuilder().Build(candles));
+            notifier.Observe(analysis);   // raises only if the classification is actionable
+        }
+
+        var mainVm = new MainViewModel(signalVm, journalVm, chartVm, notifier, liveStatusVm);
 
         MainWindow = new MainWindow { DataContext = mainVm };
         ShutdownMode = ShutdownMode.OnMainWindowClose;
         MainWindow.Show();
     }
+
+    /// <summary>
+    /// Cycle 7 (FR-36/FR-37): drive the dashboard from the LIVE read-only MT5 feed.
+    /// It reads through the out-of-process Python bridge (loopback + token) and
+    /// re-runs the existing analytical core on a timer. It NEVER fabricates: on any
+    /// unsafe condition (bridge/terminal not ready, no gold mapping, stale/future data)
+    /// the FR-12 veto gate suppresses the signal and the status strip shows the exact
+    /// banner while the signal panel stays Neutral. There is NO order surface (INV-1)
+    /// and NO trading credential is read or stored (INV-2/INV-3 — Mode A attach only).
+    /// The bridge token is read from the environment (GSA_BRIDGE_TOKEN), never persisted.
+    /// </summary>
+    private void StartLiveFeed(
+        SetupProfile profile,
+        SqliteJournalStore journalStore,
+        SignalViewModel signalVm,
+        ChartViewModel chartVm,
+        SignalNotifier notifier,
+        LiveStatusViewModel liveStatusVm,
+        ILiveSignalAuditLog auditLog)
+    {
+        liveStatusVm.MarkLive();
+        signalVm.Load(null); // no signal until the gate allows one (no fabrication)
+
+        var token = Environment.GetEnvironmentVariable("GSA_BRIDGE_TOKEN");
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            liveStatusVm.Update(NotReady(
+                "Live selected, but GSA_BRIDGE_TOKEN is not set. Start MetaTrader5 (logged into your "
+                + "broker), then run: python run_bridge.py --live  with GSA_BRIDGE_TOKEN set, and relaunch."));
+            return;
+        }
+
+        BridgeEndpoint endpoint;
+        MetaTrader5MarketDataProvider provider;
+        LiveSignalCoordinator coordinator;
+        NormalizedSymbol liveSymbol = NormalizedSymbol.Gold;
+        const TimeFrame liveTimeFrame = TimeFrame.H1;
+        try
+        {
+            endpoint = BridgeEndpoint.Loopback(profile.EndpointPort);
+            var http = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
+            var client = new HttpMt5BridgeClient(http, endpoint, token);
+            provider = new MetaTrader5MarketDataProvider(client);
+
+            var mapping = new GoldSymbolResolver().SelectManually(new BrokerSymbol(profile.SymbolRaw, null));
+            provider.UseSymbolMapping(mapping);
+            liveSymbol = mapping.Normalized;
+
+            var options = new LiveSignalOptions(
+                mapping.Normalized, liveTimeFrame, CandleCount: 120,
+                SymbolSpec.Gold(), profile.AccountBalance, new SignalContext());
+            var freshness = new DataFreshnessMonitor(SystemClock.Instance, TimeSpan.FromSeconds(90));
+            coordinator = new LiveSignalCoordinator(
+                provider, new SignalAnalysisService(SystemClock.Instance),
+                new SignalGate(), freshness, options, hasSymbolMapping: true);
+        }
+        catch (Exception ex)
+        {
+            liveStatusVm.Update(NotReady($"Live feed could not be configured: {ex.Message}"));
+            return;
+        }
+
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
+        bool busy = false;
+        timer.Tick += async (_, _) =>
+        {
+            if (busy) return;   // never overlap a slow poll
+            busy = true;
+            try
+            {
+                if (provider.State != ConnectionState.Connected)
+                    await provider.ConnectAsync();
+
+                var result = await coordinator.RefreshAsync(
+                    hasOpenPosition: journalStore.GetOpen() is not null);
+
+                liveStatusVm.Update(result);
+
+                // FR-38: record what this refresh showed (or why it was paused), append-only.
+                auditLog.Record(LiveSignalAuditEntry.From(
+                    result, liveSymbol, liveTimeFrame, SystemClock.Instance.UtcNow));
+
+                if (result.SignalAllowed && result.Analysis is not null)
+                {
+                    signalVm.Load(result.Analysis);
+                    notifier.Observe(result.Analysis);
+                }
+                else
+                {
+                    signalVm.Load(null); // suppressed → Neutral, never a stale/fabricated signal
+                }
+
+                // The bars are real broker data; safe to chart even while paused
+                // (the status strip states the pause). Empty pull → leave prior chart.
+                if (result.Candles.Count > 0)
+                    chartVm.Load(new ChartSeriesBuilder().Build(result.Candles));
+            }
+            catch (Exception ex)
+            {
+                var errorResult = NotReady($"Live feed error: {ex.Message}");
+                liveStatusVm.Update(errorResult);
+                auditLog.Record(LiveSignalAuditEntry.From(
+                    errorResult, liveSymbol, liveTimeFrame, SystemClock.Instance.UtcNow));
+                signalVm.Load(null);
+            }
+            finally
+            {
+                busy = false;
+            }
+        };
+        timer.Start();
+    }
+
+    /// <summary>A suppressed live result carrying an operator-facing reason — no data, no signal.</summary>
+    private static LiveRefreshResult NotReady(string message) => new(
+        new SignalGateDecision(SignalGateStatus.Suppressed, message),
+        Analysis: null,
+        Candles: Array.Empty<Candle>(),
+        Freshness: new FreshnessAssessment(FreshnessStatus.Unknown, TimeSpan.Zero, null),
+        ConnectionState: ConnectionState.Disconnected);
 
     /// <summary>
     /// A small, representative broker symbol list offered to the setup wizard so the

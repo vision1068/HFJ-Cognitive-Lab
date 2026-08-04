@@ -34,9 +34,20 @@ public sealed record SymbolChoice(BrokerSymbol Broker, double MatchConfidence)
 /// </summary>
 public sealed class SetupWizardViewModel : ViewModelBase
 {
-    /// <summary>The exact C-3 reason surfaced when the user selects the live source (AC-28.2).</summary>
-    public const string LiveBlockedReason =
-        "Live MT5 data requires named-approver authorization (C-3) and is not enabled in this build.";
+    /// <summary>
+    /// Cycle 7 (FR-36): the C-3a named-approver gate for LIVE READ-ONLY attach is satisfied by
+    /// the human owner's explicit, recorded authorization for this cycle — specified in
+    /// projects/gold-signal-analyzer/cycle7-spec.md (FR-36/FR-37/FR-38) and signed off in
+    /// phase-6-ceo-cycle7.md. That authorization is what makes the live source selectable; it
+    /// covers READ-ONLY attach ONLY. This text is guidance shown in the UI — NOT a validation
+    /// error — reminding the user what live mode requires and that it stays read-only:
+    /// C-3b (any order/execution capability) remains permanently closed (INV-1).
+    /// </summary>
+    public const string Mt5LiveGuidance =
+        "Live MT5 is read-only — it reads your terminal and generates signals, it never places, " +
+        "modifies, or closes any order (INV-1). Before launching: open MetaTrader5 and log into " +
+        "your broker (e.g. Exness demo), then start the local bridge (python run_bridge.py --live) " +
+        "with GSA_BRIDGE_TOKEN set. No trading password is ever stored (INV-2/INV-3).";
 
     public const int StepWelcome = 0;
     public const int StepDataSource = 1;
@@ -81,7 +92,7 @@ public sealed class SetupWizardViewModel : ViewModelBase
         {
             new DataSourceOption(DataSourceKind.SampleDemo, "Sample / demo data (built-in)", true, null),
             new DataSourceOption(DataSourceKind.CsvFile, "Historical CSV file", true, null),
-            new DataSourceOption(DataSourceKind.Mt5Live, "Live MT5 terminal (blocked)", false, LiveBlockedReason),
+            new DataSourceOption(DataSourceKind.Mt5Live, "Live MT5 terminal (read-only)", true, Mt5LiveGuidance),
         };
 
         // Only gold candidates (score > 0), ranked best-first, become choices (AC-28.3).
@@ -138,8 +149,12 @@ public sealed class SetupWizardViewModel : ViewModelBase
     public DataSourceOption? SelectedDataSourceOption
     {
         get => _selectedDataSourceOption;
-        set { if (SetField(ref _selectedDataSourceOption, value)) Revalidate(); }
+        set { if (SetField(ref _selectedDataSourceOption, value)) { Revalidate(); OnPropertyChanged(nameof(LiveGuidance)); } }
     }
+
+    /// <summary>Cycle 7: read-only-live guidance shown when the live source is selected; empty otherwise.</summary>
+    public string LiveGuidance =>
+        _selectedDataSourceOption?.Kind == DataSourceKind.Mt5Live ? Mt5LiveGuidance : "";
 
     public string? CsvPath
     {

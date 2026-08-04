@@ -52,11 +52,11 @@
                 <!-- 1 Data Source -->
                 <TabItem>
                     <StackPanel>
-                        <TextBlock Text="Choose the data to analyse. Live MT5 is listed but disabled in this build."
+                        <TextBlock Text="Choose the data to analyse. Live MT5 is read-only — it reads your terminal and generates signals, never trades."
                                    TextWrapping="Wrap" Margin="0,0,0,10"/>
                         <ListBox ItemsSource="{Binding DataSourceOptions}"
                                  SelectedItem="{Binding SelectedDataSourceOption}"
-                                 Height="130">
+                                 Height="110">
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="ListBoxItem">
                                     <Setter Property="IsEnabled" Value="{Binding IsSelectable}"/>
@@ -68,6 +68,8 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
+                        <TextBlock Text="{Binding LiveGuidance, Mode=OneWay}"
+                                   Foreground="#FF6B5B00" TextWrapping="Wrap" FontSize="12" Margin="0,8,0,0"/>
                         <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                             <TextBlock Text="CSV path: " VerticalAlignment="Center"/>
                             <TextBox Text="{Binding CsvPath, UpdateSourceTrigger=PropertyChanged}" Width="440"/>

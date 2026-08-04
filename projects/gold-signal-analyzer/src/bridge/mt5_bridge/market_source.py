@@ -3,14 +3,24 @@
 MarketDataSource is the seam. Two implementations:
   * FakeMarketDataSource — deterministic, used by tests and demos. Explicitly
     NOT live (is_live == False) so its data can never be mistaken for a quote.
-  * Mt5MarketDataSource — the real terminal seam. It imports the MetaTrader5
-    package lazily and is READ-ONLY (copy_rates / symbol_info_tick only; no
-    order_send). It is never constructed or exercised by the test suite in
-    this cycle (no live terminal in scope). NFR-5: never fabricates data.
+  * Mt5MarketDataSource — the real terminal seam (Cycle 7, FR-7/FR-36). It reads
+    from an already-running MetaTrader5 terminal that the USER has logged into
+    their broker (e.g. Exness demo) — "Mode A / attach existing session". It is
+    strictly READ-ONLY: it calls only initialize / terminal_info / symbols_get /
+    symbol_select / symbol_info_tick / copy_rates_from_pos. It exposes and calls
+    NO order function (no order_send / order_check / positions_*) — INV-1. It
+    never fabricates data (NFR-5): if the terminal is not connected it raises or
+    returns None rather than inventing a price.
+
+The MetaTrader5 module is INJECTED (constructor arg) so the whole live source is
+unit-testable with a fake module — proving the candle/tick conversion and the
+read-only contract without a real terminal (the real-terminal E2E is the owner's
+manual step, since Claude Code cannot install/log-in a live terminal).
 """
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from datetime import datetime, timezone
 
 
 class MarketDataSource(ABC):
@@ -51,35 +61,130 @@ class FakeMarketDataSource(MarketDataSource):
         return list(self._candles[-count:])
 
 
+# Minutes-per-candle -> the MetaTrader5 module's TIMEFRAME_* constant NAME.
+# Resolved against the (injected) module so tests can supply a fake module.
+# Mirrors GoldSignalAnalyzer.Domain.TimeFrame (M1/M5/M15/M30/H1/H4/D1).
+_TIMEFRAME_ATTR_BY_MINUTES = {
+    1: "TIMEFRAME_M1",
+    5: "TIMEFRAME_M5",
+    15: "TIMEFRAME_M15",
+    30: "TIMEFRAME_M30",
+    60: "TIMEFRAME_H1",
+    240: "TIMEFRAME_H4",
+    1440: "TIMEFRAME_D1",
+}
+
+
+def _epoch_to_iso_utc(epoch_seconds) -> str:
+    """MT5 timestamps are POSIX seconds in UTC. Emit ISO-8601 with a 'Z' suffix
+    so the .NET client parses it as universal (NFR-5: no ambiguous local time)."""
+    dt = datetime.fromtimestamp(int(epoch_seconds), tz=timezone.utc)
+    return dt.isoformat().replace("+00:00", "Z")
+
+
+def _field(row, name):
+    """Read a named field from a copy_rates row. Works for a numpy structured
+    array row (row["time"]) and for a plain dict/mapping (fake module in tests)."""
+    try:
+        return row[name]
+    except (KeyError, IndexError, TypeError):
+        return getattr(row, name)
+
+
 class Mt5MarketDataSource(MarketDataSource):
-    """Read-only real terminal seam (FR-7/FR-8). Guarded import; the test
-    suite never instantiates this. Deliberately exposes NO trading calls."""
+    """Read-only live terminal seam (Cycle 7, FR-36). Attaches to an
+    already-logged-in terminal (Mode A) and reads market data only.
+
+    Deliberately exposes NO trading/order method. The injected `mt5` module is
+    used only for: initialize, terminal_info, symbols_get, symbol_select,
+    symbol_info_tick, copy_rates_from_pos. NFR-5: raises/returns-None instead of
+    fabricating when the terminal is unavailable."""
     is_live = True
 
-    def __init__(self):
-        try:
-            import MetaTrader5 as mt5  # noqa: F401  (optional, Windows + terminal only)
-        except ImportError as exc:  # pragma: no cover - depends on live env
-            raise RuntimeError(
-                "MetaTrader5 package not available. Install it and run on a host "
-                "with an MT5 terminal. This bridge is READ-ONLY."
-            ) from exc
+    def __init__(self, mt5=None):
+        if mt5 is None:  # pragma: no cover - import path exercised only on a live host
+            try:
+                import MetaTrader5 as mt5  # noqa: F811  (optional, Windows + terminal only)
+            except ImportError as exc:
+                raise RuntimeError(
+                    "MetaTrader5 package not available. Install it (pip install MetaTrader5) "
+                    "and run on Windows with an MT5 terminal already logged into your broker. "
+                    "This bridge is READ-ONLY."
+                ) from exc
         self._mt5 = mt5
-        # NOTE: intentionally NOT calling mt5.initialize() here — live attach is
-        # out of scope for this cycle and requires explicit owner go-ahead.
+        self._initialized = False
 
-    def terminal_connected(self) -> bool:  # pragma: no cover - live only
+    def initialize(self) -> None:
+        """Mode A attach: connect to the running terminal WITHOUT credentials.
+        The user must already be logged into their broker (e.g. Exness demo) in
+        the MT5 terminal. No login/password is passed — INV-2/INV-3 (the bridge
+        stores and transmits no trading credential)."""
+        ok = self._mt5.initialize()
+        if not ok:
+            err = None
+            last_error = getattr(self._mt5, "last_error", None)
+            if callable(last_error):
+                err = last_error()
+            raise RuntimeError(
+                f"MT5 initialize() failed ({err}). Open the MetaTrader5 terminal and log "
+                "into your broker account first (Mode A: attach existing session)."
+            )
+        self._initialized = True
+
+    def terminal_connected(self) -> bool:
         info = self._mt5.terminal_info()
         return bool(info and getattr(info, "connected", False))
 
-    def list_symbols(self):  # pragma: no cover - live only
-        return [{"raw": s.name, "description": s.description} for s in (self._mt5.symbols_get() or [])]
+    def list_symbols(self):
+        return [
+            {"raw": s.name, "description": getattr(s, "description", "")}
+            for s in (self._mt5.symbols_get() or [])
+        ]
 
-    def get_tick(self, broker_symbol: str):  # pragma: no cover - live only
+    def get_tick(self, broker_symbol: str):
+        # Ensure the symbol is selected in Market Watch (read-only side effect).
+        self._mt5.symbol_select(broker_symbol, True)
         t = self._mt5.symbol_info_tick(broker_symbol)
         if t is None:
             return None
-        return {"symbol": broker_symbol, "bid": t.bid, "ask": t.ask, "time": t.time}
+        return {
+            "symbol": broker_symbol,
+            "bid": _field_attr(t, "bid"),
+            "ask": _field_attr(t, "ask"),
+            "time": _epoch_to_iso_utc(_field_attr(t, "time")),
+        }
 
-    def get_candles(self, broker_symbol: str, timeframe_minutes: int, count: int):  # pragma: no cover - live only
-        raise NotImplementedError("Live candle retrieval is out of scope for this read-only cycle.")
+    def get_candles(self, broker_symbol: str, timeframe_minutes: int, count: int):
+        if count <= 0:
+            return []
+        attr = _TIMEFRAME_ATTR_BY_MINUTES.get(int(timeframe_minutes))
+        if attr is None:
+            raise ValueError(
+                f"Unsupported timeframe {timeframe_minutes} minutes "
+                f"(supported: {sorted(_TIMEFRAME_ATTR_BY_MINUTES)})."
+            )
+        tf_const = getattr(self._mt5, attr)
+        self._mt5.symbol_select(broker_symbol, True)
+        # copy_rates_from_pos(symbol, timeframe, start_pos=0, count) — newest `count` bars.
+        rows = self._mt5.copy_rates_from_pos(broker_symbol, tf_const, 0, count)
+        if rows is None:
+            return []
+        candles = []
+        for r in rows:
+            candles.append({
+                "time": _epoch_to_iso_utc(_field(r, "time")),
+                "open": float(_field(r, "open")),
+                "high": float(_field(r, "high")),
+                "low": float(_field(r, "low")),
+                "close": float(_field(r, "close")),
+                # MT5 exposes tick_volume for FX/metals (real_volume is often 0).
+                "volume": float(_field(r, "tick_volume")),
+            })
+        return candles
+
+
+def _field_attr(obj, name):
+    """Read a field from a tick object (attribute) or a mapping (test fake)."""
+    if isinstance(obj, dict):
+        return obj[name]
+    return getattr(obj, name)

@@ -1,5 +1,6 @@
 using System.Reflection;
 using GoldSignalAnalyzer.Application.Abstractions;
+using GoldSignalAnalyzer.Application.Bridge;
 using GoldSignalAnalyzer.Domain;
 using GoldSignalAnalyzer.Presentation.Setup;
 using Xunit;
@@ -100,21 +101,44 @@ public class SetupWizardViewModelTests
         Assert.Null(vm.ValidateStep(SetupWizardViewModel.StepDataSource));
     }
 
-    [Fact] // AC-28.2: selecting the live MT5 source is INVALID with the exact C-3 reason
-    public void Selecting_Mt5Live_data_source_is_invalid_with_C3_reason()
+    [Fact] // Cycle 7 (AC-36.1): C-3a lifted — the live source is now SELECTABLE and read-only-valid.
+    public void Selecting_Mt5Live_data_source_is_now_selectable_and_valid()
     {
         var vm = New();
         vm.NextCommand.Execute(null); // navigate to the DataSource step so CurrentError reflects it
         Assert.Equal(SetupWizardViewModel.StepDataSource, vm.CurrentStepIndex);
 
         var live = Option(vm, DataSourceKind.Mt5Live);
-        Assert.False(live.IsSelectable);
+        Assert.True(live.IsSelectable); // no longer blocked (owner authorized C-3a read-only attach)
+
         vm.SelectedDataSourceOption = live;
-        Assert.Equal(
-            "Live MT5 data requires named-approver authorization (C-3) and is not enabled in this build.",
-            vm.ValidateStep(SetupWizardViewModel.StepDataSource));
-        Assert.Equal(SetupWizardViewModel.LiveBlockedReason, vm.CurrentError); // now on the DataSource step
-        Assert.False(vm.NextCommand.CanExecute(null)); // cannot advance past a blocked source
+        // Live needs no extra field at wizard time (Mode A default) → the step is valid.
+        Assert.Null(vm.ValidateStep(SetupWizardViewModel.StepDataSource));
+        Assert.Null(vm.CurrentError);
+        Assert.True(vm.NextCommand.CanExecute(null)); // can advance
+
+        // The read-only guidance is surfaced, and it commits to no-orders (INV-1 stays closed).
+        Assert.Equal(SetupWizardViewModel.Mt5LiveGuidance, vm.LiveGuidance);
+        Assert.Contains("read-only", vm.LiveGuidance, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("never places", vm.LiveGuidance, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact] // Cycle 7: a completed Mt5Live profile persists the live kind (Mode A → no login/secret).
+    public void Finish_persists_Mt5Live_profile_without_secret()
+    {
+        var store = new InMemorySetupProfileStore();
+        var vm = New(store);
+        vm.SelectedDataSourceOption = Option(vm, DataSourceKind.Mt5Live);
+        vm.SelectedSymbol = vm.SymbolChoices[0];
+        vm.AccountBalance = 10_000m;
+        Assert.True(vm.AllStepsValid);
+        vm.FinishCommand.Execute(null);
+
+        var p = store.Load()!;
+        Assert.Equal(DataSourceKind.Mt5Live, p.DataSource);
+        Assert.Equal(Mt5ConnectionMode.AttachExistingSession, p.ConnectionMode); // Mode A
+        Assert.Null(p.AccountLogin);   // Mode A → no login
+        Assert.Null(p.CredentialKey);  // no secret captured (INV-2/INV-3)
     }
 
     // ---- AC-28.3: symbol ranking + confidence (0..1, never a %) ----

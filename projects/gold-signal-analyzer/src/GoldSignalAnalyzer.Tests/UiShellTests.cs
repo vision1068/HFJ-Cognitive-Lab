@@ -206,6 +206,10 @@ public class UiShellTests
         // FR-22: scores described as 0-100, not probabilities
         Assert.Contains("0-100", full);
         Assert.DoesNotContain("guarantee of profit", full);
+        // C-C (Cycle 7 CEO condition): disclaimer must note signals may derive from
+        // live market data while no order is ever placed.
+        Assert.Contains("live market data", full);
+        Assert.Contains("never results in a trade being executed", full);
     }
 
     [Fact] // AC-35.2a: banner is non-empty and carries the key phrase (FR-35.2)

@@ -3,9 +3,10 @@ using GoldSignalAnalyzer.Application.Bridge;
 namespace GoldSignalAnalyzer.Presentation.Setup;
 
 /// <summary>
-/// The data source the app should analyse (FR-28 / D5-2). Only the two non-live
-/// kinds are selectable; the live MT5 kind is surfaced so the user knows it exists
-/// but selecting it is a validation failure (C-3, named-approver gate).
+/// The data source the app should analyse (FR-28 / D5-2, extended by Cycle 7 FR-36).
+/// All three kinds are now selectable: the two non-live kinds (SampleDemo, CsvFile) and
+/// the live MT5 kind, which is enabled READ-ONLY under the owner's Cycle-7 authorization
+/// (cycle7-spec.md FR-36, C-3a satisfied; C-3b order capability remains permanently closed).
 /// </summary>
 public enum DataSourceKind
 {
@@ -15,7 +16,7 @@ public enum DataSourceKind
     /// <summary>Historical CSV file — never live (INV-4); requires a path.</summary>
     CsvFile = 1,
 
-    /// <summary>Live MT5 attach — BLOCKED in this build (C-3, D5-2).</summary>
+    /// <summary>Live MT5 attach — READ-ONLY (Cycle 7, FR-36; C-3a authorized, no orders INV-1).</summary>
     Mt5Live = 2
 }
 
@@ -35,7 +36,8 @@ public enum DataSourceKind
 /// </summary>
 public sealed record SetupProfile
 {
-    /// <summary>Chosen data source. Only non-live kinds are ever persisted (D5-2).</summary>
+    /// <summary>Chosen data source. Any kind may be persisted; the live kind is read-only
+    /// (Cycle 7, FR-36 — C-3a authorized, no order surface INV-1).</summary>
     public DataSourceKind DataSource { get; init; } = DataSourceKind.SampleDemo;
 
     /// <summary>Historical CSV path when <see cref="DataSource"/> is CsvFile.</summary>
