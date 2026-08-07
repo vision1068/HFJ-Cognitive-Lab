@@ -46,7 +46,7 @@ interview → IDed brief.md), never from a one-liner. Before any
 engagement, read .claude/memory/lessons-learned.md; after Phase 6,
 append a retrospective entry to it (orchestrator rules 7-9).
 
-## Constitution — 6 non-negotiable standards
+## Constitution — 7 non-negotiable standards
 
 Scaled down from ConnectSW's 14-article constitution
 (github.com/Tamoura/Claude-Code-creates-the-SW-company) to what
@@ -78,6 +78,12 @@ follows these; the orchestrator verifies compliance at each checkpoint.
 6. **Diagram-first.** Anything that can be drawn (architecture,
    integration flow, multi-step business process) must be drawn in
    Mermaid, not just described in prose.
+
+7. **Minimal code.** Before implementing, climb the 7-rung decision
+   ladder (necessity → reuse → standard library → native platform →
+   installed dependencies → one-liner → implement) — write only the
+   code that has to exist. Never cut validation, security, or
+   accessibility to save lines. See `.claude/skills/minimal-code.md`.
 
 Amendments to this Constitution require explicit user approval — no
 agent may loosen these standards on its own judgment.

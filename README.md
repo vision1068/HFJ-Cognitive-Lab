@@ -131,6 +131,7 @@ Beyond the specialist agents, the company maintains a shared **skills library** 
 | `ui-ux-design` | Screen specs, user flow templates, accessibility checklist, QDB brand colors |
 | `spec-driven-dev` | Spec-before-code discipline — functional/non-functional requirements, ADRs, frozen scope before Phase 3 begins, plus end-to-end requirement traceability (spec ID → commit → test → PR → QA/Audit) |
 | `token-efficient` | Output compression rules for long engagements — trims agent prose, merges redundant points |
+| `minimal-code` | 7-rung decision ladder applied before writing any implementation code (necessity → reuse → standard library → native platform → installed deps → one-liner → implement) — write only the code that has to exist |
 
 ---
 
@@ -306,6 +307,7 @@ Structural ideas in this company are adapted from the best open-source AI-compan
 - [dsifry/metaswarm](https://github.com/dsifry/metaswarm) — the requirements-intake flow, the adversarial Plan Review Gate with a 3-iteration cap, the "never trust subagent self-reports" independent-validation rule, and the post-engagement retrospective feeding company memory.
 - [diet103/claude-code-infrastructure-showcase](https://github.com/diet103/claude-code-infrastructure-showcase) — the hooks architecture: SessionStart context priming and `skill-rules.json`-driven skill auto-activation.
 - [rohitg00/pro-workflow](https://github.com/rohitg00/pro-workflow) — the compounding, append-only lessons-learned memory pattern and the `[LEARN]`-block auto-capture Stop hook.
+- [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) — the `minimal-code` 7-rung decision ladder (necessity → reuse → standard library → native platform → installed deps → one-liner → implement), wired into every implementation agent plus a review trigger in `codex-rescuer` and the `/audit` Code Quality dimension. Benchmarked ~54% average token/cost reduction upstream, without cutting validation, security, or accessibility.
 - [dralgorhythm/claude-agentic-framework](https://github.com/dralgorhythm/claude-agentic-framework) — the safety hooks (destructive-command blocking, protected secret files) and the "keep the skill catalog lean" design principle.
 - [aws-samples/sample-claude-code-agent-team](https://github.com/aws-samples/sample-claude-code-agent-team) — the machine-checkable task format (`[role] verb what | files | acceptance. Run: command`) and single-verdict review synthesis.
 - [ciscoittech/claude-agent-framework](https://github.com/ciscoittech/claude-agent-framework) — effort-based model/cost routing.

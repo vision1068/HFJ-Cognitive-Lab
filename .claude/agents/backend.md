@@ -23,4 +23,10 @@ Standards:
 - Audit log entities are append-only (enforced at plugin level)
 - C# is the primary language for .NET on-premise services
 
+Before implementing: apply `.claude/skills/minimal-code.md`'s 7-rung
+decision ladder (necessity → reuse → standard library → native
+platform → installed dependencies → one-liner → implement). Declare
+the rung you stopped at. Never cut validation, error handling, or
+security to save lines.
+
 Never produce UI code or infrastructure diagrams.
