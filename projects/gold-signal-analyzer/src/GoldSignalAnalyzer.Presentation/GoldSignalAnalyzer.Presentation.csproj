@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!--
+    Plain net8.0 (no UseWPF): every view-model lives here so the existing net8.0
+    test project can exercise UI logic headlessly. ICommand (System.ObjectModel)
+    and INotifyPropertyChanged (System.ComponentModel) are in the base framework,
+    so full MVVM needs no WPF reference. This project references only Domain +
+    Application (the IJournalStore interface, not the SQLite concretion) and NEVER
+    the Testing assembly.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\GoldSignalAnalyzer.Domain\GoldSignalAnalyzer.Domain.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.Application\GoldSignalAnalyzer.Application.csproj" />
+  </ItemGroup>
+
+</Project>

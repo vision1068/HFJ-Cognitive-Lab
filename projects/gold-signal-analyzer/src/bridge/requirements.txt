@@ -1,0 +1,7 @@
+# Runtime deps for the LIVE bridge (Windows + running MT5 terminal only).
+# The scaffold + test suite run on the Python standard library alone; these
+# are needed only when attaching to a real terminal with --live.
+MetaTrader5>=5.0.45 ; sys_platform == "win32"
+
+# NOTE: no web framework is required — the bridge uses http.server (stdlib).
+# NOTE: never put a token or credential in this file or any file in the repo.

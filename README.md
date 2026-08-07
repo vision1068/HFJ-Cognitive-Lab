@@ -24,7 +24,7 @@ Every instruction — a business problem, a design request, a bug, a question �
 | **B — Single Specialist** | "what does the architect think", "backend design for X" | Calls one agent, returns its output directly |
 | **C — Phase Revision** | "revise", "the architect missed", "update the QA section" | Re-reads the existing phase file, re-runs only that agent |
 | **D — Parallel Consultation** | "what do backend and QA think" | Calls named agents in parallel, synthesizes the results |
-| **E — Audit/Governance Check** | "audit this", "is this secure", "QCB requirements" | Calls the Auditor only |
+| **E — Audit/Governance Check** | "audit this", "is this secure", "compliance requirements" | Calls the Auditor only |
 | **F — Memory/Status Query** | "what did we decide", "what phase are we on" | Reads from `projects/`, summarizes — no agents called |
 | **G — Broken Build / Code Rescue** | "this is broken", "tests are failing", "review this code" | Calls Codex Rescuer only — reproduces before diagnosing |
 
@@ -90,7 +90,7 @@ Dynamics CRM on-premise: plugins, entity schemas, security roles, Power Automate
 Test strategy and Given/When/Then test cases across 7 categories: functional correctness, boundary conditions, CRM plugin constraints, audit trail integrity, high-volume/performance, regression, and security.
 
 ### Auditor — *Phase 5*
-Security risk assessment, QCB compliance, data residency, audit trail validation. Operating principle: **over-flagging is better than missing a risk** — every governance gap is flagged before go-live, no exceptions.
+Security risk assessment, regulatory/governance compliance (project-specific, never assumed by default), data residency, audit trail validation. Operating principle: **over-flagging is better than missing a risk** — every governance gap is flagged before go-live, no exceptions.
 
 ### Business Analyst
 Requirements gathering, user stories (As a / I want / So that), AS-IS → TO-BE process mapping, gap analysis. Bridges business stakeholders and the technical agents before Phase 2 begins.
@@ -190,7 +190,7 @@ Invocable shortcuts for common cross-project operations:
 | `/status [project]` | Quick status across all projects, or deep-dive one — phases completed, last CEO decision, open items |
 | `/security-scan <project>` | Runs the `secure-coding.md` checklist and dependency audit, item by item, with evidence |
 | `/pre-deploy <project>` | Walks Gate 6 (Production Readiness) plus confirms Gates 1–5 already passed |
-| `/compliance-check <project>` | Focused QCB/governance pass — the standard Auditor Phase 5 mode |
+| `/compliance-check <project>` | Focused governance/compliance pass — the standard Auditor Phase 5 mode |
 | `/new-project <idea>` | Structured 3-round requirements intake interview → IDed `brief.md` → full 6-phase engagement |
 
 ---
@@ -281,7 +281,7 @@ Every engagement — regardless of which pattern triggered it — produces a fol
 Just type your request. Don't address a specific agent — the Orchestrator decides who's needed:
 
 ```
-"Build a customer onboarding portal for QDB loan applicants"
+"Build a customer onboarding portal for loan applicants"
 → Pattern A: full 6-phase engagement, output in projects/customer-onboarding/
 
 "What does the architect think about using Cloudflare Workers here?"
@@ -290,7 +290,7 @@ Just type your request. Don't address a specific agent — the Orchestrator deci
 "The QA phase missed mobile Safari testing, add it"
 → Pattern C: QA re-run with the existing test plan + your addition
 
-"Audit this integration for QCB compliance"
+"Audit this integration for compliance"
 → Pattern E: auditor only
 
 "The deploy keeps failing, can you fix it"

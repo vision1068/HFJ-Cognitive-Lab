@@ -1,0 +1,16 @@
+<Project>
+  <!--
+    Shared build settings for the Gold Signal Analyzer solution.
+    Clean-architecture layering; nullable reference types on everywhere
+    (secure-by-construction: fewer null-deref surprises in the data path).
+  -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>12</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors>CS8600;CS8602;CS8603;CS8618;CS8625</WarningsAsErrors>
+  </PropertyGroup>
+</Project>

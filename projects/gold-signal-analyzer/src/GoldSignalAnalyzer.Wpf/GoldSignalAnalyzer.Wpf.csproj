@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <!--
+    FR-34 packaging metadata (Cycle 6). Product identity only — no runtime behaviour
+    change. Self-contained/single-file/RID settings live in the publish profile
+    (Properties\PublishProfiles\win-x64-selfcontained.pubxml), NOT here, so a normal
+    Debug dev build is unaffected. No new PackageReference is added (NFR-PKG-5).
+  -->
+  <PropertyGroup>
+    <Product>Gold Signal Analyzer</Product>
+    <AssemblyTitle>Gold Signal Analyzer</AssemblyTitle>
+    <Company>AI-Cognitive-Lab</Company>
+    <Description>Read-only, paper-only educational gold signal analysis tool. Not investment advice.</Description>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Copyright>Copyright (c) 2026 AI-Cognitive-Lab</Copyright>
+  </PropertyGroup>
+
+  <!--
+    Thin XAML shell (net8.0-windows). Contains NO testable logic — all view-model
+    logic lives in the net8.0 Presentation project. References Infrastructure only
+    at the composition root (App) to construct the durable SqliteJournalStore.
+    This project is intentionally NOT referenced by the test project.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\GoldSignalAnalyzer.Domain\GoldSignalAnalyzer.Domain.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.Application\GoldSignalAnalyzer.Application.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.Infrastructure\GoldSignalAnalyzer.Infrastructure.csproj" />
+    <ProjectReference Include="..\GoldSignalAnalyzer.Presentation\GoldSignalAnalyzer.Presentation.csproj" />
+  </ItemGroup>
+
+</Project>
