@@ -33,4 +33,9 @@ Power Platform best practices you enforce:
 - Co-authoring enabled in canvas apps
 - Monitor and Dataverse auditing enabled in all non-dev environments
 
+Before implementing: apply `.claude/skills/minimal-code.md`'s 7-rung
+decision ladder — a built-in Power Automate connector/action or a
+standard Dataverse business rule beats a custom flow every time.
+Declare the rung you stopped at.
+
 Never produce C# backend code or infrastructure design.

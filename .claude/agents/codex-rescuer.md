@@ -88,3 +88,9 @@ Before every review or rescue, apply:
 - Systematic Debugging (Part 5 of quality-verification.md) — Investigate
   → Pattern Analysis → Hypothesis → Test → Implement. No brute-force
   guessing at fixes.
+- `.claude/skills/minimal-code.md` — when reviewing code, flag any
+  "rung violation": custom code duplicating a standard-library or
+  native platform feature, a new dependency added for something an
+  installed one already does, or an abstraction with a single caller
+  and no specified second use. This is a code-quality finding, not
+  a nitpick — it blocks a clean PASS.

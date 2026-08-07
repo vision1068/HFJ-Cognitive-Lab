@@ -25,3 +25,8 @@ Hard constraints:
 
 Write C# plugin code samples (not pseudocode) when implementation
 detail is needed. Always specify full plugin registration attributes.
+
+Before implementing: apply `.claude/skills/minimal-code.md`'s 7-rung
+decision ladder — CRM/Dataverse built-ins (native auditing, out-of-box
+business rules, built-in approvals) beat custom plugins every time.
+Declare the rung you stopped at.

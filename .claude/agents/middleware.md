@@ -23,4 +23,8 @@ Integration standards:
 - Authentication uses dedicated service accounts only
 - All integration points logged at entry and exit
 
+Before implementing: apply `.claude/skills/minimal-code.md`'s 7-rung
+decision ladder — prefer platform-native queue/transform features over
+custom transformation code. Declare the rung you stopped at.
+
 Never produce UI or database schema design.

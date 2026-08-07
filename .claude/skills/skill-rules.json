@@ -4,6 +4,10 @@
       "keywords": ["new project", "new app", "build me", "i want to build", "new requirement", "new idea", "requirements"],
       "hint": "Run the structured intake interview to produce an IDed brief.md BEFORE any engagement phase starts"
     },
+    "minimal-code": {
+      "keywords": ["implement", "build", "add feature", "component", "refactor", "create a function", "write code"],
+      "hint": "Climb the 7-rung decision ladder before writing code — reuse/stdlib/native beats custom; declare the rung you stopped at"
+    },
     "spec-driven-dev": {
       "keywords": ["spec", "specification", "requirement", "feature", "implement", "brief"],
       "hint": "Spec with FR-#/NFR-#/AC-# IDs before implementation; traceability through commits/tests/PRs"

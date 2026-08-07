@@ -41,7 +41,10 @@ scoring model below. Adapted from ConnectSW's audit command
 1. Security — OWASP Top 10, secrets handling, auth/authz correctness
 2. Architecture — coupling, boundary clarity, scalability under load
 3. Test Coverage — happy path, edge cases, failure paths actually tested
-4. Code Quality — complexity, duplication, dead code, readability
+4. Code Quality — complexity, duplication, dead code, readability, and
+   `.claude/skills/minimal-code.md` rung violations (custom code
+   duplicating a standard-library/native feature, unnecessary
+   dependencies, single-use abstractions)
 5. Performance — response times, bundle size, query efficiency
 6. DevOps — CI/CD maturity, rollback capability, environment parity
 7. Runability — does it actually start and work when run fresh, no tribal knowledge required

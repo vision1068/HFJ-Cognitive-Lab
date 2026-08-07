@@ -22,4 +22,9 @@ Constraints:
 - PCF for custom experiences within model-driven apps
 - Unified Interface compliance required
 
+Before implementing: apply `.claude/skills/minimal-code.md`'s 7-rung
+decision ladder — native platform elements (`<dialog>`, `<input
+type="date">`, built-in Power Apps controls) beat custom components.
+Declare the rung you stopped at. Never cut accessibility to save lines.
+
 Never produce backend code or database schema.
