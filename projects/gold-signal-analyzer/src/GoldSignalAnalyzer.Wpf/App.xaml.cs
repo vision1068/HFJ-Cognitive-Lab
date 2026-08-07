@@ -7,6 +7,7 @@ using GoldSignalAnalyzer.Application.Bridge;
 using GoldSignalAnalyzer.Application.Charting;
 using GoldSignalAnalyzer.Application.Freshness;
 using GoldSignalAnalyzer.Application.Live;
+using GoldSignalAnalyzer.Application.News;
 using GoldSignalAnalyzer.Application.Scoring;
 using GoldSignalAnalyzer.Application.Symbols;
 using GoldSignalAnalyzer.Domain;
@@ -119,13 +120,22 @@ public partial class App // base System.Windows.Application supplied by the XAML
             void RunSample(TimeFrame tf)
             {
                 var candles = SampleCandleSeries.Build(tf);
+                // Cycle 9 (FR-42, D9-8): derive a REAL higher-timeframe confirmation from the
+                // stepped-up sample series (not a hardcoded Buy), through the same
+                // HigherTimeFrameAnalyzer the live path uses. Not-applicable at D1 (top of ladder).
+                // Cycle 10 (FR-44): fold in the same deterministic news-blackout check the live
+                // path uses (a pure clock+calendar read — no logic beyond object composition).
+                var now = SystemClock.Instance.UtcNow;
+                var newsGate = new NewsBlackoutGate(SampleEconomicCalendar.Build(now));
+                var context = SampleHtfContext.For(tf) with { NewsBlackout = newsGate.ActiveBlackout(now) is not null };
+
                 var analysis = new SignalAnalysisService(SystemClock.Instance).Analyze(
                     NormalizedSymbol.Gold,
                     tf,
                     candles,
                     SymbolSpec.Gold(),
                     accountBalance: profile?.AccountBalance ?? 10_000m,
-                    context: new SignalContext(HtfDirection: SignalDirection.Buy),
+                    context: context,
                     hasOpenPosition: journalStore.GetOpen() is not null);
 
                 signalVm.Load(analysis);
@@ -194,13 +204,20 @@ public partial class App // base System.Windows.Application supplied by the XAML
             provider.UseSymbolMapping(mapping);
             liveSymbol = mapping.Normalized;
 
+            // Cycle 9 (FR-42): the base context is enriched per-poll by the coordinator with a
+            // REAL higher-timeframe confirmation (HtfDirection + HtfConfirmationApplicable) — no
+            // longer the bare `new SignalContext()` whose null HtfDirection forced Neutral forever.
             var options = new LiveSignalOptions(
                 mapping.Normalized, liveTimeFrame, CandleCount: 120,
                 SymbolSpec.Gold(), profile.AccountBalance, new SignalContext());
             var freshness = new DataFreshnessMonitor(SystemClock.Instance, TimeSpan.FromSeconds(90));
+            // Cycle 10 (FR-44): the same sample/illustrative calendar drives the live path's
+            // news-blackout gate this cycle (D10-2 — no live calendar API yet).
+            var newsGate = new NewsBlackoutGate(SampleEconomicCalendar.Build(SystemClock.Instance.UtcNow));
             coordinator = new LiveSignalCoordinator(
                 provider, new SignalAnalysisService(SystemClock.Instance),
-                new SignalGate(), freshness, options, hasSymbolMapping: true);
+                new SignalGate(), freshness, options, hasSymbolMapping: true,
+                clock: SystemClock.Instance, newsGate: newsGate);
         }
         catch (Exception ex)
         {

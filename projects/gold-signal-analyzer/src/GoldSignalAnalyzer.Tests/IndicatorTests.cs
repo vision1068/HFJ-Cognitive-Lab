@@ -176,5 +176,136 @@ public class IndicatorTests
         var snap = new IndicatorEngine().Compute(Gold, TimeFrame.H1, Trend(3));
         Assert.Null(snap.Get("ADX"));   // needs 2*14 bars — absent, not invented
         Assert.Null(snap.Get("RSI"));
+        Assert.Null(snap.Get("FIB_RETRACE_PCT"));  // needs 50 bars — absent, not invented
+        Assert.Null(snap.Get("SWEEP_LOW"));        // needs 21 bars — absent, not invented
+    }
+
+    // ---- Fibonacci retracement (Cycle 10, FR-45) ----
+
+    [Fact]
+    public void Fibonacci_up_leg_retraces_into_golden_pocket()
+    {
+        // swing low 100 (first), swing high 110 (after) → up leg; last close 105 → 50% retrace.
+        var candles = new[]
+        {
+            C(101, 100, 100.5m),
+            C(105, 102, 104m),
+            C(110, 106, 109m),
+            C(108, 104, 106m),
+            C(106, 104, 105m),
+        };
+        var fib = Indicators.FibonacciRetracement(candles, lookback: 5);
+        Assert.NotNull(fib);
+        Assert.Equal(110m, fib!.SwingHigh);
+        Assert.Equal(100m, fib.SwingLow);
+        Assert.Equal(SignalDirection.Buy, fib.SwingDirection);
+        Near(0.5m, fib.RetracementPct);
+    }
+
+    [Fact]
+    public void Fibonacci_down_leg_mirrors()
+    {
+        // swing high 110 (first), swing low 100 (after) → down leg; last close 105 → 50% bounce.
+        var candles = new[]
+        {
+            C(110, 106, 109m),
+            C(108, 104, 106m),
+            C(101, 100, 100.5m),
+            C(105, 102, 104m),
+            C(106, 104, 105m),
+        };
+        var fib = Indicators.FibonacciRetracement(candles, lookback: 5);
+        Assert.NotNull(fib);
+        Assert.Equal(SignalDirection.Sell, fib!.SwingDirection);
+        Near(0.5m, fib.RetracementPct);
+    }
+
+    [Fact]
+    public void Fibonacci_returns_null_on_insufficient_data()
+        => Assert.Null(Indicators.FibonacciRetracement(new[] { C(101, 100, 100.5m) }, lookback: 5));
+
+    [Fact]
+    public void Fibonacci_returns_null_on_degenerate_flat_window()
+    {
+        var flat = Enumerable.Range(0, 5).Select(_ => C(100, 100, 100m)).ToArray();
+        // A candle requires high >= low; 100/100 is a valid degenerate (zero-range) bar.
+        Assert.Null(Indicators.FibonacciRetracement(flat, lookback: 5));
+    }
+
+    [Fact]
+    public void Fibonacci_returns_null_when_swing_high_and_low_land_on_same_candle()
+    {
+        // Every candle identical (high 1900.5 / low 1899.5) — the swing high and swing low
+        // both resolve to the FIRST candle in the window, so no directional leg exists (D10-6).
+        // This is the exact shape of HtfConfirmationTests.Flat() and must not fabricate a lean.
+        var flat = Enumerable.Range(0, 10).Select(_ => C(1900.5m, 1899.5m, 1900m)).ToArray();
+        Assert.Null(Indicators.FibonacciRetracement(flat, lookback: 10));
+    }
+
+    // ---- Liquidity sweep (Cycle 10, FR-46) ----
+
+    [Fact]
+    public void LiquiditySweep_detects_swept_low()
+    {
+        var candles = new[]
+        {
+            C(105, 102, 103m),
+            C(108, 104, 106m),
+            C(110, 105, 108m),  // priorHigh = 110
+            C(107, 100, 104m),  // priorLow = 100
+            C(106, 103, 105m),
+            C(105, 99, 101m),   // last: Low 99 < 100, Close 101 > 100 → swept low
+        };
+        var sweep = Indicators.DetectLiquiditySweep(candles, lookback: 5);
+        Assert.True(sweep.SweptLow);
+        Assert.False(sweep.SweptHigh);
+    }
+
+    [Fact]
+    public void LiquiditySweep_detects_swept_high()
+    {
+        var candles = new[]
+        {
+            C(105, 102, 103m),
+            C(108, 104, 106m),
+            C(110, 105, 108m),  // priorHigh = 110
+            C(107, 100, 104m),  // priorLow = 100
+            C(106, 103, 105m),
+            C(112, 105, 108m),  // last: High 112 > 110, Close 108 < 110 → swept high
+        };
+        var sweep = Indicators.DetectLiquiditySweep(candles, lookback: 5);
+        Assert.True(sweep.SweptHigh);
+        Assert.False(sweep.SweptLow);
+    }
+
+    [Fact]
+    public void LiquiditySweep_no_sweep_when_last_candle_inside_prior_range()
+    {
+        var candles = new[]
+        {
+            C(105, 102, 103m),
+            C(108, 104, 106m),
+            C(110, 105, 108m),
+            C(107, 100, 104m),
+            C(106, 103, 105m),
+            C(107, 102, 105m), // fully inside [100,110]
+        };
+        var sweep = Indicators.DetectLiquiditySweep(candles, lookback: 5);
+        Assert.False(sweep.SweptHigh);
+        Assert.False(sweep.SweptLow);
+    }
+
+    [Fact]
+    public void LiquiditySweep_throws_on_insufficient_data_never_fabricates()
+        => Assert.Throws<ArgumentException>(() => Indicators.DetectLiquiditySweep(new[] { C(101, 100, 100.5m) }, lookback: 5));
+
+    [Fact]
+    public void Engine_categorizes_fib_as_trend_and_sweep_as_momentum()
+    {
+        var snap = new IndicatorEngine().Compute(Gold, TimeFrame.H1, Trend(60));
+        Assert.Equal(IndicatorCategory.Trend, snap.Get("FIB_RETRACE_PCT")!.Category);
+        Assert.Equal(IndicatorCategory.Trend, snap.Get("FIB_SWING_DIR")!.Category);
+        Assert.Equal(IndicatorCategory.Momentum, snap.Get("SWEEP_LOW")!.Category);
+        Assert.Equal(IndicatorCategory.Momentum, snap.Get("SWEEP_HIGH")!.Category);
     }
 }

@@ -19,6 +19,8 @@ manual step, since Claude Code cannot install/log-in a live terminal).
 """
 from __future__ import annotations
 
+import threading
+import time
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 
@@ -98,10 +100,23 @@ class Mt5MarketDataSource(MarketDataSource):
     Deliberately exposes NO trading/order method. The injected `mt5` module is
     used only for: initialize, terminal_info, symbols_get, symbol_select,
     symbol_info_tick, copy_rates_from_pos. NFR-5: raises/returns-None instead of
-    fabricating when the terminal is unavailable."""
+    fabricating when the terminal is unavailable.
+
+    Cycle 11 (FR-41/FR-42/NFR-6) — AUTO-RECONNECT. The MT5 IPC handle bound by
+    initialize() goes stale if the terminal64.exe process restarts under a new
+    PID (auto-update / crash-relaunch). Rather than requiring a human to restart
+    the whole bridge, every data access first calls `_reconnect_if_stale()`: if
+    the source was initialized but the terminal now reads disconnected, it
+    re-attempts a credential-free Mode A `initialize()` (INV-2/INV-3), throttled
+    to at most one attempt per `reconnect_min_interval_s`. This NEVER fabricates
+    (NFR-6): while disconnected — including during/after a failed reconnect — the
+    source keeps reporting not-connected and returns None/[] for ticks/candles;
+    connected state is reported only when `terminal_info().connected` is truly
+    true again. The `clock` (monotonic seconds) is injectable so the throttle is
+    unit-testable without wall-clock waits."""
     is_live = True
 
-    def __init__(self, mt5=None):
+    def __init__(self, mt5=None, clock=None, reconnect_min_interval_s: float = 5.0):
         if mt5 is None:  # pragma: no cover - import path exercised only on a live host
             try:
                 import MetaTrader5 as mt5  # noqa: F811  (optional, Windows + terminal only)
@@ -113,6 +128,15 @@ class Mt5MarketDataSource(MarketDataSource):
                 ) from exc
         self._mt5 = mt5
         self._initialized = False
+        # Injected monotonic clock (seconds) so the reconnect throttle is testable.
+        self._clock = clock or time.monotonic
+        self._reconnect_min_interval_s = reconnect_min_interval_s
+        self._last_reconnect_attempt = None  # monotonic seconds of the last attempt
+        # The bridge runs under ThreadingHTTPServer sharing ONE source instance, so
+        # concurrent /health + /tick could both enter the reconnect path. This lock
+        # serializes the throttle-check-and-attempt so initialize() fires at most
+        # once per interval (FR-42) and the MT5 library is never re-entered.
+        self._reconnect_lock = threading.Lock()
 
     def initialize(self) -> None:
         """Mode A attach: connect to the running terminal WITHOUT credentials.
@@ -131,17 +155,64 @@ class Mt5MarketDataSource(MarketDataSource):
             )
         self._initialized = True
 
-    def terminal_connected(self) -> bool:
-        info = self._mt5.terminal_info()
+    def _raw_connected(self) -> bool:
+        """True iff the terminal reports connected RIGHT NOW. A dead/stale IPC
+        handle may make terminal_info() return None or raise — both read as
+        not-connected (NFR-6: never surface a live read as an error to callers,
+        and never report connected when it isn't)."""
+        try:
+            info = self._mt5.terminal_info()
+        except Exception:
+            return False
         return bool(info and getattr(info, "connected", False))
 
+    def _reconnect_if_stale(self) -> None:
+        """FR-41/FR-42: if this source was initialized but the terminal now reads
+        disconnected (PID restarted → stale handle), re-attempt a credential-free
+        Mode A initialize() against the currently-running terminal — throttled to
+        at most one attempt per reconnect_min_interval_s. Failures are swallowed:
+        the source stays HONESTLY disconnected (NFR-6) and retries next window.
+        Never auto-initializes a session a human never opened (guard: _initialized)."""
+        if not self._initialized:
+            return  # FR-41 AC-41.3: only re-attach; never open the first session.
+        if self._raw_connected():
+            return  # cheap fast-path: skip the lock while healthy (common case).
+        with self._reconnect_lock:
+            # Double-checked: another thread may have reconnected while we waited.
+            if self._raw_connected():
+                return
+            now = self._clock()
+            if (self._last_reconnect_attempt is not None
+                    and now - self._last_reconnect_attempt < self._reconnect_min_interval_s):
+                return  # FR-42: throttle — don't hammer initialize() on a down terminal.
+            self._last_reconnect_attempt = now
+            try:
+                # Mode A: NO credentials (INV-2/INV-3). Rebinds the IPC handle to the
+                # currently-running terminal the human is logged into.
+                self._mt5.initialize()
+            except Exception:
+                pass  # NFR-6: stay disconnected + honest; re-attempt after the interval.
+
+    def terminal_connected(self) -> bool:
+        self._reconnect_if_stale()
+        return self._raw_connected()
+
     def list_symbols(self):
+        self._reconnect_if_stale()
+        if not self._raw_connected():
+            return []  # NFR-6: never serve a cached symbol universe while disconnected.
         return [
             {"raw": s.name, "description": getattr(s, "description", "")}
             for s in (self._mt5.symbols_get() or [])
         ]
 
     def get_tick(self, broker_symbol: str):
+        self._reconnect_if_stale()
+        # NFR-6 (structural): the MT5 API can return a LAST-CACHED tick after the
+        # broker link drops, so gate on the live connection state — never serve a
+        # stale-but-real-looking price during a genuine outage.
+        if not self._raw_connected():
+            return None
         # Ensure the symbol is selected in Market Watch (read-only side effect).
         self._mt5.symbol_select(broker_symbol, True)
         t = self._mt5.symbol_info_tick(broker_symbol)
@@ -155,6 +226,12 @@ class Mt5MarketDataSource(MarketDataSource):
         }
 
     def get_candles(self, broker_symbol: str, timeframe_minutes: int, count: int):
+        self._reconnect_if_stale()
+        # NFR-6 (structural): copy_rates_from_pos reads MT5's LOCAL rate cache and
+        # routinely returns the last-known bars even while disconnected. Gate on the
+        # live connection so a genuine outage yields [] rather than stale candles.
+        if not self._raw_connected():
+            return []
         if count <= 0:
             return []
         attr = _TIMEFRAME_ATTR_BY_MINUTES.get(int(timeframe_minutes))

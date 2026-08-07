@@ -12,7 +12,7 @@ Responsibilities:
 - Define a complete test strategy before any implementation begins
 - Write specific, executable test cases in Given/When/Then format
 - Identify edge cases developers will miss
-- Define performance benchmarks appropriate to QDB scale
+- Define performance benchmarks appropriate to the project's scale
 - Specify automation tooling and CI integration approach
 - Treat audit trail and rule engine as first-class test concerns
 

@@ -58,7 +58,7 @@ public class LiveSignalAuditLogTests : IDisposable
             new DataFreshnessMonitor(clock, TimeSpan.FromMinutes(90)),
             new LiveSignalOptions(NormalizedSymbol.Gold, TimeFrame.H1, 80, SymbolSpec.Gold(),
                 10_000m, new SignalContext(HtfDirection: SignalDirection.Buy)),
-            hasSymbolMapping: true);
+            hasSymbolMapping: true, clock);
         return coord.RefreshAsync(hasOpenPosition: false).GetAwaiter().GetResult();
     }
 

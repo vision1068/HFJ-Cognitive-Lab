@@ -90,6 +90,56 @@ public class ScoringAndVetoTests
         Assert.Equal(10m, adx.CappedPoints); // third trend signal trimmed by the cap — visible
     }
 
+    // ---- Cycle 10 (FR-45/FR-46): Fibonacci + liquidity-sweep scoring rules ----
+
+    [Fact]
+    public void Fibonacci_pocket_retracement_scores_in_leg_direction()
+    {
+        var buySnap = Snap(CandleStatus.Completed,
+            ("FIB_RETRACE_PCT", IndicatorCategory.Trend, 0.5m),
+            ("FIB_SWING_DIR", IndicatorCategory.Trend, 1m));
+        var buyScore = new ScoringEngine().Score(buySnap, 2000m, MarketRegime.TrendingUp);
+        Assert.Contains(buyScore.Contributions, c => c.Indicator == "FIB_RETRACE" && c.Direction == SignalDirection.Buy);
+
+        var sellSnap = Snap(CandleStatus.Completed,
+            ("FIB_RETRACE_PCT", IndicatorCategory.Trend, 0.5m),
+            ("FIB_SWING_DIR", IndicatorCategory.Trend, -1m));
+        var sellScore = new ScoringEngine().Score(sellSnap, 2000m, MarketRegime.TrendingDown);
+        Assert.Contains(sellScore.Contributions, c => c.Indicator == "FIB_RETRACE" && c.Direction == SignalDirection.Sell);
+    }
+
+    [Fact]
+    public void Fibonacci_outside_golden_pocket_does_not_score()
+    {
+        var snap = Snap(CandleStatus.Completed,
+            ("FIB_RETRACE_PCT", IndicatorCategory.Trend, 0.1m), // shallow retrace, not in [0.382,0.618]
+            ("FIB_SWING_DIR", IndicatorCategory.Trend, 1m));
+        var score = new ScoringEngine().Score(snap, 2000m, MarketRegime.TrendingUp);
+        Assert.DoesNotContain(score.Contributions, c => c.Indicator == "FIB_RETRACE");
+    }
+
+    [Fact]
+    public void LiquiditySweep_low_scores_buy_high_scores_sell()
+    {
+        var lowSnap = Snap(CandleStatus.Completed, ("SWEEP_LOW", IndicatorCategory.Momentum, 1m));
+        var lowScore = new ScoringEngine().Score(lowSnap, 2000m, MarketRegime.Ranging);
+        Assert.Contains(lowScore.Contributions, c => c.Indicator == "LIQUIDITY_SWEEP" && c.Direction == SignalDirection.Buy);
+
+        var highSnap = Snap(CandleStatus.Completed, ("SWEEP_HIGH", IndicatorCategory.Momentum, 1m));
+        var highScore = new ScoringEngine().Score(highSnap, 2000m, MarketRegime.Ranging);
+        Assert.Contains(highScore.Contributions, c => c.Indicator == "LIQUIDITY_SWEEP" && c.Direction == SignalDirection.Sell);
+    }
+
+    [Fact]
+    public void LiquiditySweep_zero_does_not_score()
+    {
+        var snap = Snap(CandleStatus.Completed,
+            ("SWEEP_LOW", IndicatorCategory.Momentum, 0m),
+            ("SWEEP_HIGH", IndicatorCategory.Momentum, 0m));
+        var score = new ScoringEngine().Score(snap, 2000m, MarketRegime.Ranging);
+        Assert.DoesNotContain(score.Contributions, c => c.Indicator == "LIQUIDITY_SWEEP");
+    }
+
     // ---- FR-20: hard veto forces Neutral ----
 
     [Fact]
@@ -143,6 +193,25 @@ public class ScoringAndVetoTests
         var c = new SignalClassifier(new ManualClock(T0)).Classify(ScoreOf(70m, 10m), new SignalContext(HtfDirection: null));
         Assert.Equal(SignalDirection.Neutral, c.Direction);
         Assert.Equal(SignalClassifier.ReasonHtf, c.PrimaryReason);
+    }
+
+    // ---- Cycle 10 (FR-44): news blackout veto ----
+
+    [Fact]
+    public void News_blackout_forces_neutral_even_with_a_strong_confirmed_score()
+    {
+        var c = new SignalClassifier(new ManualClock(T0))
+            .Classify(ScoreOf(90m, 5m), new SignalContext(HtfDirection: SignalDirection.Buy, NewsBlackout: true));
+        Assert.Equal(SignalDirection.Neutral, c.Direction);
+        Assert.Equal(SignalClassifier.ReasonNews, c.PrimaryReason);
+    }
+
+    [Fact]
+    public void No_news_blackout_is_unaffected_existing_behaviour_preserved()
+    {
+        var c = new SignalClassifier(new ManualClock(T0))
+            .Classify(ScoreOf(70m, 10m), new SignalContext(HtfDirection: SignalDirection.Buy, NewsBlackout: false));
+        Assert.Equal(SignalDirection.Buy, c.Direction);
     }
 
     [Fact]

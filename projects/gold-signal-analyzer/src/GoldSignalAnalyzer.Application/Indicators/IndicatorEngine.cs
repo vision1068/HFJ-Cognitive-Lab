@@ -19,6 +19,10 @@ public sealed record IndicatorConfig
     public int StochK { get; init; } = 14;
     public int StochD { get; init; } = 3;
     public int VolumeSma { get; init; } = 20;
+    /// <summary>Cycle 10 (FR-45): swing lookback window for Fibonacci retracement.</summary>
+    public int FibonacciLookback { get; init; } = 50;
+    /// <summary>Cycle 10 (FR-46): prior-window lookback for liquidity sweep detection.</summary>
+    public int LiquiditySweepLookback { get; init; } = 20;
 }
 
 /// <summary>
@@ -70,6 +74,23 @@ public sealed class IndicatorEngine
             Add("STOCH_K", IndicatorCategory.Momentum, s.K);
             Add("STOCH_D", IndicatorCategory.Momentum, s.D);
         });
+        // Cycle 10 (FR-46): liquidity sweep — reuses the Momentum category (D10-5); a sweep is a
+        // momentum-exhaustion/reversal read, the same family as RSI/Stochastic.
+        Try(() =>
+        {
+            var sw = Indicators.DetectLiquiditySweep(candles, _cfg.LiquiditySweepLookback);
+            Add("SWEEP_LOW", IndicatorCategory.Momentum, sw.SweptLow ? 1m : 0m);
+            Add("SWEEP_HIGH", IndicatorCategory.Momentum, sw.SweptHigh ? 1m : 0m);
+        });
+
+        // Cycle 10 (FR-45): Fibonacci retracement — reuses the Trend category (D10-5); a
+        // golden-pocket retracement confirms continuation of the existing leg.
+        var fib = Indicators.FibonacciRetracement(candles, _cfg.FibonacciLookback);
+        if (fib is not null)
+        {
+            Add("FIB_RETRACE_PCT", IndicatorCategory.Trend, fib.RetracementPct);
+            Add("FIB_SWING_DIR", IndicatorCategory.Trend, fib.SwingDirection == SignalDirection.Buy ? 1m : -1m);
+        }
 
         Try(() => Add("ATR", IndicatorCategory.Volatility, Indicators.Atr(candles, _cfg.Atr)));
         Try(() =>

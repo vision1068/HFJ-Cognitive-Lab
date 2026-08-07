@@ -67,7 +67,7 @@ Action: Call named agents in parallel. Synthesize outputs.
 
 ### Pattern E — Audit or governance check
 Triggers: "audit this", "check for compliance", "is this secure",
-"governance review", "QCB requirements".
+"governance review", "compliance requirements".
 Action: Call auditor only. Pass the document as context.
 
 ### Pattern F — Memory or status query

@@ -1,5 +1,5 @@
 ---
-description: Focused QCB/governance compliance check on a project or decision
+description: Focused governance/compliance check on a project or decision
 ---
 
 Invoke the `auditor` agent in its standard Phase 5 governance mode
@@ -7,8 +7,10 @@ Invoke the `auditor` agent in its standard Phase 5 governance mode
 named in `$ARGUMENTS`.
 
 Focus specifically on:
-- QCB supervisory requirement alignment
-- Data residency / Qatar sovereignty requirements
+- Regulatory/supervisory requirement alignment, if the project's own
+  scope implicates a specific regulator (ask the owner rather than
+  assuming one)
+- Data residency requirements applicable to the project's jurisdiction
 - Audit trail completeness (can every decision be explained from the log alone?)
 - Service account privilege scope (least-privilege verified, not assumed)
 - Versioning/immutability — is it actually legally defensible, or just "probably fine"

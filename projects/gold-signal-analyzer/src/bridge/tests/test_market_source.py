@@ -173,5 +173,206 @@ class Mt5LiveSourceTests(unittest.TestCase):
             )
 
 
+class _Clock:
+    """Injectable monotonic clock so the reconnect throttle is testable without
+    wall-clock waits."""
+    def __init__(self, t=0.0):
+        self.t = t
+
+    def __call__(self):
+        return self.t
+
+    def advance(self, dt):
+        self.t += dt
+
+
+class ReconnectFakeMt5:
+    """Fake MT5 module whose connection can be flipped at runtime to simulate the
+    terminal64.exe process dying/restarting under a new PID. A successful
+    initialize() models a real Mode A re-attach: it flips the terminal back to
+    connected. Counts initialize() calls and records their args so the tests can
+    prove credential-free reconnect + throttling."""
+    TIMEFRAME_H1 = 16385
+
+    def __init__(self, connected=True, init_ok=True):
+        self.connected = connected            # mutable: False == PID died / stale handle
+        self.init_ok = init_ok                # whether a reconnect initialize() succeeds
+        self.init_raises = False              # dead pipe: initialize() itself throws
+        self.terminal_info_raises = False     # stale handle: terminal_info() throws
+        # Models the REAL MT5 hazard: symbol_info_tick / copy_rates_from_pos /
+        # symbols_get keep returning last-cached data even while disconnected. When
+        # True the API is "dishonest" and only the source's _raw_connected() gate
+        # can keep NFR-6 (this is the adversarial case F1/C1 asks for).
+        self.serve_cached_while_disconnected = False
+        self.init_calls = 0
+        self.init_args = []
+
+    def _serving(self):
+        return self.connected or self.serve_cached_while_disconnected
+
+    def initialize(self, *args, **kwargs):
+        self.init_calls += 1
+        self.init_args.append((args, kwargs))
+        if self.init_raises:
+            raise RuntimeError("dead pipe")
+        if self.init_ok:
+            self.connected = True             # successful re-attach → terminal connected
+        return self.init_ok
+
+    def last_error(self):
+        return (-1, "fake error")
+
+    def terminal_info(self):
+        if self.terminal_info_raises:
+            raise RuntimeError("stale handle")
+        return _TermInfo(self.connected)
+
+    def symbols_get(self):
+        return [_Sym("XAUUSD", "Gold")] if self._serving() else []
+
+    def symbol_select(self, symbol, enable):
+        return True
+
+    def symbol_info_tick(self, symbol):
+        if not self._serving():
+            return None
+        return {"bid": 3300.1, "ask": 3300.3, "time": 1785499200}
+
+    def copy_rates_from_pos(self, symbol, timeframe, start_pos, count):
+        if not self._serving():
+            return None
+        return [{"time": 1785499200, "open": 1.0, "high": 2.0, "low": 0.5,
+                 "close": 1.5, "tick_volume": 3}]
+
+
+class Mt5AutoReconnectTests(unittest.TestCase):
+    """Cycle 11 — FR-41 / FR-42 / NFR-6."""
+
+    def _initialized_source(self, fake, clock, interval=5.0):
+        src = Mt5MarketDataSource(mt5=fake, clock=clock, reconnect_min_interval_s=interval)
+        src.initialize()  # startup Mode A attach (fake starts connected)
+        return src
+
+    def test_reconnects_when_stale_and_recovers(self):
+        # AC-41.1: initialized, terminal dies, next access re-inits and recovers.
+        clock = _Clock(0.0)
+        fake = ReconnectFakeMt5(connected=True, init_ok=True)
+        src = self._initialized_source(fake, clock)
+        self.assertEqual(fake.init_calls, 1)          # startup only, so far
+        fake.connected = False                         # terminal PID died -> stale handle
+        self.assertTrue(src.terminal_connected())      # triggers a reconnect that succeeds
+        self.assertEqual(fake.init_calls, 2)           # exactly one reconnect attempt
+
+    def test_reconnect_initialize_passes_no_credentials(self):
+        # AC-41.2 (INV-2/INV-3): the reconnect initialize() carries no args at all.
+        clock = _Clock(0.0)
+        fake = ReconnectFakeMt5(connected=True, init_ok=True)
+        src = self._initialized_source(fake, clock)
+        fake.connected = False
+        src.terminal_connected()
+        self.assertEqual(fake.init_args[-1], ((), {}))  # Mode A: no login/password/server
+
+    def test_no_reconnect_before_explicit_initialize(self):
+        # AC-41.3: a never-initialized source never auto-opens a session.
+        clock = _Clock(0.0)
+        fake = ReconnectFakeMt5(connected=False, init_ok=True)
+        src = Mt5MarketDataSource(mt5=fake, clock=clock)   # NOTE: no initialize()
+        self.assertFalse(src.terminal_connected())
+        self.assertEqual(fake.init_calls, 0)
+
+    def test_reconnect_is_throttled_within_interval(self):
+        # AC-42.1: many accesses in one window -> at most one reconnect attempt.
+        clock = _Clock(0.0)
+        fake = ReconnectFakeMt5(connected=True, init_ok=True)
+        src = self._initialized_source(fake, clock)
+        fake.init_ok = False                           # reconnects will now fail...
+        fake.connected = False                         # ...and terminal is down
+        src.terminal_connected()                       # attempt #1 (init_calls -> 2)
+        src.terminal_connected()                       # throttled (same clock)
+        src.get_tick("XAUUSD")                          # throttled
+        src.get_candles("XAUUSD", 60, 5)                # throttled
+        self.assertEqual(fake.init_calls, 2)           # 1 startup + 1 reconnect only
+
+    def test_reconnect_retries_after_interval(self):
+        # AC-42.2: once the throttle window elapses, a fresh attempt is made.
+        clock = _Clock(0.0)
+        fake = ReconnectFakeMt5(connected=True, init_ok=True)
+        src = self._initialized_source(fake, clock)
+        fake.init_ok = False
+        fake.connected = False
+        src.terminal_connected()                       # attempt #1 at t=0 (init_calls -> 2)
+        clock.advance(5.0)                              # window elapses
+        src.terminal_connected()                       # attempt #2 at t=5 (init_calls -> 3)
+        self.assertEqual(fake.init_calls, 3)
+
+    def test_failed_reconnect_stays_honest_no_fabrication(self):
+        # AC-NFR6.1: while disconnected, nothing connected/no tick/no candle is faked.
+        clock = _Clock(0.0)
+        fake = ReconnectFakeMt5(connected=True, init_ok=True)
+        src = self._initialized_source(fake, clock)
+        fake.init_ok = False
+        fake.connected = False
+        self.assertFalse(src.terminal_connected())
+        self.assertIsNone(src.get_tick("XAUUSD"))
+        self.assertEqual(src.get_candles("XAUUSD", 60, 5), [])
+
+    def test_reconnect_initialize_raising_is_swallowed(self):
+        # AC-NFR6.2: a reconnect initialize() that throws never surfaces to callers.
+        clock = _Clock(0.0)
+        fake = ReconnectFakeMt5(connected=True, init_ok=True)
+        src = self._initialized_source(fake, clock)
+        fake.connected = False
+        fake.init_raises = True
+        self.assertFalse(src.terminal_connected())     # no exception raised
+        self.assertEqual(fake.init_calls, 2)           # attempt was made and swallowed
+
+    def test_terminal_info_raising_reads_as_disconnected(self):
+        # NFR-6 robustness: a stale handle whose terminal_info() throws reads as
+        # not-connected, never as an error to the caller.
+        clock = _Clock(0.0)
+        fake = ReconnectFakeMt5(connected=True, init_ok=True)
+        src = self._initialized_source(fake, clock)
+        fake.terminal_info_raises = True
+        self.assertFalse(src.terminal_connected())
+
+    def test_disconnected_never_serves_cached_data(self):
+        # C1/F1 (structural NFR-6): even when the MT5 API keeps handing back
+        # last-cached ticks/candles/symbols while disconnected, the source must
+        # gate on terminal_info().connected and return None/[]/[]. This test FAILS
+        # against a source that trusts the API's null-behavior — that's the point.
+        clock = _Clock(0.0)
+        fake = ReconnectFakeMt5(connected=True, init_ok=True)
+        src = self._initialized_source(fake, clock)
+        fake.init_ok = False                       # reconnect can't restore the link
+        fake.connected = False                     # terminal genuinely disconnected
+        fake.serve_cached_while_disconnected = True  # ...but the API still serves cache
+        self.assertIsNone(src.get_tick("XAUUSD"))
+        self.assertEqual(src.get_candles("XAUUSD", 60, 5), [])
+        self.assertEqual(src.list_symbols(), [])
+
+    def test_reconnect_single_attempt_under_concurrency(self):
+        # F2: under ThreadingHTTPServer many requests share one source; the lock +
+        # double-check must keep reconnect to exactly ONE initialize() per outage.
+        import threading as _t
+        clock = _Clock(0.0)
+        fake = ReconnectFakeMt5(connected=True, init_ok=True)
+        src = self._initialized_source(fake, clock)   # init_calls == 1 (startup)
+        fake.connected = False                         # terminal died
+        results = []
+        start = _t.Barrier(12)
+
+        def worker():
+            start.wait()                               # release all at once → force the race
+            results.append(src.terminal_connected())
+
+        threads = [_t.Thread(target=worker) for _ in range(12)]
+        for th in threads:
+            th.start()
+        for th in threads:
+            th.join()
+        self.assertEqual(fake.init_calls, 2)           # 1 startup + exactly 1 reconnect
+        self.assertTrue(all(results))                  # every caller ends up seeing connected
+
+
 if __name__ == "__main__":
     unittest.main()

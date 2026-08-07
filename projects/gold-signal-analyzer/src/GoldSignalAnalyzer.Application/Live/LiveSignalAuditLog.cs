@@ -27,7 +27,15 @@ public sealed record LiveSignalAuditEntry(
     decimal? SellScore,
     decimal? Confidence,
     string? DisplayedReason,
-    string? SuppressionReason)
+    string? SuppressionReason,
+    // Cycle 9 (FR-43): higher-timeframe confirmation provenance, recording three
+    // distinguishable states so a decision is explainable from the log alone:
+    //   HtfTimeFrame = "none"      / HtfDirection = "n/a"          → not applicable (D1, top of ladder)
+    //   HtfTimeFrame = e.g. "H4"   / HtfDirection = "unavailable"  → HTF read attempted but empty/failed/tied/frozen
+    //   HtfTimeFrame = e.g. "H4"   / HtfDirection = "Buy"|"Sell"   → real HTF lean derived
+    //   HtfTimeFrame = null        / HtfDirection = null           → refresh gate-suppressed before any HTF read (INV-4: no fabricated field)
+    string? HtfTimeFrame = null,
+    string? HtfDirection = null)
 {
     /// <summary>
     /// Build an audit entry from one live refresh outcome. When the gate allowed a
@@ -46,6 +54,28 @@ public sealed record LiveSignalAuditEntry(
 
         var a = result.Analysis;
         bool allowed = result.SignalAllowed;
+
+        // FR-43: map the HTF confirmation provenance to the three distinguishable states.
+        // When the refresh was gate-suppressed before any HTF read, result.Htf is null →
+        // both fields stay null (INV-4: no fabricated HTF field when there was no HTF read).
+        string? htfTimeFrame = null;
+        string? htfDirection = null;
+        if (result.Htf is { } htf)
+        {
+            if (!htf.Applicable)
+            {
+                htfTimeFrame = "none";       // top of ladder (D1) — no higher timeframe exists
+                htfDirection = "n/a";
+            }
+            else
+            {
+                htfTimeFrame = htf.TimeFrame?.ToString();
+                htfDirection = htf.Available && htf.Direction is not null
+                    ? htf.Direction.Value.ToString()   // real lean derived
+                    : "unavailable";                    // attempted but empty/failed/tied/frozen
+            }
+        }
+
         return new LiveSignalAuditEntry(
             RecordedAtUtc: recordedAtUtc.ToString("O"),
             Symbol: symbol.Value,
@@ -59,7 +89,9 @@ public sealed record LiveSignalAuditEntry(
             SellScore: allowed ? a!.Signal.SellScore : null,
             Confidence: allowed ? a!.Signal.Confidence : null,
             DisplayedReason: allowed ? a!.Signal.PrimaryReason : null,
-            SuppressionReason: allowed ? null : result.SuppressionReason);
+            SuppressionReason: allowed ? null : result.SuppressionReason,
+            HtfTimeFrame: htfTimeFrame,
+            HtfDirection: htfDirection);
     }
 }
 

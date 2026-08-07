@@ -128,7 +128,7 @@ public class TimeFrameSelectionTests
             new DataFreshnessMonitor(clock, staleAfter ?? TimeSpan.FromMinutes(90)),
             new LiveSignalOptions(NormalizedSymbol.Gold, TimeFrame.H1, 80, SymbolSpec.Gold(),
                 10_000m, new SignalContext(HtfDirection: SignalDirection.Buy)),
-            hasSymbolMapping: true);
+            hasSymbolMapping: true, clock);
     }
 
     [Fact] // AC-40.1: SetTimeFrame changes CurrentTimeFrame and the next pull uses it.
@@ -187,8 +187,11 @@ public class TimeFrameSelectionTests
         release.SetResult();
         await refreshTask;
 
-        // The in-flight poll must have pulled at the ORIGINAL H1 (snapshot), not D1.
-        Assert.Equal(TimeFrame.H1, provider.LastRequestedTimeFrame);
+        // The in-flight poll must have pulled entirely off the ORIGINAL H1 snapshot, not D1:
+        // the LTF pull at H1 and the Cycle-9 HTF pull at H4 (= StepUp(H1)), in that order —
+        // NEVER D1 or StepUp(D1). This proves the HTF read rides the same start-of-refresh
+        // snapshot (D9-7), so a mid-poll switch cannot leak a stale HTF read into this poll.
+        Assert.Equal(new[] { TimeFrame.H1, TimeFrame.H4 }, provider.RequestedTimeFrames);
         // But the coordinator now reports the newly-selected timeframe for the NEXT poll.
         Assert.Equal(TimeFrame.D1, coord.CurrentTimeFrame);
     }
@@ -229,6 +232,11 @@ public class TimeFrameSelectionTests
         public ConnectionState State { get; private set; } = ConnectionState.Disconnected;
         public TimeFrame? LastRequestedTimeFrame { get; private set; }
 
+        private readonly List<TimeFrame> _requestedTimeFrames = new();
+        /// <summary>Cycle 9: the ordered sequence of requested timeframes across one refresh
+        /// (LTF then HTF), so the snapshot proof can assert the whole poll used the snapshot.</summary>
+        public IReadOnlyList<TimeFrame> RequestedTimeFrames => _requestedTimeFrames;
+
         /// <summary>Completes once GetCandlesAsync has been entered (and the snapshot taken).</summary>
         public Task CandlesRequested => _requested.Task;
 
@@ -254,6 +262,7 @@ public class TimeFrameSelectionTests
             NormalizedSymbol symbol, TimeFrame timeFrame, int count, CancellationToken ct = default)
         {
             LastRequestedTimeFrame = timeFrame; // recorded at the moment of the call (post-snapshot)
+            _requestedTimeFrames.Add(timeFrame);
             _requested.TrySetResult();
             await _release.ConfigureAwait(false);
             return _candles.TakeLast(count).ToList();

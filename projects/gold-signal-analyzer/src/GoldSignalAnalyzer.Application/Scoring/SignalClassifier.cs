@@ -4,10 +4,26 @@ using GoldSignalAnalyzer.Domain;
 namespace GoldSignalAnalyzer.Application.Scoring;
 
 /// <summary>Runtime context for a classification decision (FR-20/FR-21).</summary>
+/// <remarks>
+/// Cycle 9 (FR-42): <see cref="HtfConfirmationApplicable"/> is appended LAST (positional-arg
+/// safety) and defaults to <c>true</c> so the FR-21 HTF guard stays active for every existing
+/// caller. It is set to <c>false</c> ONLY at the top of the curated ladder (D1), where there is
+/// no higher timeframe to confirm against, so the guard becomes a no-op there (D9-3). This is an
+/// explicit, honest "not applicable" — never the accidental <c>null HtfDirection</c> that caused
+/// the live path to force Neutral forever.
+/// </remarks>
+/// <remarks>
+/// Cycle 10 (FR-44): <see cref="NewsBlackout"/> is appended LAST (same positional-arg-safety rule
+/// as <see cref="HtfConfirmationApplicable"/>) and defaults to <c>false</c> so every existing
+/// caller is unaffected. Set <c>true</c> only when <c>NewsBlackoutGate.ActiveBlackout</c> finds an
+/// active High-impact event — a hard veto, same strength as <see cref="DataStale"/> (D10-4b).
+/// </remarks>
 public sealed record SignalContext(
     SignalDirection? HtfDirection = null,
     bool IsProvisional = false,
-    bool DataStale = false);
+    bool DataStale = false,
+    bool HtfConfirmationApplicable = true,
+    bool NewsBlackout = false);
 
 /// <summary>FR-21 guard thresholds. All configurable.</summary>
 public sealed record ClassifierConfig
@@ -47,6 +63,7 @@ public sealed class SignalClassifier
     public const string ReasonMargin = "WINNING MARGIN BELOW THRESHOLD — NEUTRAL";
     public const string ReasonOpposite = "OPPOSING SCORE TOO HIGH — NEUTRAL";
     public const string ReasonHtf = "HIGHER-TIMEFRAME NOT CONFIRMED — NEUTRAL";
+    public const string ReasonNews = "HIGH-IMPACT NEWS EVENT WINDOW — NEUTRAL";
     public const string ReasonCooldown = "COOLDOWN / DUPLICATE — SUPPRESSED";
 
     private readonly ClassifierConfig _cfg;
@@ -68,6 +85,9 @@ public sealed class SignalClassifier
 
         // FR-20 hard vetoes force Neutral regardless of scores.
         if (ctx.DataStale) return Neutral(ReasonStale);
+        // Cycle 10 (FR-44, D10-4b): a High-impact news window is a hard veto, same strength as
+        // DataStale — checked before scores are even consulted.
+        if (ctx.NewsBlackout) return Neutral(ReasonNews);
         if (score.Vetoes.Count > 0) return Neutral(score.Vetoes[0].Reason);
 
         var proposed = score.BuyScore > score.SellScore ? SignalDirection.Buy
@@ -81,7 +101,11 @@ public sealed class SignalClassifier
         // FR-21 guards
         if (margin < _cfg.MinMargin) return Neutral(ReasonMargin);
         if (opposite > _cfg.OppositeScoreCap) return Neutral(ReasonOpposite);
-        if (_cfg.RequireHtfConfirmation && ctx.HtfDirection != proposed) return Neutral(ReasonHtf);
+        // FR-21 HTF guard (Cycle 9): a REAL check now that both call sites populate
+        // ctx.HtfDirection from a genuine higher-timeframe read. Skipped only when HTF
+        // confirmation is not applicable (top of the curated ladder, D1 — D9-3).
+        if (_cfg.RequireHtfConfirmation && ctx.HtfConfirmationApplicable && ctx.HtfDirection != proposed)
+            return Neutral(ReasonHtf);
 
         // Cooldown + dedupe: an identical direction within the window is suppressed.
         if (_lastEmit is { } last && last.dir == proposed && (_clock.UtcNow - last.time) < _cfg.Cooldown)

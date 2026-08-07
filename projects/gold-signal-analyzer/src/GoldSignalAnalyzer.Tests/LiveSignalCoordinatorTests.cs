@@ -1,6 +1,7 @@
 using GoldSignalAnalyzer.Application.Analysis;
 using GoldSignalAnalyzer.Application.Freshness;
 using GoldSignalAnalyzer.Application.Live;
+using GoldSignalAnalyzer.Application.News;
 using GoldSignalAnalyzer.Application.Scoring;
 using GoldSignalAnalyzer.Domain;
 using GoldSignalAnalyzer.Testing;
@@ -49,7 +50,7 @@ public class LiveSignalCoordinatorTests
         var analysis = new SignalAnalysisService(clock);
         var freshness = new DataFreshnessMonitor(clock, staleAfter ?? TimeSpan.FromMinutes(90));
         var coord = new LiveSignalCoordinator(
-            provider, analysis, new SignalGate(), freshness, Options(), hasMapping);
+            provider, analysis, new SignalGate(), freshness, Options(), hasMapping, clock);
         return (coord, clock);
     }
 
@@ -130,6 +131,40 @@ public class LiveSignalCoordinatorTests
 
         Assert.False(r.SignalAllowed);
         Assert.Equal(SignalGate.StaleReason, r.SuppressionReason);
+    }
+
+    [Fact] // Cycle 10 (FR-44): a live refresh during a High-impact blackout window is forced Neutral,
+           // even though the connection/freshness gate itself allows the refresh.
+    public async Task News_blackout_suppresses_even_when_otherwise_allowed()
+    {
+        var provider = ConnectedProvider(tickTime: Now);
+        var clock = new ManualClock(Now);
+        var analysis = new SignalAnalysisService(clock);
+        var freshness = new DataFreshnessMonitor(clock, TimeSpan.FromMinutes(90));
+        var calendar = new StaticEconomicCalendarProvider(new[]
+        {
+            new EconomicEvent(Now, "FOMC Rate Decision", EventImpact.High),
+        });
+        var newsGate = new NewsBlackoutGate(calendar, TimeSpan.FromMinutes(30));
+        var coord = new LiveSignalCoordinator(
+            provider, analysis, new SignalGate(), freshness, Options(), hasSymbolMapping: true, clock,
+            newsGate: newsGate);
+
+        var r = await coord.RefreshAsync(hasOpenPosition: false);
+
+        Assert.True(r.Decision.IsAllowed);      // the connection/freshness gate DID allow the refresh
+        Assert.NotNull(r.Analysis);             // analysis still runs — this is a classifier veto, not a gate suppression
+        Assert.Equal(SignalDirection.Neutral, r.Analysis!.Signal.Direction);
+        Assert.Equal(SignalClassifier.ReasonNews, r.Analysis.Signal.PrimaryReason);
+    }
+
+    [Fact] // Backward compatibility: no news gate configured (default null) → identical to pre-Cycle-10 behaviour.
+    public async Task No_news_gate_configured_preserves_prior_behaviour()
+    {
+        var provider = ConnectedProvider(tickTime: Now);
+        var (coord, _) = Build(provider); // newsGate defaults to null
+        var r = await coord.RefreshAsync(hasOpenPosition: false);
+        Assert.True(r.SignalAllowed);
     }
 
     [Fact] // Never-seen data (no tick, no candles) → suppressed, nothing fabricated.

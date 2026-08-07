@@ -19,6 +19,14 @@ public sealed record ScoringConfig
     public decimal StochPoints { get; init; } = 8m;
     public decimal BollingerPoints { get; init; } = 6m;
 
+    // Cycle 10 (FR-45): Fibonacci golden-pocket retracement confirmation.
+    public decimal FibonacciPoints { get; init; } = 8m;
+    public decimal FibonacciPocketLow { get; init; } = 0.382m;
+    public decimal FibonacciPocketHigh { get; init; } = 0.618m;
+
+    // Cycle 10 (FR-46): liquidity sweep (stop-hunt + rejection).
+    public decimal LiquiditySweepPoints { get; init; } = 10m;
+
     // FR-15 category caps (max points contributed per category, per direction).
     public decimal TrendCap { get; init; } = 30m;
     public decimal MomentumCap { get; init; } = 20m;

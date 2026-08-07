@@ -77,6 +77,20 @@ public sealed class ScoringEngine
             else if (lastClose < mid) Rule("BB_POS", IndicatorCategory.Volatility, SignalDirection.Sell, _cfg.BollingerPoints, $"price {lastClose:0.##} below BB mid {mid:0.##}");
         }
 
+        // R7 — Fibonacci golden-pocket retracement (Cycle 10, FR-45; Trend category, D10-5)
+        if (snap.Value("FIB_RETRACE_PCT") is decimal fibPct && snap.Value("FIB_SWING_DIR") is decimal fibDir
+            && fibPct >= _cfg.FibonacciPocketLow && fibPct <= _cfg.FibonacciPocketHigh)
+        {
+            if (fibDir > 0) Rule("FIB_RETRACE", IndicatorCategory.Trend, SignalDirection.Buy, _cfg.FibonacciPoints, $"retracement {fibPct:0.###} in golden pocket, up-leg");
+            else if (fibDir < 0) Rule("FIB_RETRACE", IndicatorCategory.Trend, SignalDirection.Sell, _cfg.FibonacciPoints, $"retracement {fibPct:0.###} in golden pocket, down-leg");
+        }
+
+        // R8 — Liquidity sweep / stop-hunt rejection (Cycle 10, FR-46; Momentum category, D10-5)
+        if (snap.Value("SWEEP_LOW") is decimal sweepLow && sweepLow > 0)
+            Rule("LIQUIDITY_SWEEP", IndicatorCategory.Momentum, SignalDirection.Buy, _cfg.LiquiditySweepPoints, "swept prior low, closed back above — stop-hunt rejection");
+        if (snap.Value("SWEEP_HIGH") is decimal sweepHigh && sweepHigh > 0)
+            Rule("LIQUIDITY_SWEEP", IndicatorCategory.Momentum, SignalDirection.Sell, _cfg.LiquiditySweepPoints, "swept prior high, closed back below — stop-hunt rejection");
+
         // Apply category caps (FR-15) in order, then regime weights (FR-17).
         var weights = _cfg.WeightsFor(regime);
         var used = new Dictionary<(IndicatorCategory, SignalDirection), decimal>();

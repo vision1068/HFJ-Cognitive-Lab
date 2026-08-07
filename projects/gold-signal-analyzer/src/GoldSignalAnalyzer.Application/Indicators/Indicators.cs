@@ -10,6 +10,17 @@ public sealed record BollingerResult(decimal Middle, decimal Upper, decimal Lowe
 public sealed record AdxResult(decimal Adx, decimal PlusDi, decimal MinusDi);
 public sealed record StochasticResult(decimal K, decimal D);
 
+/// <summary>Cycle 10 (FR-45): the swing this retracement is measured against, and how far the
+/// last close has retraced into it. <see cref="SwingDirection"/> is <c>Buy</c> for an up-leg
+/// (low occurred before high — retracement is a pullback from the high) and <c>Sell</c> for a
+/// down-leg (high occurred before low — retracement is a bounce off the low).</summary>
+public sealed record FibonacciResult(
+    decimal SwingHigh, decimal SwingLow, SignalDirection SwingDirection, decimal RetracementPct);
+
+/// <summary>Cycle 10 (FR-46): whether the most recent completed candle swept (wicked through and
+/// closed back inside) the prior window's high or low.</summary>
+public sealed record LiquiditySweepResult(bool SweptHigh, bool SweptLow);
+
 /// <summary>
 /// FR-13: pure, local technical-indicator calculators. Every value is computed
 /// from candles/closes the app already holds — never from a broker "signal"
@@ -250,6 +261,70 @@ public static class Indicators
         for (int i = ks.Count - dPeriod; i < ks.Count; i++) dsum += ks[i];
         decimal d = dsum / dPeriod;
         return new StochasticResult(k, d);
+    }
+
+    // ---------- Fibonacci retracement (Cycle 10, FR-45) ----------
+
+    /// <summary>
+    /// The swing high/low over the last <paramref name="lookback"/> candles, the leg direction
+    /// (which extreme occurred first), and how far the last close has retraced into that leg.
+    /// Returns <c>null</c> on insufficient data or a degenerate (flat) window — never a fabricated
+    /// or divide-by-zero result (INV-4).
+    /// </summary>
+    public static FibonacciResult? FibonacciRetracement(IReadOnlyList<Candle> candles, int lookback = 50)
+    {
+        if (candles is null) throw new ArgumentNullException(nameof(candles));
+        if (lookback <= 0) throw new ArgumentOutOfRangeException(nameof(lookback));
+        if (candles.Count < lookback) return null;
+
+        int start = candles.Count - lookback;
+        int hiIdx = start, loIdx = start;
+        for (int i = start + 1; i < candles.Count; i++)
+        {
+            if (candles[i].High > candles[hiIdx].High) hiIdx = i;
+            if (candles[i].Low < candles[loIdx].Low) loIdx = i;
+        }
+
+        decimal swingHigh = candles[hiIdx].High;
+        decimal swingLow = candles[loIdx].Low;
+        decimal range = swingHigh - swingLow;
+        if (range <= 0) return null; // degenerate/flat window — no leg to measure
+        if (loIdx == hiIdx) return null; // the extremes land on the same candle — no directional leg (D10-6)
+
+        var direction = loIdx < hiIdx ? SignalDirection.Buy : SignalDirection.Sell;
+        decimal lastClose = candles[^1].Close;
+        decimal retracementPct = direction == SignalDirection.Buy
+            ? (swingHigh - lastClose) / range   // pullback depth from the high, within an up-leg
+            : (lastClose - swingLow) / range;   // bounce height from the low, within a down-leg
+
+        return new FibonacciResult(swingHigh, swingLow, direction, retracementPct);
+    }
+
+    // ---------- liquidity sweep (Cycle 10, FR-46) ----------
+
+    /// <summary>
+    /// Whether the most recent completed candle wicked through and closed back inside the prior
+    /// <paramref name="lookback"/> candles' high/low — a classic "stop hunt" / liquidity-grab
+    /// pattern. Checks only the single most recent candle against the prior window (D10-8).
+    /// </summary>
+    public static LiquiditySweepResult DetectLiquiditySweep(IReadOnlyList<Candle> candles, int lookback = 20)
+    {
+        if (candles is null) throw new ArgumentNullException(nameof(candles));
+        if (lookback <= 0) throw new ArgumentOutOfRangeException(nameof(lookback));
+        if (candles.Count < lookback + 1)
+            throw new ArgumentException("Not enough data for liquidity sweep detection.", nameof(candles));
+
+        var last = candles[^1];
+        decimal priorHigh = decimal.MinValue, priorLow = decimal.MaxValue;
+        for (int i = candles.Count - 1 - lookback; i < candles.Count - 1; i++)
+        {
+            if (candles[i].High > priorHigh) priorHigh = candles[i].High;
+            if (candles[i].Low < priorLow) priorLow = candles[i].Low;
+        }
+
+        bool sweptHigh = last.High > priorHigh && last.Close < priorHigh;
+        bool sweptLow = last.Low < priorLow && last.Close > priorLow;
+        return new LiquiditySweepResult(sweptHigh, sweptLow);
     }
 
     // ---------- volume ----------
