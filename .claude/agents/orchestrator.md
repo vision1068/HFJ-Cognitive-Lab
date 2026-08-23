@@ -155,6 +155,24 @@ before diagnosing — never accept "should work now" without a re-run.
     subagent — handle directly or with the cheapest model available.
     Reserve full-strength agents for design, implementation, and review.
 
+13. MEMORY LEARNING LOOP — JUDGE stage: the memory-retrieve hook
+    surfaces relevant lessons at prompt time (RETRIEVE); when this
+    engagement actually puts a surfaced or retrospective-relevant
+    lesson to the test, update that entry's Status field in
+    .claude/memory/lessons-learned.md as part of the Phase 7
+    retrospective: Confirmed (the rule held, append "Confirmed by:
+    <this project/date>"), or Contradicted (the rule was wrong or
+    incomplete — write a NEW entry with the corrected understanding,
+    never edit the old one). Leave Unconfirmed entries alone; they are
+    written once and wait to be tested, not retroactively guessed at.
+
+14. MEMORY CONSOLIDATION: periodically (or on request via
+    `/memory-consolidate`), scan for lessons that now contradict each
+    other or have been folded into one broader later rule; mark the
+    older one "Superseded by <newer entry>" rather than deleting it —
+    memory stays honest and doesn't grow into noise. This is a
+    read-then-mark operation, never a rewrite of prior entries.
+
 ## Output section headers
 
 [CEO] [Architect] [Backend] [Frontend] [Middleware] [CRM Developer]

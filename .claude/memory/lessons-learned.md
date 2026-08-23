@@ -2,16 +2,35 @@
 
 Append-only. After every engagement (Phase 7 retrospective) the
 orchestrator adds an entry here; at the start of every new engagement
-it reads this file first. Pattern from metaswarm's post-merge
-reflection (github.com/dsifry/metaswarm) and rohitg00/pro-workflow's
-compounding memory.
+the memory-retrieve hook surfaces relevant entries by keyword match on
+the current prompt (RETRIEVE), and each entry carries a Status field
+the orchestrator updates when a lesson is actually put to the test
+(JUDGE). Pattern from metaswarm's post-merge reflection
+(github.com/dsifry/metaswarm), rohitg00/pro-workflow's compounding
+memory, and the RETRIEVE-JUDGE-DISTILL-CONSOLIDATE learning pipeline
+concept from ruvnet/ruflo (adapted here as plain-text/grep, not a
+vector database — unnecessary at this company's memory size).
 
 Entry format:
 
 ### YYYY-MM-DD — <project> — <one-line title>
+- **Status:** Unconfirmed | Confirmed | Contradicted | Superseded by <entry title/date>
 - **What happened:**
 - **Lesson:**
 - **Rule going forward:**
+
+Status lifecycle (the JUDGE stage):
+- New entries start **Unconfirmed** — written once, not yet tested again.
+- When a later engagement actually relies on this rule and it holds,
+  flip to **Confirmed** (append a one-line "Confirmed by: <project/date>").
+- When a later engagement follows the rule and it turns out wrong or
+  incomplete, flip to **Contradicted** and write a NEW entry with the
+  corrected understanding — never edit history, per the append-only rule
+  already proven in the gold-signal-analyzer fabricated-authorization
+  entries below.
+- When a consolidation pass (see `/memory-consolidate`) finds this
+  entry has been folded into a broader, later rule, flip to
+  **Superseded by <the newer entry>** rather than deleting it.
 
 ---
 

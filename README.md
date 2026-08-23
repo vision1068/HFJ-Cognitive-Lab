@@ -192,6 +192,7 @@ Invocable shortcuts for common cross-project operations:
 | `/pre-deploy <project>` | Walks Gate 6 (Production Readiness) plus confirms Gates 1–5 already passed |
 | `/compliance-check <project>` | Focused governance/compliance pass — the standard Auditor Phase 5 mode |
 | `/new-project <idea>` | Structured 3-round requirements intake interview → IDed `brief.md` → full 6-phase engagement |
+| `/memory-consolidate` | Scans company memory for contradicted/redundant lessons, marks them Superseded (never deletes) — the CONSOLIDATE stage of the Memory Learning Loop |
 
 ---
 
@@ -206,8 +207,24 @@ Automation that fires on session events — the company reacts without being ask
 | `safety-guard.sh` | PreToolUse (Bash) | **Blocks** destructive commands (recursive delete of root/home, force-push to main/master, `terraform destroy`); **warns** on risky ones (bulk `git add`, `rm -rf`, hard reset) — from dralgorhythm's safety hooks |
 | `file-guard.sh` | PreToolUse (Write/Edit) | Blocks agent edits to secret-bearing files (`.env`, private keys, certificates) — `.env.example` stays editable |
 | `learn-capture.sh` | Stop | Auto-captures any `[LEARN] ...` line from agent output into company memory, deduplicated — corrections compound without anyone remembering to file them (from pro-workflow) |
+| `memory-retrieve.sh` | UserPromptSubmit | Greps `lessons-learned.md` for entries matching the prompt's keywords (2+ distinct hits required to avoid noise) and surfaces only the relevant ones with their Status — the RETRIEVE stage of the Memory Learning Loop, see below |
 
 `skill-rules.json` maps keywords → skills (e.g. "dashboard" → `bi-dashboard-styles`, "new app" → `requirements-intake`). Add a keyword rule whenever a new skill is created. All hooks are fail-soft: a hook error never blocks legitimate work.
+
+---
+
+## Memory Learning Loop
+
+A file-based, no-infrastructure version of the RETRIEVE → JUDGE → DISTILL → CONSOLIDATE self-learning pipeline (concept from [ruvnet/ruflo](https://github.com/ruvnet/ruflo)'s intelligence plugin — theirs runs on a vector database with HNSW indexing and neural adapter training; at this company's memory size, `grep` does the same job without the infrastructure):
+
+| Stage | How it works here |
+|---|---|
+| **RETRIEVE** | `memory-retrieve.sh` hook — keyword-matches your prompt against every lesson, surfaces only the relevant ones instead of forcing a full-file read |
+| **JUDGE** | Every lesson carries a `Status:` field (`Unconfirmed` → `Confirmed` / `Contradicted`). The orchestrator updates it during Phase 7 when a lesson is actually put to the test — memory stops being write-only |
+| **DISTILL** | Already your company's native format — every retrospective already writes `Lesson:` + `Rule going forward:`. Nothing new needed here. |
+| **CONSOLIDATE** | `/memory-consolidate` command — finds contradicted or redundant entries and marks the older one `Superseded by <newer entry>`. Never deletes or rewrites — a correction is always a new entry, matching the append-only discipline already proven in the gold-signal-analyzer fabricated-authorization lessons. |
+
+`codex-rescuer`'s diff-risk check (from `ruflo-jujutsu`) closes the loop: before a merge, it checks the touched paths against memory and surfaces a matching prior incident automatically (e.g. touching `.github/workflows/**` surfaces the Pages first-deploy lesson).
 
 ---
 
@@ -312,3 +329,4 @@ Structural ideas in this company are adapted from the best open-source AI-compan
 - [aws-samples/sample-claude-code-agent-team](https://github.com/aws-samples/sample-claude-code-agent-team) — the machine-checkable task format (`[role] verb what | files | acceptance. Run: command`) and single-verdict review synthesis.
 - [ciscoittech/claude-agent-framework](https://github.com/ciscoittech/claude-agent-framework) — effort-based model/cost routing.
 - [ChrisWiles/claude-code-showcase](https://github.com/ChrisWiles/claude-code-showcase) — hook lifecycle reference (PreToolUse/PostToolUse/Stop patterns) informing our hook design.
+- [ruvnet/ruflo](https://github.com/ruvnet/ruflo) — the RETRIEVE→JUDGE→DISTILL→CONSOLIDATE self-learning pipeline shape (`ruflo-intelligence`), rebuilt as plain grep + a Status field instead of their vector-DB/neural-training stack, and the diff-risk-scoring concept (`ruflo-jujutsu`) added to `codex-rescuer`. We explicitly skipped the other ~90% of Ruflo — swarm/consensus/federation/AgentDB/SONA — as infrastructure built for autonomous multi-machine fleets, a scale mismatch for a 16-agent single-repo company (the same reasoning that excluded ConnectSW's 14-product registries).

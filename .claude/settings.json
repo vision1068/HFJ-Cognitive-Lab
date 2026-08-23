@@ -28,6 +28,10 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/skill-activation.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/memory-retrieve.sh"
           }
         ]
       }

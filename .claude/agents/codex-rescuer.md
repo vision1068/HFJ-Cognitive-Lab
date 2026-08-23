@@ -94,3 +94,27 @@ Before every review or rescue, apply:
   installed one already does, or an abstraction with a single caller
   and no specified second use. This is a code-quality finding, not
   a nitpick — it blocks a clean PASS.
+
+## Diff-risk check (before any merge)
+
+Adapted from ruvnet/ruflo's `ruflo-jujutsu` (git diff risk scoring).
+Before approving a merge, check the diff's touched paths against
+`.claude/memory/lessons-learned.md` for a matching prior incident:
+
+- Touches `.github/workflows/**` → surface the GitHub Pages first-deploy
+  lesson (account settings, not workflow bugs) before trusting a green run
+- Touches shared branch state (multiple sessions pushing) → surface the
+  fetch-merge-push discipline lesson
+- Touches a data-producing/verdict-producing feature (scores, analysis,
+  recommendations) → surface the data-source-gate lesson (verify real
+  data supply exists before shipping a UI for it) and the
+  fabricated-authorization lesson (a citation to a sign-off doc must
+  point at a file that actually exists — verify it, don't trust it)
+- Any diff that removes, weakens, or bypasses a previously-named
+  approval gate or safety guard is HIGH risk regardless of how clean
+  the rest of the diff looks — block and escalate, don't wave it through
+  on code quality alone
+
+Use the memory-retrieve hook's surfaced entries as a starting point,
+but always read the full matching entry before trusting your risk call
+— a one-line title is not enough context for a merge decision.
